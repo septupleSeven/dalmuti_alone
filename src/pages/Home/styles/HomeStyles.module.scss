@@ -1,0 +1,86 @@
+.gameTable {
+
+    &Container{
+        max-width: 768px;
+        max-height: 768px;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        background-color: royalblue;
+        border-radius: 100%;
+    }
+
+    &CenterContents{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        column-gap: 10px;
+    }
+
+}
+
+.player {
+
+    &Container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+
+        >p{
+            position: absolute;
+            bottom: calc(-1rem - 10px);
+            color: #fff;
+        }
+
+    }
+
+    &Node{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100px;
+        height: 100px;
+        background-color: salmon;
+        color: blue;
+    }
+
+}
+
+.deck {
+    
+    &Node{
+        width: 130px;
+        height: 200px;
+        background-color: green;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &Remain{
+        background-color: crimson;
+        color: #fff;
+        width: 50px;
+        height: 50px;
+        border-radius: 100%;
+    }
+
+}
+
+.pile {
+    
+    &Node{
+        width: 130px;
+        height: 200px;
+        background-color: green;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+}
