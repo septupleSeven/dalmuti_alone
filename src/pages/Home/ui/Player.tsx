@@ -12,7 +12,7 @@ const Player = ({
   playerInfo: PlayerTypes;
   componentIdx: number;
 }) => {
-  const { gameStep, setGameStep } = useGameStore();
+  const { gameStep, setGameStep, gameStepCondition, setgameStepCondition, setDealCard } = useGameStore();
   const { order, name, hand } = playerInfo;
   const [isOrderCard, setIsOrderCard] = useState(true);
   const lastCompCondition = componentIdx === PLAYER_NUM;
@@ -38,7 +38,7 @@ const Player = ({
     }),
     [order]
   );
-
+  
   return (
     <motion.div
       variants={pContainerMotionVariant}
@@ -47,13 +47,16 @@ const Player = ({
       className={styles.playerContainer}
       transition={{
         duration: 0.8,
+        delay: order / 20,
       }}
-      onAnimationComplete={() => {
+      onAnimationComplete={async () => {
         if (gameStep === "setting" && lastCompCondition) {
           setGameStep("dealForOrder");
         }
-        if (gameStep === "rearrange") {
+        if (gameStep === "rearrange" && gameStepCondition !== "rearrange") {
+          setgameStepCondition("rearrange");
           setGameStep("ready");
+          setDealCard("game");
         }
       }}
     >

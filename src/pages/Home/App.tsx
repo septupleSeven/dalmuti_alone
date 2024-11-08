@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Player from "./ui/Player";
 import styles from "./styles/HomeStyles.module.scss";
 import Container from "../../shared/Container";
 import { useGameStore } from "../../store/store";
-import { AnimatePresence } from "framer-motion";
 import Deck from "./ui/Deck";
 import Pile from "./ui/Pile";
+import Hand from "./ui/Hand";
 
 function App() {
   const {
@@ -16,6 +16,7 @@ function App() {
     setDealCard,
     setSortPlayer,
     initDeck,
+    getHuman
   } = useGameStore();
   view();
 
@@ -25,7 +26,7 @@ function App() {
     }
     if (gameStep === "rearrange") {
       setSortPlayer("setting");
-      initDeck(true);
+      initDeck("shuffle");
     }
   }, [gameStep, setDealCard, setSortPlayer, initDeck]);
 
@@ -42,12 +43,17 @@ function App() {
               />
             );
           })}
-        {gameStep === "ready" && 
-          (<div className={styles.gameTableCenterContents}>
-            <Deck deck={deck}/>
-            <Pile />
-          </div>)
-        }
+        {(gameStep === "ready" 
+        || gameStep === "playing" )
+        && (
+          <>
+            <div className={styles.gameTableCenterContents}>
+              <Deck deck={deck} />
+              <Pile />
+            </div>
+            <Hand human={getHuman()}/>
+          </>
+        )}
       </div>
     </Container>
   );

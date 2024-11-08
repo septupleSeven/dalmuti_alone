@@ -84,3 +84,61 @@
     }
 
 }
+
+.hand {
+    
+    &Node{
+        position: fixed;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
+
+    &Btn{
+
+    }
+
+    &Container {
+        height: 100%;
+        background-color: crimson;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+
+        > ul {
+            display: flex;
+            flex-direction: column;
+            row-gap: 20px;
+        }
+
+    }
+
+}
+
+.card {
+
+    &Container{
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+    }
+
+    &Node{
+        color: #fff;
+        background-color: seagreen;
+    }
+
+    &Size{
+
+        &--normal {
+            aspect-ratio: 1/1.5;
+            width: 30px;
+        }
+
+    }        
+
+}

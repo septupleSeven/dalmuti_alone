@@ -9,4 +9,5 @@ export type PlayerTypes = {
   name: string;
   hand: CardTypes[];
   order: number;
+  state: "waiting" | "setting" | "inAction"
 };
