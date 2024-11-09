@@ -1,14 +1,6 @@
 import { PLAYER_NAME_TABLE } from "../config/contants";
-import { CardTypes, PlayerTypes } from "./settingTypes";
-
-export const copyPlayer = (players: PlayerTypes[]) => {
-  const copiedPlayers = players.map((player) => ({
-    ...player,
-    hand: [...player.hand],
-    status: {...player.status}
-  }));
-  return copiedPlayers;
-};
+import { CardTypes, PlayerTypes } from "./types/featuresTypes";
+import { copyDeck, copyPlayer } from "./utils";
 
 export const setPlayer = (playerNum: number) => {
   const players: PlayerTypes[] = [];
@@ -24,7 +16,8 @@ export const setPlayer = (playerNum: number) => {
       status: {
         gameState: i === 0 ? "inAction" : "waiting",
         isLeader: false,
-      }
+        gameOrder: 0
+      },
     };
     players.push(playerObj);
   }
@@ -71,7 +64,7 @@ export const dealDeck = (
   players: PlayerTypes[],
   type: "setting" | "game"
 ) => {
-  const copiedDeck = deck.map((card) => ({ ...card }));
+  const copiedDeck = copyDeck(deck);
   const copiedPlayers = copyPlayer(players);
 
   const distributeCards = (players: PlayerTypes[], deck: CardTypes[]) => {
@@ -106,7 +99,7 @@ export const sortPlayer = (
 
   switch (type) {
     case "setting": {
-      copiedDeck = deck.map((card) => ({ ...card }));
+      copiedDeck = copyDeck(deck);
       sortedPlayers = copyPlayer(players);
 
       sortedPlayers.sort((a, b) => {
@@ -128,12 +121,12 @@ export const sortPlayer = (
       break;
     }
     case "gRevolution": {
-      sortedPlayers = copyPlayer(players).reverse().map(
-        (player, idx) => {
+      sortedPlayers = copyPlayer(players)
+        .reverse()
+        .map((player, idx) => {
           player.order = idx;
-          return player
-        }
-      );
+          return player;
+        });
 
       break;
     }
@@ -150,58 +143,47 @@ export const sortPlayer = (
   return sortedPlayers as PlayerTypes[];
 };
 
-export const sortHand = (
-  players: PlayerTypes[],
-  isCopy?: boolean
-) => {
+export const sortHand = (players: PlayerTypes[], isCopy?: boolean) => {
   let sortedPlayers;
 
-  if(isCopy){
+  if (isCopy) {
     sortedPlayers = copyPlayer(players);
-  }else{
+  } else {
     sortedPlayers = players;
   }
 
-  sortedPlayers.forEach(
-    player => {
-      player.hand.sort((a, b) => a.value - b.value);
-    }
-  );
+  sortedPlayers.forEach((player) => {
+    player.hand.sort((a, b) => a.value - b.value);
+  });
 
   return sortedPlayers;
-}
+};
 
-export const setPlayerClass = (
-  players: PlayerTypes[],
-  isCopy?: boolean
-) => {
+export const setPlayerClass = (players: PlayerTypes[], isCopy?: boolean) => {
   let sortedPlayers;
 
-  if(isCopy){
+  if (isCopy) {
     sortedPlayers = copyPlayer(players);
-  }else{
+  } else {
     sortedPlayers = players;
   }
 
-  sortedPlayers.forEach(
-    player => {
-      // 꼬리표 중복 문제 나중에 해결을 위해 넣어둠 24.11.09
-      player.name = `${PLAYER_NAME_TABLE[`ORDER${player.order}`]}(${player.name})`;
-    }
-  );
+  sortedPlayers.forEach((player) => {
+    // 꼬리표 중복 문제 나중에 해결을 위해 넣어둠 24.11.09
+    player.name = `${PLAYER_NAME_TABLE[`ORDER${player.order}`]}(${
+      player.name
+    })`;
+  });
 
   return sortedPlayers;
-}
+};
 
-export const setReadyForPlay = (
-  players: PlayerTypes[],
-  isCopy?: boolean
-) => {
+export const setReadyForPlay = (players: PlayerTypes[], isCopy?: boolean) => {
   let copiedPlayers;
 
-  if(isCopy){
+  if (isCopy) {
     copiedPlayers = copyPlayer(players);
-  }else{
+  } else {
     copiedPlayers = players;
   }
 
@@ -209,7 +191,7 @@ export const setReadyForPlay = (
   const grantedPlayers = setPlayerClass(handSortedPlayers);
 
   return grantedPlayers;
-}
+};
 
 export const clearHand = (players: PlayerTypes[]) => {
   const copiedPlayers = copyPlayer(players);
@@ -218,17 +200,48 @@ export const clearHand = (players: PlayerTypes[]) => {
   return copiedPlayers;
 };
 
+export const setOrder = (
+  players: PlayerTypes[],
+  type: "setting" | "game"
+) => {
+  const copiedPlayers = copyPlayer(players);
+  
+  if(type === "setting"){
+    copiedPlayers.forEach(player => {
+      player.status.gameOrder = player.order
+    });
+
+  }
+
+  if(type === "game"){
+    const getLeaderIdx = copiedPlayers.findIndex(player => player.status.isLeader === true);
+    const slicedPlayersA =  copiedPlayers.slice(getLeaderIdx);
+    const slicedPlayersB =  copiedPlayers.slice(0, getLeaderIdx);
+    const rearrangedPlayers = [...slicedPlayersA, ... slicedPlayersB]
+
+    rearrangedPlayers.forEach((player, idx) => {
+      const targetPlayer = copiedPlayers.find(cPlayer => cPlayer.id === player.id);
+      if(targetPlayer){
+        targetPlayer.status.gameOrder = idx;
+      }
+    })
+
+  }
+
+  return copiedPlayers
+
+}
+
 export const setGRevolution = (
   deck: CardTypes[],
   players: PlayerTypes[],
   isCopy?: boolean
 ) => {
-
   let copiedPlayers;
 
-  if(isCopy){
+  if (isCopy) {
     copiedPlayers = copyPlayer(players);
-  }else{
+  } else {
     copiedPlayers = players;
   }
 
@@ -236,7 +249,7 @@ export const setGRevolution = (
   const grantedPlayers = setPlayerClass(sortedPlayers, true);
 
   return grantedPlayers;
-}
+};
 
 export const setDelay = async (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));

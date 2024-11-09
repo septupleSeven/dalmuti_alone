@@ -1,16 +1,7 @@
 import { useGameStore } from "../store/store";
-import { copyPlayer, setDelay, sortHand } from "./setting";
-import { CardTypes, PlayerTypes } from "./settingTypes";
-
-// export const runGame = async (
-//     players: PlayerTypes[],
-//     turnInfo: "firstInit" | number,
-//     setTurn: (value?: number) => void
-// ) => {
-
-//     await setNextTurn(players, turnInfo, setTurn);
-
-// }
+import { setDelay, sortHand } from "./setting";
+import { CardTypes, LayDownCardType, PlayerTypes } from "./types/featuresTypes";
+import { copyDeck, copyPlayer, randomNumBetween } from "./utils";
 
 export const isRevolution = async (
   players: PlayerTypes[]
@@ -19,13 +10,13 @@ export const isRevolution = async (
 
   const filteredPlayers = copiedPlayers.filter((player) => {
     const getJoker = player.hand.filter((card) => card.value === 13);
-    if(getJoker.length >= 2){
-        return getJoker;
+    if (getJoker.length >= 2) {
+      return getJoker;
     }
   });
 
   return await new Promise((resolve) => {
-    let result:"revolution" | "gRevolution" | "continue" = "continue";
+    let result: "revolution" | "gRevolution" | "continue" = "continue";
 
     if (filteredPlayers.length) {
       result = "revolution";
@@ -89,6 +80,118 @@ export const actionSwapCard = (players: PlayerTypes[]) => {
   return sortHand(copiedPlayers);
 };
 
+export const layDownCard = (
+  players: PlayerTypes[],
+  pile: Array<CardTypes>[],
+  currentTurn: number
+): LayDownCardType => {
+  const copiedPlayers = copyPlayer(players);
+  const copiedPile = copyDeck(pile, "pile");
+
+  let isPass = Math.floor(Math.random() * 10) > 7 ? true : false;
+
+  const currentPlayer = copiedPlayers.find(
+    (player) => player.order === currentTurn
+  )!;
+
+  const { hand } = currentPlayer;
+
+  if (!pile.length) {
+    isPass = false;
+    let randomVal = randomNumBetween(6, 11);
+    let randomCards = hand.filter((card) => card.value === randomVal);
+
+    while (!randomCards.length) {
+      randomVal = randomNumBetween(2, 11);
+      randomCards = hand.filter((card) => card.value === randomVal);
+    }
+
+    const randomDraw = randomNumBetween(1, randomCards.length);
+    const toSendCards = [];
+
+    for (let i = 0; i < randomDraw; i++) {
+      toSendCards.push({ ...randomCards[i] });
+      const targetCardIdx = hand.findIndex(
+        (card) => card.id === randomCards[i].id
+      );
+      hand.splice(targetCardIdx, 1);
+    }
+
+    copiedPile.push(toSendCards);
+    currentPlayer.status.isLeader = true;
+  } else if(pile.length && !isPass) {
+    const currentLeaderPlayer = copiedPlayers.find(
+      (player) => player.status.isLeader === true
+    )!;
+
+    const latestPileCards = copiedPile[copiedPile.length - 1];
+    const pickedCards = hand.filter(
+      (card) => card.value < latestPileCards[0].value
+    );
+
+    if (pickedCards.length) {
+      const groupedCards = pickedCards.reduce(
+        (acc: Record<string, typeof pickedCards>, cur) => {
+          const keyString = String(cur.value);
+          if (!acc[keyString]) {
+            acc[keyString] = [];
+          }
+          acc[keyString].push(cur);
+
+          return acc;
+        },
+        {}
+      );
+
+      let entryCards = [];
+
+      for (let val in groupedCards) {
+        if (groupedCards[val].length >= latestPileCards.length) {
+          entryCards.push(groupedCards[val]);
+        }
+      }
+
+      if (entryCards.length) {
+        const randomDraw = randomNumBetween(0, entryCards.length - 1);
+        const selectedCards = entryCards[randomDraw];
+
+        const toSendCards = [];
+
+        for (let i = 0; i < latestPileCards.length; i++) {
+          toSendCards.push(selectedCards[i]);
+          const targetCardIdx = hand.findIndex(
+            (card) => card.id === selectedCards[i].id
+          );
+          hand.splice(targetCardIdx, 1);
+        }
+
+        copiedPile.push(toSendCards);
+        currentLeaderPlayer.status.isLeader = false;
+        currentPlayer.status.isLeader = true;
+      } else {
+        isPass = true;
+      }
+    } else {
+      isPass = true;
+    }
+  }
+
+  if (isPass) {
+    console.log("Pass ACT");
+    return {
+      result: "pass",
+      ...setNextTurn(copiedPlayers, currentTurn),
+    };
+  } else {
+    console.log("LayDown ACT");
+    return {
+      result: "layDown",
+      copiedPile: copiedPile,
+      ...setNextTurn(copiedPlayers, currentTurn),
+    };
+  }
+};
+
 export const setNextTurn = (
   players: PlayerTypes[],
   currentTurn: number
@@ -97,6 +200,8 @@ export const setNextTurn = (
   nextPlayers: PlayerTypes[];
 } => {
   const copiedPlayers = copyPlayer(players);
+
+  copiedPlayers[currentTurn].status.gameState = "turnEnd";
 
   if (copiedPlayers[currentTurn + 1]) {
     copiedPlayers[currentTurn + 1].status.gameState = "inAction";

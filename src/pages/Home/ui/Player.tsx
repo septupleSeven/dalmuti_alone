@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { PlayerTypes } from "../../../features/settingTypes";
+import { PlayerTypes } from "../../../features/types/featuresTypes";
 import { AnimatePresence, motion } from "framer-motion";
 import { PLAYER_NUM } from "../../../config/contants";
 import { useGameStore } from "../../../store/store";

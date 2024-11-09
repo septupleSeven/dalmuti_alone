@@ -1,5 +1,5 @@
 import React from "react";
-import { CardTypes } from "../../../features/settingTypes";
+import { CardTypes } from "../../../features/types/featuresTypes";
 import { motion } from "framer-motion";
 import styles from "../styles/HomeStyles.module.scss";
 

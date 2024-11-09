@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "../styles/HomeStyles.module.scss";
 import { motion, useCycle } from "framer-motion";
-import { CardTypes, PlayerTypes } from "../../../features/settingTypes";
+import { CardTypes, PlayerTypes } from "../../../features/types/featuresTypes";
 import { HandGroupTypes } from "../types/HomeTypes";
 import HandCardGroup from "./HandCardGroup";
 

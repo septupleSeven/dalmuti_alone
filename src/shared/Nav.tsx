@@ -8,7 +8,8 @@ const Nav = () => {
     settingStatus,
     setShuffleDeck,
     setTaxCollect,
-    setSettingStep
+    setSettingStep,
+    setGameOrder
   } = useGameStore();
 
   const { settingStep } = settingStatus;
@@ -56,6 +57,7 @@ const Nav = () => {
       <button
         onClick={() => {
           if (settingStep === "ready") {
+            setGameOrder("setting");
             setSettingStep("playing");
           }
         }}
