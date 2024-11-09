@@ -14,23 +14,32 @@ import {
 import { MAXIMUM_CARDRANK, PLAYER_NUM } from "../config/contants";
 import { produce } from "immer";
 import { actionSwapCard, isRevolution } from "../features/playing";
-// import { actionLayDownCard, setNextTurn } from "../features/playing";
 
 export const useGameStore = create<useGameStoreTypes>((set, get) => ({
   players: [...setPlayer(PLAYER_NUM)],
   deck: [...createDeck(MAXIMUM_CARDRANK)],
-  gameStep: "booting",
-  gameStepCondition: "booting",
-  currentTurn: 0,
+  settingStatus: {
+    settingStep: "booting",
+    settingStepCondition: "booting",
+  },
+  gameStatus: {
+    gameStep: "collectingTax",
+    gameStepCondition: "collectingTax",
+    currentTurn: 0,
+  },
   view: () => console.log(get()),
-  setGameStep: (value) =>
-    set((state) => {
-      return { gameStep: value };
-    }),
-  setgameStepCondition: (value) =>
-    set((state) => {
-      return { gameStepCondition: value };
-    }),
+  setSettingStep: (value) =>
+    set(
+      produce((state) => {
+        state.settingStatus.settingStep = value;
+      })
+    ),
+  setSettingStepCondition: (value) =>
+    set(
+      produce((state) => {
+        state.settingStatus.settingStepCondition = value;
+      })
+    ),
   setShuffleDeck: () =>
     set(
       produce((state) => {
@@ -64,21 +73,16 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
         state.players = sortPlayer(state.deck, state.players, type);
       })
     ),
-  // setSortPlayerHand: () => set(
-  //   produce((state) => {
-  //     state.players = sortHand(state.players)
-  //   })
-  // ),
   getHuman: () => get().players.find((player) => player.id === "Human")!,
   setTurn: (nextTurn, nextPlayers) =>
     set(
       produce((state) => {
-        state.currentTurn = nextTurn;
+        state.gameStatus.currentTurn = nextTurn;
         state.players = nextPlayers;
       })
     ),
-  playGame: async () => {
-    const { deck, players, currentTurn, setTurn, setSortPlayer } = get();
+  setTaxCollect: async () => {
+    const { deck, players } = get();
 
     const isRevolutionVal = await isRevolution(players)
 
@@ -98,15 +102,6 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
       )
     }
 
-    // const res = await actionSwapCard(players);
-
-    // await actionSwapCard(players)
-
-    // set(
-    //   produce((state) => {
-    //     state.players = actionSwapCard(players);
-    //   })
-    // )
 
     // if(res === "complete"){
     //   const { nextTurn, nextPlayers } = setNextTurn(players, currentTurn);
@@ -119,6 +114,9 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
     // await setNextTurn(players, currentTurn);
     // await setNextTurn(players, currentTurn, setTurn);
   },
+  playGame: async () => {
+
+  }
 }));
 
 // export const usePlayingStore = create<usePlayingStoreTypes>()

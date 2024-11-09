@@ -11,7 +11,7 @@ function App() {
   const {
     players,
     deck,
-    gameStep,
+    settingStatus,
     view,
     setDealCard,
     setSortPlayer,
@@ -20,20 +20,22 @@ function App() {
   } = useGameStore();
   view();
 
+  const { settingStep } = settingStatus;
+
   useEffect(() => {
-    if (gameStep === "dealForOrder") {
+    if (settingStep === "dealForOrder") {
       setDealCard("setting");
     }
-    if (gameStep === "rearrange") {
+    if (settingStep === "rearrange") {
       setSortPlayer("setting");
       initDeck("shuffle");
     }
-  }, [gameStep, setDealCard, setSortPlayer, initDeck]);
+  }, [settingStep, setDealCard, setSortPlayer, initDeck]);
 
   return (
     <Container>
       <div className={styles.gameTableContainer}>
-        {gameStep !== "booting" &&
+        {settingStep !== "booting" &&
           players.map((player, idx) => {
             return (
               <Player
@@ -43,8 +45,8 @@ function App() {
               />
             );
           })}
-        {(gameStep === "ready" 
-        || gameStep === "playing" )
+        {(settingStep === "ready" 
+        || settingStep === "playing" )
         && (
           <>
             <div className={styles.gameTableCenterContents}>

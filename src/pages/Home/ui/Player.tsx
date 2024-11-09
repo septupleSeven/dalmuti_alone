@@ -12,7 +12,9 @@ const Player = ({
   playerInfo: PlayerTypes;
   componentIdx: number;
 }) => {
-  const { gameStep, setGameStep, gameStepCondition, setgameStepCondition, setDealCard } = useGameStore();
+  const { settingStatus, setSettingStep, setSettingStepCondition, setDealCard } = useGameStore();
+  const { settingStep, settingStepCondition } = settingStatus;
+
   const { order, name, hand } = playerInfo;
   const [isOrderCard, setIsOrderCard] = useState(true);
   const lastCompCondition = componentIdx === PLAYER_NUM;
@@ -50,19 +52,19 @@ const Player = ({
         delay: order / 20,
       }}
       onAnimationComplete={async () => {
-        if (gameStep === "setting" && lastCompCondition) {
-          setGameStep("dealForOrder");
+        if (settingStep === "setting" && lastCompCondition) {
+          setSettingStep("dealForOrder");
         }
-        if (gameStep === "rearrange" && gameStepCondition !== "rearrange") {
-          setgameStepCondition("rearrange");
-          setGameStep("ready");
+        if (settingStep === "rearrange" && settingStepCondition !== "rearrange") {
+          setSettingStepCondition("rearrange");
+          setSettingStep("ready");
           setDealCard("game");
         }
       }}
     >
       <motion.div className={styles.playerNode}>{name}</motion.div>
       <AnimatePresence>
-        {gameStep === "dealForOrder" && hand.length ? (
+        {settingStep === "dealForOrder" && hand.length ? (
           <motion.p
             key={`ORDERCARD-${componentIdx}`}
             initial={{
@@ -78,10 +80,10 @@ const Player = ({
               delay: order / 8,
             }}
             onAnimationComplete={async () => {
-              if (gameStep === "dealForOrder" && lastCompCondition && isOrderCard) {
+              if (settingStep === "dealForOrder" && lastCompCondition && isOrderCard) {
                 setIsOrderCard(false);
                 await new Promise((resolve) => setTimeout(resolve, 1000));
-                setGameStep("rearrange");
+                setSettingStep("rearrange");
               }
             }}
             exit={{

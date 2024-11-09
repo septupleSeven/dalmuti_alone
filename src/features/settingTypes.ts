@@ -1,5 +1,5 @@
 export type CardTypes = {
-  id: string
+  id: string;
   rank: string;
   value: number;
 };
@@ -9,5 +9,9 @@ export type PlayerTypes = {
   name: string;
   hand: CardTypes[];
   order: number;
-  state: "waiting" | "setting" | "inAction"
+  status: {
+    gameState: "waiting" | "setting" | "inAction" | "win";
+    isLeader: boolean,
+    // nextOrder: number
+  };
 };

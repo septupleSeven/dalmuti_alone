@@ -5,14 +5,13 @@ import { useGameStore } from "../store/store";
 
 const Nav = () => {
   const {
-    gameStep,
-    setGameStep,
+    settingStatus,
     setShuffleDeck,
-    players,
-    currentTurn,
-    setTurn,
-    playGame
+    setTaxCollect,
+    setSettingStep
   } = useGameStore();
+
+  const { settingStep } = settingStatus;
 
   const [firstInitGame, setFirstInitGame] = useState(false);
   const headerMotionControls = useAnimationControls();
@@ -29,20 +28,10 @@ const Nav = () => {
   };
 
   useEffect(() => {
-    if (gameStep === "playing") {
-        // runGame(
-        //   players,
-        //   currentTurn,
-        //   setTurn,
-        // );
-        playGame();
+    if (settingStep === "playing") {
+      setTaxCollect();
     }
-  }, [
-    // currentTurn,
-    gameStep,
-    playGame
-    // gameStep, players, currentTurn, setTurn
-  ])
+  }, [settingStep, setTaxCollect])
   
 
   return (
@@ -57,7 +46,7 @@ const Nav = () => {
           if (!firstInitGame) {
             headerMotionControls.start("started");
             setShuffleDeck();
-            setGameStep("setting");
+            setSettingStep("setting");
           }
           setFirstInitGame(true);
         }}
@@ -66,8 +55,8 @@ const Nav = () => {
       </button>
       <button
         onClick={() => {
-          if (gameStep === "ready") {
-            setGameStep("playing");
+          if (settingStep === "ready") {
+            setSettingStep("playing");
           }
         }}
       >

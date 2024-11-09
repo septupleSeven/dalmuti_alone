@@ -5,6 +5,7 @@ export const copyPlayer = (players: PlayerTypes[]) => {
   const copiedPlayers = players.map((player) => ({
     ...player,
     hand: [...player.hand],
+    status: {...player.status}
   }));
   return copiedPlayers;
 };
@@ -20,7 +21,10 @@ export const setPlayer = (playerNum: number) => {
       },
       hand: [],
       order: i,
-      state: i === 0 ? "inAction" : "waiting",
+      status: {
+        gameState: i === 0 ? "inAction" : "waiting",
+        isLeader: false,
+      }
     };
     players.push(playerObj);
   }

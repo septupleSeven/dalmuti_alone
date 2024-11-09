@@ -99,9 +99,9 @@ export const setNextTurn = (
   const copiedPlayers = copyPlayer(players);
 
   if (copiedPlayers[currentTurn + 1]) {
-    copiedPlayers[currentTurn + 1].state = "inAction";
+    copiedPlayers[currentTurn + 1].status.gameState = "inAction";
   } else {
-    copiedPlayers[0].state = "inAction";
+    copiedPlayers[0].status.gameState = "inAction";
   }
 
   return {
