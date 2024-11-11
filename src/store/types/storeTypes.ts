@@ -34,6 +34,7 @@ export type GameStatusTypes = {
   gameStepCondition: GameStepTypes;
   currentTurn: number;
   latestPlayer: string;
+  resultRank: Array<PlayerTypes>;
   // roundCount: number;
 }
 
@@ -60,11 +61,13 @@ export type useGameStoreTypes = {
   setDeck: (deck: Array<CardTypes>) => void;
   getHuman: () => PlayerTypes;
   getCurrentLeaderOrder: () => number;
-  setTurn: (nextTurn: number, nextPlayers: PlayerTypes[]) => void;
+  setTurn: (nextTurn: number, nextPlayers?: PlayerTypes[]) => void;
   setTaxCollect: () => Promise<void> | null;
   setGameOrder: (type: GameSettingTypes) => void;
   setGameState: () => void;
   setLatestPlayer: (value:string) => void;
+  setPlayers: (players:Array<PlayerTypes>) => void;
+  setResultRank: (players:Array<PlayerTypes>) => void;
 
 
 
@@ -88,8 +91,9 @@ export type useGameStoreTypes = {
 export type HumanCardStatusTypes = {
   rank: string;
   value: number;
-  cards: Omit<CardTypes, "rank">[];
+  cards: CardTypes[];
   selected: 0;
+  jokerPicked: CardTypes[];
 };
 
 export type HumanLatestActionTypes = "passed" | "layDown" | "waiting";
@@ -109,7 +113,9 @@ export type useHumanStoreTypes = {
     cardGroup: HandGroupTypes,
     value?: string
   ) => void;
-  setCardStatusSelected: (value:string) => void;
+  setCardStatusSelected: (value:(string | number)) => void;
+  setCardStatusJokerPicked: (cardGroup: Omit<CardTypes, "rank">[]) => void;
+  setCardStatusCombine: (value:number) => void;
   setLatestAction: (value:HumanLatestActionTypes) => void;
   runHumanActionTrigger: () => void;
 };

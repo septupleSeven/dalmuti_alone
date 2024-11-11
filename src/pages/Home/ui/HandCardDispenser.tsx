@@ -5,6 +5,7 @@ import {
   useHandDispenserStore,
   useGameStore,
 } from "../../../store/store";
+import { getRankGroup } from "../../../features/utils";
 
 const HandCardDispenser = ({
   onSelect,
@@ -18,12 +19,15 @@ const HandCardDispenser = ({
     setLatestAction,
     view,
     runHumanActionTrigger,
+    setCardStatusJokerPicked,
+    setCardStatusCombine,
   } = useHumanStore();
 
   const { players, pile, gameStatus } = useGameStore();
 
   const [inputVal, setInputVal] = useState<string>("");
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null);
+  const jokerRef = useRef<HTMLInputElement>(null);
 
   const onlyNumber = (e: FormEvent<HTMLInputElement>) => {
     setInputVal(
@@ -32,15 +36,28 @@ const HandCardDispenser = ({
   };
 
   const chkBtn = () => {
-    if(inputRef.current){
+    if (inputRef.current) {
       setCardStatusSelected(inputRef.current.value);
     }
   };
 
   const isHumanTurn = () => {
-    const humanPlayer = players.find(player => player.id === "Human");
-    return humanPlayer?.status.gameState === "inAction"
-  }
+    const humanPlayer = players.find((player) => player.id === "Human");
+    return humanPlayer?.status.gameState === "inAction";
+  };
+
+  const hasJoker = () => {
+    const humanPlayer = players.find((player) => player.id === "Human");
+    return humanPlayer?.hand.some((card) => card.value === 13);
+  };
+
+  const jokerGroup = () => {
+    const humanPlayer = players.find((player) => player.id === "Human")!;
+    const joker = getRankGroup(humanPlayer.hand).find(
+      (group) => group.rank === "JOKER"
+    );
+    return joker ? joker : null;
+  };
 
   return (
     <div className={styles.handDispenser}>
@@ -52,10 +69,37 @@ const HandCardDispenser = ({
           </p>
         </div>
 
-        <input 
-          type="text" 
+        <div>
+          <input
+            type="checkbox"
+            id="joker"
+            disabled={
+              hasJoker() &&
+              pile.length &&
+              useHumanStore.getState().cardStatus.cards.length <
+                pile[pile.length - 1].length
+                ? false
+                : true
+            }
+            onChange={(e) => {
+              const groupedJoker = jokerGroup();
+              if (e.target.checked && groupedJoker) {
+                setCardStatusJokerPicked(groupedJoker.cards);
+              } else {
+                setCardStatusJokerPicked([]);
+              }
+            }}
+            ref={jokerRef}
+            defaultChecked={false}
+          />
+          <label htmlFor="joker">조커 사용</label>
+          {hasJoker() ? <p>남은 수 {jokerGroup()?.cards.length}/2 장</p> : null}
+        </div>
+
+        <input
+          type="text"
           value={pile.length ? String(pile[pile.length - 1].length) : inputVal}
-          onInput={(e) => onlyNumber(e)} 
+          onInput={(e) => onlyNumber(e)}
           disabled={isHumanTurn() && pile.length ? true : false}
           ref={inputRef}
         />
@@ -64,24 +108,50 @@ const HandCardDispenser = ({
           <div className={styles.handDispenserBtnWrap}>
             <button
               onClick={() => {
-                view();
-                if(!pile.length && !inputVal){
+                if (!pile.length && !inputVal) {
                   alert("제출 카드를 선택해주세요.");
-                  return false;
-                }else if(!pile.length && cardStatus.cards.length < Number(inputVal)){
-                  alert("선택한 카드가 충분하지 않습니다.");
-                  return false;
-                }
-                
-                if(pile.length && cardStatus.cards[0].value >= pile[pile.length - 1][0].value){
-                  alert("숫자가 안맞습니다.");
-                  return false;
-                }else if(pile.length && cardStatus.cards.length < pile[pile.length - 1].length){
-                  alert("조건에 맞는 카드가 충분하지 않습니다.");
                   return false;
                 }
 
-                if(gameStatus.gameStep === "inPlaying"){
+                if (
+                  !pile.length &&
+                  cardStatus.cards.length < Number(inputVal)
+                ) {
+                  alert("선택한 카드가 충분하지 않습니다.");
+                  return false;
+                }
+
+                if (
+                  pile.length &&
+                  !cardStatus.cards.some((card) => card.value === 13) &&
+                  cardStatus.cards[0].value >= pile[pile.length - 1][0].value
+                ) {
+                  alert("숫자가 안맞습니다.");
+                  return false;
+                }
+
+                if (
+                  pile.length &&
+                  cardStatus.cards.length < pile[pile.length - 1].length
+                ) {
+                  if (
+                    jokerRef.current &&
+                    jokerRef.current.checked &&
+                    cardStatus.rank !== "JOKER"
+                  ) {
+                    setCardStatusCombine(pile[pile.length - 1].length);
+                    setCardStatusSelected(
+                      useHumanStore.getState().cardStatus.cards.length
+                    );
+                  } else {
+                    alert("조건에 맞는 카드가 충분하지 않습니다.");
+                    return false;
+                  }
+                }
+
+                // view();
+
+                if (gameStatus.gameStep === "inPlaying") {
                   chkBtn();
                   setLatestAction("layDown");
                   runHumanActionTrigger();
@@ -89,7 +159,11 @@ const HandCardDispenser = ({
                   setDispenserClose();
                 }
               }}
-              disabled={isHumanTurn() && gameStatus.gameStep === "inPlaying" ? false : true}
+              disabled={
+                isHumanTurn() && gameStatus.gameStep === "inPlaying"
+                  ? false
+                  : true
+              }
             >
               확인
             </button>

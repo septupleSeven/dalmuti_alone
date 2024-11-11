@@ -9,6 +9,7 @@ import {
   createDeck,
   dealDeck,
   setGRevolution,
+  setJokerCombine,
   setOrder,
   setPlayer,
   setPlayerCardStatus,
@@ -26,6 +27,7 @@ import {
   isRevolution,
   layDownCard,
   playerLayDownCard,
+  setWinner,
 } from "../features/playing";
 import Player from "../pages/Home/ui/Player";
 import { LayDownCardType } from "../features/types/featuresTypes";
@@ -46,6 +48,7 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
     currentTurn: 0,
     latestPlayer: "",
     // roundCount: 1,
+    resultRank: []
   },
   // roundStatus: {
   //   log: {},
@@ -138,7 +141,11 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
     set(
       produce((state) => {
         state.gameStatus.currentTurn = nextTurn;
-        state.players = nextPlayers;
+
+        // 이 부분 분할 고려 => setPlayer
+        if(nextPlayers){
+          state.players = nextPlayers;
+        }
       })
     ),
   setGameOrder: (type) =>
@@ -153,6 +160,16 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
         state.players = setPlayerGameState(state.players);
       })
     ),
+  setPlayers: (players) => set(
+    produce(state => {
+      state.players = players;
+    })
+  ),
+  setResultRank: (players) => set(
+    produce(state => {
+      state.gameStatus.resultRank = players;
+    })
+  ),
 
 
 
@@ -211,6 +228,18 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
   playGame: async () => {
     const {
       players,
@@ -221,7 +250,8 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
       playGame,
       setGameStep,
       setLatestPlayer,
-      settleRound,
+      setPlayers,
+      setResultRank,
     } = get();
 
     const getCurrentPlayer = players.find(
@@ -265,12 +295,42 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
       setTurn(actionResult.nextTurn, actionResult.nextPlayers);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const isGameContinue = await new Promise<void>((resolve, reject) => setTimeout(() => {
+      const playerChk = get().players.find(player => player.id === actionResult.latestPlayer);
+
+      if(
+        // playerChk && !playerChk.hand.length
+        playerChk && playerChk.hand.length < 12
+      ){
+        console.log("%cGame Set winner is=> ", 'background: #820e0e; color: #111', playerChk.name)
+        const resultData = setWinner(players, playerChk, get().gameStatus);
+        setPlayers(resultData.remainedPlayers);
+        setResultRank(resultData.updatedResultRank);
+        setTurn(resultData.currentTurn);
+
+        if(get().players.length === 1){
+          alert("게임 종료");
+          return reject();
+        }
+
+      }
+
+      return resolve();
+    }, 1500)).then(() => true).catch(() => false);
+
+    if(!isGameContinue){ return }
 
     if (get().gameStatus.gameStep === "inPlaying") {
       playGame();
     }
+
   },
+
+
+
+
+
+
 
 
 
@@ -357,6 +417,7 @@ export const useHumanStore = create<useHumanStoreTypes>((set, get) => ({
     value: 0,
     cards: [],
     selected: 0,
+    jokerPicked: [],
   },
   latestAction: "waiting",
   view: () => console.log(get()),
@@ -364,9 +425,15 @@ export const useHumanStore = create<useHumanStoreTypes>((set, get) => ({
     set(
       produce((state) => {
         if (value) {
-          state.cardStatus = setPlayerCardStatus(cardGroup, value);
+          state.cardStatus = {
+            ...state.cardStatus,
+            ...setPlayerCardStatus(cardGroup, value)
+          };
         } else {
-          state.cardStatus = setPlayerCardStatus(cardGroup);
+          state.cardStatus = {
+            ...state.cardStatus,
+            ...setPlayerCardStatus(cardGroup, value)
+          };
         }
       })
     ),
@@ -377,6 +444,16 @@ export const useHumanStore = create<useHumanStoreTypes>((set, get) => ({
         state.cardStatus.selected = numVal;
       })
     ),
+  setCardStatusJokerPicked: (cardGroup) => set(
+    produce(state => {
+      state.cardStatus.jokerPicked = cardGroup;
+    })
+  ),
+  setCardStatusCombine: (value) => set(
+    produce(state => {
+      state.cardStatus.cards = setJokerCombine(state.cardStatus, value);
+    })
+  ),
   setLatestAction: (value) =>
     set(
       produce((state) => {

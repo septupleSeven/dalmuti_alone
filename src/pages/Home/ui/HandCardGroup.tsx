@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { HandGroupTypes } from "../types/HomeTypes";
 import Card from "./Card";
 import styles from "../styles/HomeStyles.module.scss";
@@ -19,6 +19,7 @@ const HandCardGroup = ({
   const { gameStatus } = useGameStore();
 
   const { rank, cards } = group;
+  // view();
 
   return (
     <div

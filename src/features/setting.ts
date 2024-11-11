@@ -1,6 +1,9 @@
 import { PLAYER_NAME_TABLE } from "../config/contants";
 import { HandGroupTypes } from "../pages/Home/types/HomeTypes";
-import { RoundStatusTypes } from "../store/types/storeTypes";
+import {
+  HumanCardStatusTypes,
+  RoundStatusTypes,
+} from "../store/types/storeTypes";
 import { CardTypes, PlayerTypes } from "./types/featuresTypes";
 import { copyDeck, copyPlayer } from "./utils";
 
@@ -18,7 +21,7 @@ export const setPlayer = (playerNum: number) => {
       status: {
         gameState: "waiting",
         isLeader: false,
-        roundOrder: 0
+        roundOrder: 0,
       },
     };
     players.push(playerObj);
@@ -109,12 +112,12 @@ export const sortPlayer = (
         const { value: bVal } = b.hand[0];
 
         if (aVal === bVal) {
-          let cVal; 
+          let cVal;
           let dVal;
 
           do {
-            if(copiedDeck.length < 2) {
-              return 0
+            if (copiedDeck.length < 2) {
+              return 0;
             }
             cVal = copiedDeck.pop()!.value;
             dVal = copiedDeck.pop()!.value;
@@ -127,8 +130,8 @@ export const sortPlayer = (
       });
 
       sortedPlayers.forEach((player, idx) => {
-        player.status.roundOrder = idx
-        player.order = idx
+        player.status.roundOrder = idx;
+        player.order = idx;
       });
 
       break;
@@ -137,7 +140,7 @@ export const sortPlayer = (
       sortedPlayers = copyPlayer(players)
         .reverse()
         .map((player, idx) => {
-          player.status.roundOrder = idx
+          player.status.roundOrder = idx;
           player.order = idx;
           return player;
         });
@@ -214,54 +217,52 @@ export const clearHand = (players: PlayerTypes[]) => {
   return copiedPlayers;
 };
 
-export const setOrder = (
-  players: PlayerTypes[],
-  type: "setting" | "game"
-) => {
+export const setOrder = (players: PlayerTypes[], type: "setting" | "game") => {
   const copiedPlayers = copyPlayer(players);
-  
-  if(type === "setting"){
-    copiedPlayers.forEach(player => {
-      player.status.roundOrder = player.order
+
+  if (type === "setting") {
+    copiedPlayers.forEach((player) => {
+      player.status.roundOrder = player.order;
     });
   }
 
-  if(type === "game"){
-    const getLeaderIdx = copiedPlayers.findIndex(player => player.status.isLeader === true);
-    const slicedPlayersA =  copiedPlayers.slice(getLeaderIdx);
-    const slicedPlayersB =  copiedPlayers.slice(0, getLeaderIdx);
-    const rearrangedPlayers = [...slicedPlayersA, ...slicedPlayersB]
+  if (type === "game") {
+    const getLeaderIdx = copiedPlayers.findIndex(
+      (player) => player.status.isLeader === true
+    );
+    const slicedPlayersA = copiedPlayers.slice(getLeaderIdx);
+    const slicedPlayersB = copiedPlayers.slice(0, getLeaderIdx);
+    const rearrangedPlayers = [...slicedPlayersA, ...slicedPlayersB];
 
     rearrangedPlayers.forEach((player, idx) => {
-      const targetPlayer = copiedPlayers.find(cPlayer => cPlayer.id === player.id);
-      if(targetPlayer){
+      const targetPlayer = copiedPlayers.find(
+        (cPlayer) => cPlayer.id === player.id
+      );
+      if (targetPlayer) {
         targetPlayer.status.roundOrder = idx;
       }
 
-      if(targetPlayer?.status.isLeader){
+      if (targetPlayer?.status.isLeader) {
         targetPlayer.status.gameState = "inAction";
       }
 
       player.status.isLeader = false;
-    })
+    });
   }
 
-  return copiedPlayers
+  return copiedPlayers;
+};
 
-}
-
-export const setPlayerGameState = (
-  players: PlayerTypes[]
-) => {
+export const setPlayerGameState = (players: PlayerTypes[]) => {
   const copiedPlayers = copyPlayer(players);
-  const firstPlayer = copiedPlayers.find(el => el.order === 0);
-  
-  if(firstPlayer){
+  const firstPlayer = copiedPlayers.find((el) => el.order === 0);
+
+  if (firstPlayer) {
     firstPlayer.status.gameState = "inAction";
   }
 
   return copiedPlayers;
-}
+};
 
 export const setGRevolution = (
   deck: CardTypes[],
@@ -284,14 +285,14 @@ export const setGRevolution = (
 
 export const setPlayerCardStatus = (
   group: HandGroupTypes,
-  value?: string,
-):{
+  value?: string
+): {
   rank: string;
   value: number;
-  cards: (Omit<CardTypes, "rank">)[];
-  selected: number
+  cards: Omit<CardTypes, "rank">[];
+  selected: number;
 } => {
-  const copiedGroup = structuredClone(group);
+  const copiedGroup = Object.assign({}, group);
   const { rank, cards } = copiedGroup;
   const numVal = value ? Number(value) : 0;
 
@@ -300,18 +301,20 @@ export const setPlayerCardStatus = (
     value: cards[0].value,
     cards: cards,
     selected: numVal,
-  }
+  };
+};
 
-}
+export const setJokerCombine = (
+  cardStatus: HumanCardStatusTypes,
+  value: number
+) => {
+  const copiedCards = cardStatus.cards.map((card) => card);
+  const copiedJokers = cardStatus.jokerPicked.map((card) => card);
+  const jokerNeeds = copiedJokers.slice(0, value);
+  copiedCards.push(...jokerNeeds);
 
-
-
-
-
-
-
-
-
+  return copiedCards;
+};
 
 export const setDelay = async (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));

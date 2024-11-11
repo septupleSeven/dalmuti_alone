@@ -1,3 +1,4 @@
+import { HandGroupTypes } from "../pages/Home/types/HomeTypes";
 import { CardTypes, PileTypes, PlayerTypes } from "./types/featuresTypes";
 
 export const randomNumBetween = (
@@ -54,4 +55,25 @@ export const calcCoordinate = (
   const y = Math.cos(getRadians) * 300;
 
   return { x, y };
+};
+
+export const getRankGroup = (hand: CardTypes[]) => {
+  return Object.values(
+    hand.reduce((acc: Record<string, HandGroupTypes>, cur) => {
+      if (!acc[cur.rank]) {
+        acc[cur.rank] = {
+          rank: cur.rank,
+          cards: [],
+        };
+      }
+
+      acc[cur.rank].cards.push({
+        id: cur.id,
+        rank: cur.rank,
+        value: cur.value,
+      });
+
+      return acc;
+    }, {})
+  );
 };
