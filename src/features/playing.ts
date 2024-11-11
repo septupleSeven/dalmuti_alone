@@ -1,6 +1,7 @@
 import { useGameStore } from "../store/store";
-import { setDelay, sortHand } from "./setting";
-import { CardTypes, LayDownCardType, PlayerTypes } from "./types/featuresTypes";
+import { HumanCardStatusTypes, HumanLatestActionTypes } from "../store/types/storeTypes";
+import { setDelay, setOrder, sortHand } from "./setting";
+import { CardTypes, LayDownCardType, PileTypes, PlayerTypes } from "./types/featuresTypes";
 import { copyDeck, copyPlayer, randomNumBetween } from "./utils";
 
 export const isRevolution = async (
@@ -82,7 +83,7 @@ export const actionSwapCard = (players: PlayerTypes[]) => {
 
 export const layDownCard = (
   players: PlayerTypes[],
-  pile: Array<CardTypes>[],
+  pile: PileTypes,
   currentTurn: number
 ): LayDownCardType => {
   const copiedPlayers = copyPlayer(players);
@@ -91,7 +92,7 @@ export const layDownCard = (
   let isPass = Math.floor(Math.random() * 10) > 7 ? true : false;
 
   const currentPlayer = copiedPlayers.find(
-    (player) => player.order === currentTurn
+    (player) => player.status.roundOrder === currentTurn
   )!;
 
   const { hand } = currentPlayer;
@@ -123,6 +124,13 @@ export const layDownCard = (
     const currentLeaderPlayer = copiedPlayers.find(
       (player) => player.status.isLeader === true
     )!;
+
+    if(currentLeaderPlayer.id === currentPlayer.id){
+      return {
+        result: "roundEnd",
+        latestPlayer: currentLeaderPlayer.id
+      };
+    }
 
     const latestPileCards = copiedPile[copiedPile.length - 1];
     const pickedCards = hand.filter(
@@ -177,13 +185,16 @@ export const layDownCard = (
   }
 
   if (isPass) {
-    console.log("Pass ACT");
+    console.log("Action: Pass ACT");
     return {
       result: "pass",
       ...setNextTurn(copiedPlayers, currentTurn),
     };
   } else {
-    console.log("LayDown ACT");
+    console.log(
+      "Action: LayDown ACT | value is =>", 
+      copiedPile[copiedPile.length - 1][0].value, 
+      " / length is =>", copiedPile[copiedPile.length - 1].length);
     return {
       result: "layDown",
       copiedPile: copiedPile,
@@ -196,21 +207,140 @@ export const setNextTurn = (
   players: PlayerTypes[],
   currentTurn: number
 ): {
+  latestPlayer: string;
   nextTurn: number;
   nextPlayers: PlayerTypes[];
 } => {
   const copiedPlayers = copyPlayer(players);
 
-  copiedPlayers[currentTurn].status.gameState = "turnEnd";
+  const currentPlayer = copiedPlayers.find(player => player.status.gameState === "inAction")!;
+  currentPlayer.status.gameState = "waiting";
 
-  if (copiedPlayers[currentTurn + 1]) {
-    copiedPlayers[currentTurn + 1].status.gameState = "inAction";
+  const nextPlayer = copiedPlayers.find(player => player.status.roundOrder === (currentTurn + 1));
+
+  // console.log("setNextTurn currentPlayer => ", currentPlayer)
+  // console.log("setNextTurn nextPlayer => ", nextPlayer)
+
+  if (nextPlayer) {
+    nextPlayer.status.gameState = "inAction";
   } else {
-    copiedPlayers[0].status.gameState = "inAction";
+    const firstPlayer = copiedPlayers.find(player => player.status.roundOrder === 0);
+    
+    if(firstPlayer){
+      firstPlayer.status.gameState = "inAction";
+    }
   }
 
   return {
+    latestPlayer: currentPlayer.id,
     nextTurn: currentTurn + 1 >= players.length ? 0 : currentTurn + 1,
     nextPlayers: copiedPlayers,
   };
 };
+
+
+
+
+export const playerLayDownCard = (
+  players: PlayerTypes[],
+  pile: Array<CardTypes>[],
+  currentTurn: number,
+  cardStatus: HumanCardStatusTypes,
+  actionType: HumanLatestActionTypes
+): LayDownCardType => {
+  const copiedPlayers = copyPlayer(players);
+  const copiedPile = copyDeck(pile, "pile");
+  const copiedCardStatus = structuredClone(cardStatus);
+
+  const humanPlayer = copiedPlayers.find(
+    (player) => player.id === "Human"
+  )!;
+
+  const { hand } = humanPlayer;
+
+  if(actionType === "layDown"){
+    const currentLeaderPlayer = copiedPlayers.find(
+      (player) => player.status.isLeader === true
+    )!;
+
+    if(!pile.length) {
+      const toSendCards = [];
+
+      for(let i = 0; i < copiedCardStatus.selected; i++){
+        toSendCards.push({ ...copiedCardStatus.cards[i] });
+        const targetCardIdx = hand.findIndex(card => card.id === copiedCardStatus.cards[i].id);
+        hand.splice(targetCardIdx, 1);
+      }
+
+      copiedPile.push(toSendCards);
+      humanPlayer.status.isLeader = true;
+
+    }else{
+      const latestPileCards = copiedPile[copiedPile.length - 1];
+
+      if(
+        copiedCardStatus.cards[0].value < latestPileCards[0].value
+        && copiedCardStatus.selected === latestPileCards.length
+      ){
+        
+        console.log("Human => ", copiedPlayers)
+        const toSendCards = [];
+
+        for(let i = 0; i < copiedCardStatus.selected; i++){
+          toSendCards.push({ ...copiedCardStatus.cards[i] });
+          const targetCardIdx = hand.findIndex(card => card.id === copiedCardStatus.cards[i].id);
+          hand.splice(targetCardIdx, 1);
+        }
+        
+        copiedPile.push(toSendCards);
+        currentLeaderPlayer.status.isLeader = false;
+        humanPlayer.status.isLeader = true;
+      }
+      
+    }
+
+  }
+
+  if(actionType === "passed") {
+    console.log("Action: Pass ACT");
+    return {
+      result: "pass",
+      ...setNextTurn(copiedPlayers, currentTurn),
+    };
+  }
+
+  console.log(
+    "Action: LayDown ACT | value is =>", 
+    copiedPile[copiedPile.length - 1][0].value, 
+    " / length is =>", copiedPile[copiedPile.length - 1].length);
+  return {
+    result: "layDown",
+    copiedPile: copiedPile,
+    ...setNextTurn(copiedPlayers, currentTurn),
+  }
+}
+
+export const getSettleRoundData = (
+  players: PlayerTypes[],
+  pile: PileTypes,
+  deck: CardTypes[]
+) => {
+  const copiedPlayers = structuredClone(players);
+  const copiedDeck = deck.length ? copyDeck(deck, "deck") : [];
+
+  if(copiedPlayers.length > 1){
+    const rearrangedPlayers = setOrder(copiedPlayers, "game");
+    const untiePile = pile.reduce((acc:Array<CardTypes>, cur:Array<CardTypes>) => {
+      acc.push(...cur);
+      return acc
+    }, []);
+    copiedDeck.push(...untiePile);
+
+    return {
+      rearrangedPlayers: rearrangedPlayers,
+      clearPile: [],
+      updatedDeck: copiedDeck
+    }
+  }
+
+}

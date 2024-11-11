@@ -1,4 +1,6 @@
 import { PLAYER_NAME_TABLE } from "../config/contants";
+import { HandGroupTypes } from "../pages/Home/types/HomeTypes";
+import { RoundStatusTypes } from "../store/types/storeTypes";
 import { CardTypes, PlayerTypes } from "./types/featuresTypes";
 import { copyDeck, copyPlayer } from "./utils";
 
@@ -14,9 +16,9 @@ export const setPlayer = (playerNum: number) => {
       hand: [],
       order: i,
       status: {
-        gameState: i === 0 ? "inAction" : "waiting",
+        gameState: "waiting",
         isLeader: false,
-        gameOrder: 0
+        roundOrder: 0
       },
     };
     players.push(playerObj);
@@ -107,8 +109,16 @@ export const sortPlayer = (
         const { value: bVal } = b.hand[0];
 
         if (aVal === bVal) {
-          const cVal = copiedDeck.pop()!.value;
-          const dVal = copiedDeck.pop()!.value;
+          let cVal; 
+          let dVal;
+
+          do {
+            if(copiedDeck.length < 2) {
+              return 0
+            }
+            cVal = copiedDeck.pop()!.value;
+            dVal = copiedDeck.pop()!.value;
+          } while (cVal !== dVal);
 
           return cVal - dVal;
         } else {
@@ -116,7 +126,10 @@ export const sortPlayer = (
         }
       });
 
-      sortedPlayers.forEach((player, idx) => (player.order = idx));
+      sortedPlayers.forEach((player, idx) => {
+        player.status.roundOrder = idx
+        player.order = idx
+      });
 
       break;
     }
@@ -124,6 +137,7 @@ export const sortPlayer = (
       sortedPlayers = copyPlayer(players)
         .reverse()
         .map((player, idx) => {
+          player.status.roundOrder = idx
           player.order = idx;
           return player;
         });
@@ -208,28 +222,45 @@ export const setOrder = (
   
   if(type === "setting"){
     copiedPlayers.forEach(player => {
-      player.status.gameOrder = player.order
+      player.status.roundOrder = player.order
     });
-
   }
 
   if(type === "game"){
     const getLeaderIdx = copiedPlayers.findIndex(player => player.status.isLeader === true);
     const slicedPlayersA =  copiedPlayers.slice(getLeaderIdx);
     const slicedPlayersB =  copiedPlayers.slice(0, getLeaderIdx);
-    const rearrangedPlayers = [...slicedPlayersA, ... slicedPlayersB]
+    const rearrangedPlayers = [...slicedPlayersA, ...slicedPlayersB]
 
     rearrangedPlayers.forEach((player, idx) => {
       const targetPlayer = copiedPlayers.find(cPlayer => cPlayer.id === player.id);
       if(targetPlayer){
-        targetPlayer.status.gameOrder = idx;
+        targetPlayer.status.roundOrder = idx;
       }
-    })
 
+      if(targetPlayer?.status.isLeader){
+        targetPlayer.status.gameState = "inAction";
+      }
+
+      player.status.isLeader = false;
+    })
   }
 
   return copiedPlayers
 
+}
+
+export const setPlayerGameState = (
+  players: PlayerTypes[]
+) => {
+  const copiedPlayers = copyPlayer(players);
+  const firstPlayer = copiedPlayers.find(el => el.order === 0);
+  
+  if(firstPlayer){
+    firstPlayer.status.gameState = "inAction";
+  }
+
+  return copiedPlayers;
 }
 
 export const setGRevolution = (
@@ -250,6 +281,37 @@ export const setGRevolution = (
 
   return grantedPlayers;
 };
+
+export const setPlayerCardStatus = (
+  group: HandGroupTypes,
+  value?: string,
+):{
+  rank: string;
+  value: number;
+  cards: (Omit<CardTypes, "rank">)[];
+  selected: number
+} => {
+  const copiedGroup = structuredClone(group);
+  const { rank, cards } = copiedGroup;
+  const numVal = value ? Number(value) : 0;
+
+  return {
+    rank: rank,
+    value: cards[0].value,
+    cards: cards,
+    selected: numVal,
+  }
+
+}
+
+
+
+
+
+
+
+
+
 
 export const setDelay = async (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));

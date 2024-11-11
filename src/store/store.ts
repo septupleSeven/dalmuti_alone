@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { useGameStoreTypes } from "./types/storeTypes";
+import {
+  useGameStoreTypes,
+  useHandDispenserStoreTypes,
+  useHumanStoreTypes,
+} from "./types/storeTypes";
 import {
   clearHand,
   createDeck,
@@ -7,14 +11,26 @@ import {
   setGRevolution,
   setOrder,
   setPlayer,
+  setPlayerCardStatus,
   setPlayerClass,
+  setPlayerGameState,
   setReadyForPlay,
   shuffleDeck,
   sortPlayer,
 } from "../features/setting";
 import { MAXIMUM_CARDRANK, PLAYER_NUM } from "../config/contants";
 import { produce } from "immer";
-import { actionSwapCard, isRevolution, layDownCard } from "../features/playing";
+import {
+  actionSwapCard,
+  getSettleRoundData,
+  isRevolution,
+  layDownCard,
+  playerLayDownCard,
+} from "../features/playing";
+import Player from "../pages/Home/ui/Player";
+import { LayDownCardType } from "../features/types/featuresTypes";
+
+export let humanActionTrigger: (() => void) | null = null;
 
 export const useGameStore = create<useGameStoreTypes>((set, get) => ({
   players: [...setPlayer(PLAYER_NUM)],
@@ -28,7 +44,13 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
     gameStep: "collectingTax",
     gameStepCondition: "collectingTax",
     currentTurn: 0,
+    latestPlayer: "",
+    // roundCount: 1,
   },
+  // roundStatus: {
+  //   log: {},
+  //   resultRank: [],
+  // },
   view: () => console.log(get()),
   setSettingStep: (value) =>
     set(
@@ -87,6 +109,13 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
         state.players = sortPlayer(state.deck, state.players, type);
       })
     ),
+    setDeck: (deck) => {
+      set(
+        produce((state) => {
+          state.deck = deck;
+        })
+      );
+    },
   setPile: (pile) => {
     set(
       produce((state) => {
@@ -95,6 +124,16 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
     );
   },
   getHuman: () => get().players.find((player) => player.id === "Human")!,
+  getCurrentLeaderOrder: () => {
+    const currentLeader = get().players.find(
+      (player) => player.status.isLeader
+    );
+    if (currentLeader) {
+      return currentLeader.order;
+    } else {
+      return 0;
+    }
+  },
   setTurn: (nextTurn, nextPlayers) =>
     set(
       produce((state) => {
@@ -102,13 +141,27 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
         state.players = nextPlayers;
       })
     ),
-  setGameOrder: (type) => set(
-    produce(state => {
-      state.players = setOrder(state.players, type);
-    })
-  ),
+  setGameOrder: (type) =>
+    set(
+      produce((state) => {
+        state.players = setOrder(state.players, type);
+      })
+    ),
+  setGameState: () =>
+    set(
+      produce((state) => {
+        state.players = setPlayerGameState(state.players);
+      })
+    ),
+
+
+
+
+
+
   setTaxCollect: async () => {
-    const { deck, players, gameStatus, setGameStep, playGame } = get();
+    const { deck, players, gameStatus, setGameStep, playGame, setGameState } =
+      get();
 
     if (gameStatus.gameStep === "inPlaying") {
       // playGame();
@@ -118,34 +171,92 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
     const isRevolutionVal = await isRevolution(players);
 
     if (isRevolutionVal === "continue") {
-      console.log("continue");
+      console.log("Tax Collect result => continue");
       set(
         produce((state) => {
           state.players = actionSwapCard(players);
         })
       );
     } else if (isRevolutionVal === "gRevolution") {
-      console.log("gRevolution");
+      console.log("Tax Collect result => gRevolution");
       set(
         produce((state) => {
           state.players = setGRevolution(deck, players, true);
         })
       );
+    } else if (isRevolutionVal === "revolution") {
+      console.log("Tax Collect result => revolution");
     }
 
-    const isComplete = await new Promise((resolve) => {
-      setGameStep("inPlaying");
-      resolve("inPlaying");
-    });
+    setGameStep("inPlaying");
+    setGameState();
+
+    const isComplete = await new Promise<string>((resolve) =>
+      setTimeout(() => {
+        return resolve("inPlaying");
+      }, 2000)
+    );
 
     if (isComplete) {
       playGame();
     }
   },
-  playGame: async () => {
-    const { players, gameStatus, pile, setTurn, setPile, playGame } = get();
+  setLatestPlayer: (value) =>
+    set(
+      produce((state) => {
+        state.gameStatus.latestPlayer = value;
+      })
+    ),
 
-    const actionResult = layDownCard(players, pile, gameStatus.currentTurn)!;
+
+
+
+  playGame: async () => {
+    const {
+      players,
+      gameStatus,
+      pile,
+      setTurn,
+      setPile,
+      playGame,
+      setGameStep,
+      setLatestPlayer,
+      settleRound,
+    } = get();
+
+    const getCurrentPlayer = players.find(
+      (player) => player.status.gameState === "inAction"
+    );
+
+    console.log("%cNow Turn is =>", 'background: #a7a8d9; color: #111', getCurrentPlayer?.name);
+
+    let actionResult: LayDownCardType;
+
+    if (getCurrentPlayer!.status.isLeader) {
+      console.log("%cRound Ended Winner is => ", 'background: #bada55; color: #111', getCurrentPlayer);
+      setGameStep("roundEnd");
+      return;
+    }
+
+    if (getCurrentPlayer && getCurrentPlayer.id === "Human") {
+      await new Promise<void>((resolve) => {
+        humanActionTrigger = resolve;
+      });
+
+      const getHumanStore = useHumanStore.getState();
+
+      actionResult = playerLayDownCard(
+        players,
+        pile,
+        gameStatus.currentTurn,
+        getHumanStore.cardStatus,
+        getHumanStore.latestAction
+      );
+    } else {
+      actionResult = layDownCard(players, pile, gameStatus.currentTurn)!;
+    }
+
+    setLatestPlayer(actionResult.latestPlayer);
 
     if (actionResult.result === "layDown") {
       setTurn(actionResult.nextTurn, actionResult.nextPlayers);
@@ -154,12 +265,128 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
       setTurn(actionResult.nextTurn, actionResult.nextPlayers);
     }
 
-    // if (gameStatus.currentTurn === 0) {
-    //   playGame();
-    // }
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    if (gameStatus.gameStep === "inPlaying" && gameStatus.currentTurn < 4) {
+    if (get().gameStatus.gameStep === "inPlaying") {
       playGame();
+    }
+  },
+
+
+
+
+  settleRound: async () => {
+    const {
+      players,
+      pile,
+      deck,
+      playGame,
+      setGameStep,
+      setGameOrder,
+      setPile,
+      setDeck,
+      view
+    } = get();
+
+    if(players.length > 1){
+      const settledData = getSettleRoundData(players, pile, 
+        deck
+      );
+      // console.log("setGameOrder");
+      setGameOrder("game"); 
+      // view();
+      // console.log("setPile");
+      setPile(settledData!.clearPile);
+      // view();
+      // console.log("setDeck");
+      setDeck(settledData!.updatedDeck);
+      // view();
+      // console.log("setcurrentTurn");
+      set(
+        produce((state) => {
+          state.gameStatus.currentTurn = 0;
+        })
+      )
+      view();
+      
+    }
+
+    const isComplete = await new Promise<string>((resolve) =>
+      setTimeout(() => {
+        setGameStep("inPlaying");
+        return resolve("inPlaying");
+      }, 2000)
+    );
+
+    if (isComplete) {
+      console.log("Round Restart")
+      get().playGame();
+    }
+  },
+
+
+
+
+
+  setRound: () => set(({})),
+  setRoundLog: () => set(({}))
+
+
+
+
+}));
+
+export const useHandDispenserStore = create<useHandDispenserStoreTypes>(
+  (set, get) => ({
+    isDispenserOpen: false,
+    view: () => console.log(get()),
+    setDispenserOpen: () =>
+      set({
+        isDispenserOpen: true,
+      }),
+    setDispenserClose: () =>
+      set({
+        isDispenserOpen: false,
+      }),
+  })
+);
+
+export const useHumanStore = create<useHumanStoreTypes>((set, get) => ({
+  cardStatus: {
+    rank: "",
+    value: 0,
+    cards: [],
+    selected: 0,
+  },
+  latestAction: "waiting",
+  view: () => console.log(get()),
+  setCardStatus: (cardGroup, value) =>
+    set(
+      produce((state) => {
+        if (value) {
+          state.cardStatus = setPlayerCardStatus(cardGroup, value);
+        } else {
+          state.cardStatus = setPlayerCardStatus(cardGroup);
+        }
+      })
+    ),
+  setCardStatusSelected: (value) =>
+    set(
+      produce((state) => {
+        let numVal = typeof value === "string" ? Number(value) : value;
+        state.cardStatus.selected = numVal;
+      })
+    ),
+  setLatestAction: (value) =>
+    set(
+      produce((state) => {
+        state.latestAction = value;
+      })
+    ),
+  runHumanActionTrigger: () => {
+    if (humanActionTrigger) {
+      humanActionTrigger();
+      humanActionTrigger = null;
     }
   },
 }));

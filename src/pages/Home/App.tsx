@@ -3,14 +3,13 @@ import Player from "./ui/Player";
 import styles from "./styles/HomeStyles.module.scss";
 import Container from "../../shared/Container";
 import { useGameStore } from "../../store/store";
-import Deck from "./ui/Deck";
 import Pile from "./ui/Pile";
 import Hand from "./ui/Hand";
 
 function App() {
   const {
     players,
-    deck,
+    pile,
     settingStatus,
     view,
     setDealCard,
@@ -50,8 +49,7 @@ function App() {
         && (
           <>
             <div className={styles.gameTableCenterContents}>
-              <Deck deck={deck} />
-              <Pile />
+              <Pile pile={pile}/>
             </div>
             <Hand human={getHuman()}/>
           </>

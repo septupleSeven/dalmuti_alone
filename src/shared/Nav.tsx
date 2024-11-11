@@ -9,7 +9,9 @@ const Nav = () => {
     setShuffleDeck,
     setTaxCollect,
     setSettingStep,
-    setGameOrder
+    setGameOrder,
+    gameStatus,
+    settleRound
   } = useGameStore();
 
   const { settingStep } = settingStatus;
@@ -63,6 +65,17 @@ const Nav = () => {
         }}
       >
         realPlay
+      </button>
+      <button
+        disabled={gameStatus.gameStep === "roundEnd" ? false : true}
+        onClick={() => {
+          if (gameStatus.gameStep === "roundEnd") {
+            setGameOrder("setting");
+            settleRound();
+          }
+        }}
+      >
+        roundStart
       </button>
     </motion.header>
   );

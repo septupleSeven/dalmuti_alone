@@ -14,19 +14,25 @@ export type PlayerTypes = {
   status: {
     gameState: "waiting" | "setting" | "inAction" | "turnEnd" | "win";
     isLeader: boolean;
-    gameOrder: number;
+    roundOrder: number;
   };
 };
 
-export type LayDownCardType = {
-  nextTurn: number;
-  nextPlayers: PlayerTypes[];
-} & (
+export type LayDownCardType =
   | {
       result: "layDown";
-      copiedPile: CardTypes[];
+      copiedPile: CardTypes[][];
+      nextTurn: number;
+      nextPlayers: PlayerTypes[];
+      latestPlayer: string;
     }
   | {
       result: "pass";
+      nextTurn: number;
+      nextPlayers: PlayerTypes[];
+      latestPlayer: string;
     }
-);
+  | {
+      result: "roundEnd";
+      latestPlayer: string;
+    };

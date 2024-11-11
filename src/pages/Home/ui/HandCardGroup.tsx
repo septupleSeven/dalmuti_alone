@@ -2,21 +2,40 @@ import React from "react";
 import { HandGroupTypes } from "../types/HomeTypes";
 import Card from "./Card";
 import styles from "../styles/HomeStyles.module.scss";
+import { useHumanStore, useHandDispenserStore, useGameStore } from "../../../store/store";
 
-const HandCardGroup = ({ group }: { group: HandGroupTypes }) => {
+const HandCardGroup = ({
+  group,
+  selected,
+  onSelect
+}: {
+  group: HandGroupTypes;
+  selected: boolean;
+  onSelect: (val:number) => void;
+}) => {
+  const { setDispenserOpen } = useHandDispenserStore();
+
+  const { view, setCardStatus } = useHumanStore();
+  const { gameStatus } = useGameStore();
+
   const { rank, cards } = group;
 
   return (
-    <li>
+    <div
+      className={`${styles.cardContainer} ${selected ? styles.active : ""}`}
+      onClick={() => {
+        if(gameStatus.gameStep === "inPlaying"){
+          onSelect(group.cards[0].value);
+          setCardStatus(group);
+          setDispenserOpen();
+        }
+        // view();
+      }}
+    >
       <p>{rank}</p>
-      <ul className={styles.cardContainer}>
-        {cards.map((card) => (
-          <li key={`HANDCARD-${card.id}`}>
-            <Card cardVal={card.value} />
-          </li>
-        ))}
-      </ul>
-    </li>
+      <Card cardVal={cards[0].value} />
+      <p>{cards.length}</p>
+    </div>
   );
 };
 

@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { PlayerTypes } from "../../../features/types/featuresTypes";
 import { AnimatePresence, motion } from "framer-motion";
 import { PLAYER_NUM } from "../../../config/contants";
 import { useGameStore } from "../../../store/store";
 import styles from "../styles/HomeStyles.module.scss";
+import { calcCoordinate } from "../../../features/utils";
 
 const Player = ({
   playerInfo,
@@ -18,14 +19,6 @@ const Player = ({
   const { order, name, hand } = playerInfo;
   const [isOrderCard, setIsOrderCard] = useState(true);
   const lastCompCondition = componentIdx === PLAYER_NUM;
-
-  const calcCoordinate = (value: number, length: number) => {
-    const getRadians = (value / length) * (Math.PI * 2) - Math.PI;
-    const x = -Math.sin(getRadians) * 300;
-    const y = Math.cos(getRadians) * 300;
-
-    return { x, y };
-  };
 
   const pContainerMotionVariant = useMemo(
     () => ({

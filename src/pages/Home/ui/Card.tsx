@@ -3,14 +3,18 @@ import styles from "../styles/HomeStyles.module.scss";
 
 const Card = ({
     cardVal,
-    size = "normal"
+    size = "normal",
+    button = false
 }:{
     cardVal: number;
-    size?: string
+    size?: string;
+    button?: boolean
 }) => {
 
+  const isBtnClass = button ? `${styles[`cardNode--btn`]}` : ``;
+
   return (
-    <div className={`${styles.cardNode} ${styles[`cardSize--${size}`]}`}>
+    <div className={`${styles.cardNode} ${isBtnClass} ${styles[`cardSize--${size}`]}`}>
         {/* <figure>
             <img src="" alt="" />
         </figure> */}

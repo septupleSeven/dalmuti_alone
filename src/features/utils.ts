@@ -44,3 +44,14 @@ export const copyDeck = <T extends "deck" | "pile">(
 
     return copiedDeck;
 };
+
+export const calcCoordinate = (
+  value: number, 
+  length: number
+) => {
+  const getRadians = (value / length) * (Math.PI * 2) - Math.PI;
+  const x = -Math.sin(getRadians) * 300;
+  const y = Math.cos(getRadians) * 300;
+
+  return { x, y };
+};
