@@ -5,6 +5,8 @@ import Container from "../../shared/Container";
 import { useGameStore } from "../../store/store";
 import Pile from "./ui/Pile";
 import Hand from "./ui/Hand";
+import { isStepCondition } from "../../features/utils";
+import Log from "./ui/Log";
 
 function App() {
   const {
@@ -15,11 +17,12 @@ function App() {
     setDealCard,
     setSortPlayer,
     initDeck,
-    getHuman
+    getHuman,
   } = useGameStore();
   view();
 
   const { settingStep } = settingStatus;
+  const gameTableRef = useRef(null)
 
   useEffect(() => {
     if (settingStep === "dealForOrder") {
@@ -33,8 +36,8 @@ function App() {
 
   return (
     <Container>
-      <div className={styles.gameTableContainer}>
-        {settingStep !== "booting" &&
+      <div className={styles.gameTableContainer} ref={gameTableRef}>
+        {isStepCondition(settingStep, "bootingToSettingReady") &&
           players.map((player, idx) => {
             return (
               <Player
@@ -44,17 +47,18 @@ function App() {
               />
             );
           })}
-        {(settingStep === "ready" 
-        || settingStep === "playing" )
-        && (
-          <>
-            <div className={styles.gameTableCenterContents}>
-              <Pile pile={pile}/>
-            </div>
-            <Hand human={getHuman()}/>
-          </>
+        {isStepCondition(settingStep, "readyToPlaying") && (
+          <div className={styles.gameTableCenterContents}>
+            <Pile pile={pile} />
+          </div>
         )}
       </div>
+      {isStepCondition(settingStep, "readyToPlaying") && (
+        <Hand human={getHuman()} />
+      )}
+      {isStepCondition(settingStep, "bootingToSettingReady") && (
+        <Log />
+      )}
     </Container>
   );
 }

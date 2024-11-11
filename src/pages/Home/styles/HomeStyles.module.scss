@@ -1,3 +1,5 @@
+@use "../../../shared/styles/Fonts.module.scss" as *;
+
 .gameTable {
 
     &Container{
@@ -11,6 +13,7 @@
         position: relative;
         background-color: royalblue;
         border-radius: 100%;
+        transform: translateY(40px);
     }
 
     &CenterContents{
@@ -30,13 +33,6 @@
         align-items: center;
         justify-content: center;
         position: absolute;
-
-        >p{
-            position: absolute;
-            bottom: calc(-1rem - 10px);
-            color: #fff;
-        }
-
     }
 
     &Node{
@@ -46,7 +42,24 @@
         width: 100px;
         height: 100px;
         background-color: salmon;
-        color: blue;
+        border-radius: 5px;
+    }
+
+    &ClassName{
+        position: absolute;
+        top: calc(-1rem - 10px);
+        color: #fff;
+        font-size: 1.0625rem;
+        white-space: nowrap;
+        text-align: center;
+        font-family: $font_point--B;
+    }
+
+    &OrderCard{
+        position: absolute;
+        bottom: calc(-1rem - 10px);
+        color: #fff;
+        white-space: nowrap;
     }
 
 }
@@ -136,7 +149,7 @@
 
     &Container {
         height: 100%;
-        background-color: crimson;
+        background-color: rgba($color: crimson, $alpha: 0.4);
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -230,5 +243,16 @@
         }
 
     }        
+
+}
+
+.log {
+
+    &Container {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        background-color: #fff;
+    }
 
 }

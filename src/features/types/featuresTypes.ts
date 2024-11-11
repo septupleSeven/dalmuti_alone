@@ -9,6 +9,7 @@ export type PileTypes = Array<CardTypes>[];
 export type PlayerTypes = {
   id: string;
   name: string;
+  className: string;
   hand: CardTypes[];
   order: number;
   status: {

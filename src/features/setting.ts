@@ -16,6 +16,7 @@ export const setPlayer = (playerNum: number) => {
       get name() {
         return this.id === "Human" ? "YOU" : `COM${i + 1}`;
       },
+      className: "",
       hand: [],
       order: i,
       status: {
@@ -176,20 +177,11 @@ export const sortHand = (players: PlayerTypes[], isCopy?: boolean) => {
   return sortedPlayers;
 };
 
-export const setPlayerClass = (players: PlayerTypes[], isCopy?: boolean) => {
-  let sortedPlayers;
-
-  if (isCopy) {
-    sortedPlayers = copyPlayer(players);
-  } else {
-    sortedPlayers = players;
-  }
+export const setPlayerClass = (players: PlayerTypes[]) => {
+  let sortedPlayers = copyPlayer(players);
 
   sortedPlayers.forEach((player) => {
-    // 꼬리표 중복 문제 나중에 해결을 위해 넣어둠 24.11.09
-    player.name = `${PLAYER_NAME_TABLE[`ORDER${player.order}`]}(${
-      player.name
-    })`;
+    player.className = `${PLAYER_NAME_TABLE[`ORDER${player.order}`]}`;
   });
 
   return sortedPlayers;
@@ -278,7 +270,7 @@ export const setGRevolution = (
   }
 
   const sortedPlayers = sortPlayer(deck, copiedPlayers, "gRevolution");
-  const grantedPlayers = setPlayerClass(sortedPlayers, true);
+  const grantedPlayers = setPlayerClass(sortedPlayers);
 
   return grantedPlayers;
 };

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { PlayerTypes } from "../../../features/types/featuresTypes";
 import { AnimatePresence, motion } from "framer-motion";
-import { PLAYER_NUM } from "../../../config/contants";
+import { CARD_NAME_TABLE, PLAYER_NUM } from "../../../config/contants";
 import { useGameStore } from "../../../store/store";
 import styles from "../styles/HomeStyles.module.scss";
 import { calcCoordinate } from "../../../features/utils";
@@ -13,20 +13,22 @@ const Player = ({
   playerInfo: PlayerTypes;
   componentIdx: number;
 }) => {
-  const { settingStatus, setSettingStep, setSettingStepCondition, setDealCard } = useGameStore();
+  const { settingStatus, setSettingStep, setDealCard } = useGameStore();
   const { settingStep, settingStepCondition } = settingStatus;
 
-  const { order, name, hand } = playerInfo;
+  const { order, name, className, hand } = playerInfo;
   const [isOrderCard, setIsOrderCard] = useState(true);
   const lastCompCondition = componentIdx === PLAYER_NUM;
 
   const pContainerMotionVariant = useMemo(
     () => ({
       init: {
+        opacity: 0,
         x: 0,
         y: 0,
       },
       getPosition: {
+        opacity: 1,
         x: calcCoordinate(order, PLAYER_NUM).x,
         y: calcCoordinate(order, PLAYER_NUM).y,
       },
@@ -41,24 +43,36 @@ const Player = ({
       animate="getPosition"
       className={styles.playerContainer}
       transition={{
-        duration: 0.8,
+        duration: 1.2,
         delay: order / 20,
+        ease: "easeOut"
       }}
       onAnimationComplete={async () => {
         if (settingStep === "setting" && lastCompCondition) {
           setSettingStep("dealForOrder");
         }
         if (settingStep === "rearrange" && settingStepCondition !== "rearrange") {
-          setSettingStepCondition("rearrange");
+          setSettingStep("rearrange", "condition");
           setSettingStep("ready");
           setDealCard("game");
         }
       }}
     >
-      <motion.div className={styles.playerNode}>{name}</motion.div>
+      <motion.p layout className={styles.playerClassName}>
+        {className}
+        {name === "YOU" ? "(당신)" : ""}
+      </motion.p>
+      <motion.div className={styles.playerNode}>
+        {/* {CARD_NAME_TABLE[hand[0].rank] && 
+        <figure>
+          <img src="" alt="" />
+        </figure>
+        } */}
+      </motion.div>
       <AnimatePresence>
         {settingStep === "dealForOrder" && hand.length ? (
           <motion.p
+            className={styles.playerOrderCard}
             key={`ORDERCARD-${componentIdx}`}
             initial={{
               y: 20,
@@ -75,7 +89,7 @@ const Player = ({
             onAnimationComplete={async () => {
               if (settingStep === "dealForOrder" && lastCompCondition && isOrderCard) {
                 setIsOrderCard(false);
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                await new Promise((resolve) => setTimeout(resolve, 2000));
                 setSettingStep("rearrange");
               }
             }}
@@ -84,7 +98,7 @@ const Player = ({
               opacity: 0,
             }}
           >
-            {hand[0].rank}
+           {CARD_NAME_TABLE[hand[0].rank].name}{`(${hand[0].rank})`}
           </motion.p>
         ) : null}
       </AnimatePresence>
