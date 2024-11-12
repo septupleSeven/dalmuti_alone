@@ -1,7 +1,8 @@
-import { PLAYER_NAME_TABLE } from "../config/contants";
+import { HUMAN_ID, PLAYER_NAME_TABLE } from "../config/contants";
 import { HandGroupTypes } from "../pages/Home/types/HomeTypes";
 import {
   HumanCardStatusTypes,
+  LogTypes,
 } from "../store/types/storeTypes";
 import { CardTypes, PlayerTypes } from "./types/featuresTypes";
 import { copyDeck, copyPlayer } from "./utils";
@@ -11,9 +12,9 @@ export const setPlayer = (playerNum: number) => {
 
   for (let i = 0; i < playerNum; i++) {
     const playerObj: PlayerTypes = {
-      id: i < playerNum - 1 ? `Ai${i + 1}` : "Human",
+      id: i < playerNum - 1 ? `Ai${i + 1}` : HUMAN_ID,
       get name() {
-        return this.id === "Human" ? "YOU" : `COM${i + 1}`;
+        return this.id === HUMAN_ID ? "YOU" : `COM${i + 1}`;
       },
       className: "",
       hand: [],
@@ -310,3 +311,18 @@ export const setJokerCombine = (
 export const setDelay = async (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+export const setLogData = (value:string):LogTypes => {
+  const now = new Date();
+  const getLocaleTime = now.toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  })
+  
+  return {
+    contents: value,
+    time: `[${getLocaleTime}]`
+  }
+
+}

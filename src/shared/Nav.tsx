@@ -5,9 +5,12 @@ import {
   motion,
   useAnimationControls,
 } from "framer-motion";
-import { isStepCondition } from "../features/utils";
+import { getTargetPlayer, isStepCondition } from "../features/utils";
 import { useGameStore, useGameStoreAction } from "../store/gameStore";
 import { useShallow } from 'zustand/react/shallow'
+import { useLogStoreAction } from "../store/logStore";
+import { setLogData } from "../features/setting";
+import { HUMAN_ID } from "../config/contants";
 
 const Nav = () => {
 
@@ -32,6 +35,8 @@ const Nav = () => {
     settleRound,
     runTaxCollect,
   } = useGameStoreAction();
+
+  const { setLog } = useLogStoreAction();
 
 
   const [firstInitGame, setFirstInitGame] = useState(false);
@@ -106,8 +111,6 @@ const Nav = () => {
     },
   };
 
-
-  // 여기 고민중이였음 사유) players 변경 마다 useEffect 발생 우려
   useEffect(() => {
     if (settingStep === "playing") {
       runTaxCollect();
@@ -155,14 +158,16 @@ const Nav = () => {
                       if (!firstInitGame) {
                         headerMotionControls.start("headerAnimate");
                         setSettingStep("readyToSetting");
-
+                        
                         await new Promise((resolve) =>
                           setTimeout(() => {
                             setShuffleDeck();
                             setSettingStep("setting");
+                            setLog(setLogData("플레이어와 덱을 구성합니다."))
                             return resolve;
                           }, 2000)
                         );
+
                       }
                       setFirstInitGame(true);
                     }}
@@ -201,6 +206,9 @@ const Nav = () => {
               exit="navBtnExit"
               onClick={() => {
                 if (settingStep === "readyToPlay") {
+                  const human = getTargetPlayer(players, HUMAN_ID);
+                  setLog(setLogData("게임 시작!"))
+                  setLog(setLogData(`당신은 ${human?.className} 입니다.`))
                   setGameOrder("setting");
                   setSettingStep("playing");
                 }

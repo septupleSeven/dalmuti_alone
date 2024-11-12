@@ -1,11 +1,13 @@
+import { CARD_NAME_TABLE, HUMAN_ID, REVOLUTION_TEXT } from "../config/contants";
 import {
   GameActionsTypes,
   GameStatusTypes,
   GameStepTypes,
   HumanCardStatusTypes,
   HumanLatestActionTypes,
+  LogTypes,
 } from "../store/types/storeTypes";
-import { setGRevolution, setOrder, sortHand } from "./setting";
+import { setGRevolution, setLogData, setOrder, sortHand } from "./setting";
 import {
   CardTypes,
   LayDownCardType,
@@ -94,7 +96,7 @@ export const actionSwapCard = (players: PlayerTypes[]) => {
 const performLayDownCard = (
   hand: CardTypes[],
   selectedCards: CardTypes[],
-  drawNum: number
+  drawNum: number,
 ) => {
   const toSendCards = [];
 
@@ -124,7 +126,8 @@ const performSwitchLeader = (
 export const layDownCard = (
   players: PlayerTypes[],
   pile: PileTypes,
-  currentTurn: number
+  currentTurn: number,
+  setLog: (logData:LogTypes) => void,
 ): LayDownCardType => {
   const copiedPlayers = copyPlayer(players);
   const copiedPile = copyDeck(pile, "pile");
@@ -134,7 +137,7 @@ export const layDownCard = (
   const currentPlayer = copiedPlayers.find(
     (player) => player.status.roundOrder === currentTurn
   )!;
-  const { hand } = currentPlayer;
+  const { hand, className, name } = currentPlayer;
 
   if (!pile.length) {
     isPass = false;
@@ -240,6 +243,7 @@ export const layDownCard = (
 
   if (isPass) {
     console.log("Action: Pass ACT");
+    setLog(setLogData(`${className}(${name})은 턴을 넘겼습니다.`));
     return {
       result: "pass",
       ...setNextTurn(copiedPlayers, currentTurn),
@@ -251,23 +255,20 @@ export const layDownCard = (
       " / length is =>",
       copiedPile[copiedPile.length - 1].length
     );
+
+    const getLayDownCardData = {
+      value: `RANK${copiedPile[copiedPile.length - 1][0].value}`,
+      length: copiedPile[copiedPile.length - 1].length
+    }
+    setLog(setLogData(`${className}(${name})은 
+      ${CARD_NAME_TABLE[`${getLayDownCardData.value}`].name}(${getLayDownCardData.value}) 카드를 
+      ${getLayDownCardData.length}장 냈습니다.`));
     return {
       result: "layDown",
       copiedPile: copiedPile,
       ...setNextTurn(copiedPlayers, currentTurn),
     };
   }
-
-  // return isPass
-  //   ? {
-  //       result: "pass",
-  //       ...setNextTurn(copiedPlayers, currentTurn),
-  //     }
-  //   : {
-  //       result: "layDown",
-  //       copiedPile: copiedPile,
-  //       ...setNextTurn(copiedPlayers, currentTurn),
-  //     };
 };
 
 export const playerLayDownCard = (
@@ -275,14 +276,15 @@ export const playerLayDownCard = (
   pile: Array<CardTypes>[],
   currentTurn: number,
   cardStatus: HumanCardStatusTypes,
-  actionType: HumanLatestActionTypes
+  actionType: HumanLatestActionTypes,
+  setLog: (logData:LogTypes) => void,
 ): LayDownCardType => {
   const copiedPlayers = copyPlayer(players);
   const copiedPile = copyDeck(pile, "pile");
   const copiedCardStatus = Object.assign({}, cardStatus);
 
-  const humanPlayer = copiedPlayers.find((player) => player.id === "Human")!;
-  const { hand } = humanPlayer;
+  const humanPlayer = copiedPlayers.find((player) => player.id === HUMAN_ID)!;
+  const { hand, className } = humanPlayer;
 
   if (actionType === "layDown") {
     const currentLeaderPlayer = copiedPlayers.find(
@@ -319,36 +321,33 @@ export const playerLayDownCard = (
     }
   }
 
-  // if (actionType === "passed") {
-  //   console.log("Action: Pass ACT");
-  //   return {
-  //     result: "pass",
-  //     ...setNextTurn(copiedPlayers, currentTurn),
-  //   };
-  // }
+  if (actionType === "passed") {
+    console.log("Action: Pass ACT");
+    setLog(setLogData(`당신(${className})은 턴을 넘겼습니다.`));
+    return {
+      result: "pass",
+      ...setNextTurn(copiedPlayers, currentTurn),
+    };
+  }
 
-  // console.log(
-  //   "Action: LayDown ACT | value is =>",
-  //   copiedPile[copiedPile.length - 1][0].value,
-  //   " / length is =>",
-  //   copiedPile[copiedPile.length - 1].length
-  // );
-  // return {
-  //   result: "layDown",
-  //   copiedPile: copiedPile,
-  //   ...setNextTurn(copiedPlayers, currentTurn),
-  // };
-
-  return actionType === "passed"
-    ? {
-        result: "pass",
-        ...setNextTurn(copiedPlayers, currentTurn),
-      }
-    : {
-        result: "layDown",
-        copiedPile: copiedPile,
-        ...setNextTurn(copiedPlayers, currentTurn),
-      };
+  console.log(
+    "Action: LayDown ACT | value is =>",
+    copiedPile[copiedPile.length - 1][0].value,
+    " / length is =>",
+    copiedPile[copiedPile.length - 1].length
+  );
+  const getLayDownCardData = {
+    value: `RANK${copiedPile[copiedPile.length - 1][0].value}`,
+    length: copiedPile[copiedPile.length - 1].length
+  }
+  setLog(setLogData(`당신(${className})은 
+    ${CARD_NAME_TABLE[`${getLayDownCardData.value}`].name}(${getLayDownCardData.value}) 카드를 
+    ${getLayDownCardData.length}장 냈습니다.`));
+  return {
+    result: "layDown",
+    copiedPile: copiedPile,
+    ...setNextTurn(copiedPlayers, currentTurn),
+  };
 };
 
 export const setNextTurn = (
@@ -459,11 +458,14 @@ export const performTaxCollect = async (
   players: PlayerTypes[],
   gameStep: GameStepTypes,
   actions: GameActionsTypes,
+  setLog: (logData:LogTypes) => void,
   isRevolution: "revolution" | "gRevolution" | "continue"
 ) => {
   const { setGameStep, setGameState, setPlayers, runGame } = actions;
 
   if (gameStep === "inPlaying") return;
+
+  setLog(setLogData(`[세금 징수 결과] ${REVOLUTION_TEXT[isRevolution]}`));
 
   if (isRevolution === "continue") {
     console.log("Tax Collect result => continue");
@@ -480,6 +482,7 @@ export const performTaxCollect = async (
 
   const isComplete = await new Promise<string>((resolve) =>
     setTimeout(() => {
+      setLog(setLogData("게임이 시작됩니다."))
       return resolve("inPlaying");
     }, 2000)
   );

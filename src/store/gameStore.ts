@@ -6,6 +6,7 @@ import {
   clearHand,
   createDeck,
   dealDeck,
+  setLogData,
   setOrder,
   setPlayer,
   setPlayerGameState,
@@ -13,7 +14,7 @@ import {
   shuffleDeck,
   sortPlayer,
 } from "../features/setting";
-import { MAXIMUM_CARDRANK, PLAYER_NUM } from "../config/contants";
+import { HUMAN_ID, MAXIMUM_CARDRANK, PLAYER_NUM } from "../config/contants";
 import { produce } from "immer";
 import {
   getSettleRoundData,
@@ -26,6 +27,7 @@ import {
 import { LayDownCardType } from "../features/types/featuresTypes";
 import { useShallow } from "zustand/react/shallow";
 import { useHumanStore } from "./humanStore";
+import { useLogStore } from "./logStore";
 
 export const useGameStore = create<useGameStoreTypes>((set, get) => ({
   players: [...setPlayer(PLAYER_NUM)],
@@ -149,6 +151,9 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
 
     runTaxCollect: async () => {
       const { deck, players, gameStatus, actions } = get();
+      
+      const getLogStore = useLogStore.getState();
+
       const isRevolutionVal = await isRevolution(players);
 
       performTaxCollect(
@@ -156,8 +161,10 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
         players,
         gameStatus.gameStep,
         actions,
+        getLogStore.actions.setLog,
         isRevolutionVal
       );
+      
     },
     runGame: async () => {
       const { players, gameStatus, pile, actions } = get();
@@ -171,6 +178,9 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
         setResultRank,
       } = actions;
 
+      const getLogStoreAction = useLogStore.getState().actions;
+      const { setLog } = getLogStoreAction;
+
       const getCurrentPlayer = players.find(
         (player) => player.status.gameState === "inAction"
       );
@@ -180,6 +190,7 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
         "background: #a7a8d9; color: #111",
         getCurrentPlayer?.name
       );
+      setLog(setLogData(`${getCurrentPlayer?.className}(${getCurrentPlayer?.name})의 차례`))
 
       if (getCurrentPlayer!.status.isLeader) {
         console.log(
@@ -187,13 +198,15 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
           "background: #bada55; color: #111",
           getCurrentPlayer
         );
+        setLog(setLogData(`라운드 종료. 승자는 ${getCurrentPlayer?.className}(${getCurrentPlayer?.name})입니다. 
+          다음 라운드는 이 플레이어 기준 시계방향으로 시작됩니다.`))
         setGameStep("roundEnd");
         return;
       }
 
       let actionResult: LayDownCardType;
 
-      if (getCurrentPlayer && getCurrentPlayer.id === "Human") {
+      if (getCurrentPlayer && getCurrentPlayer.id === HUMAN_ID) {
         await new Promise<void>((resolve) => {
           useHumanStore.getState().actionTrigger = resolve;
         });
@@ -205,10 +218,16 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
           pile,
           gameStatus.currentTurn,
           getHumanStore.cardStatus,
-          getHumanStore.latestAction
+          getHumanStore.latestAction,
+          setLog,
         );
       } else {
-        actionResult = layDownCard(players, pile, gameStatus.currentTurn)!;
+        actionResult = layDownCard(
+          players, 
+          pile, 
+          gameStatus.currentTurn,
+          setLog,
+        )!;
       }
 
       setLatestPlayer(actionResult.latestPlayer);

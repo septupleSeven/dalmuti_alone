@@ -6,6 +6,7 @@ import { runHumanActionTrigger } from "../../../features/playing";
 import { useShallow } from "zustand/react/shallow";
 import { useHandDispenserStoreAction } from "../../../store/handStore";
 import { useHumanStore, useHumanStoreAction } from "../../../store/humanStore";
+import { HUMAN_ID } from "../../../config/contants";
 
 const HandCardDispenser = ({
   onSelect,
@@ -55,17 +56,17 @@ const HandCardDispenser = ({
   };
 
   const isHumanTurn = () => {
-    const humanPlayer = players.find((player) => player.id === "Human");
+    const humanPlayer = players.find((player) => player.id === HUMAN_ID);
     return humanPlayer?.status.gameState === "inAction";
   };
 
   const hasJoker = () => {
-    const humanPlayer = players.find((player) => player.id === "Human");
+    const humanPlayer = players.find((player) => player.id === HUMAN_ID);
     return humanPlayer?.hand.some((card) => card.value === 13);
   };
 
   const jokerGroup = () => {
-    const humanPlayer = players.find((player) => player.id === "Human")!;
+    const humanPlayer = players.find((player) => player.id === HUMAN_ID)!;
     const joker = getRankGroup(humanPlayer.hand).find(
       (group) => group.rank === "JOKER"
     );

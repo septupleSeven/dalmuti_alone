@@ -8,6 +8,7 @@ import { getTargetPlayer, isStepCondition } from "../../features/utils";
 import Log from "./ui/Log";
 import { useGameStore, useGameStoreAction } from "../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
+import { HUMAN_ID } from "../../config/contants";
 
 function App() {
   
@@ -25,7 +26,7 @@ function App() {
   view();
 
   const gameTableRef = useRef(null);
-  const humanPlayer = getTargetPlayer(players, "Human")!;
+  const humanPlayer = getTargetPlayer(players, HUMAN_ID)!;
 
   useEffect(() => {
     if (settingStep === "dealForOrder") {

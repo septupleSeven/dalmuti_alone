@@ -1,8 +1,9 @@
 @use "../../../shared/styles/Fonts.module.scss" as *;
+@use "../../../shared/styles/GlobalVariable.module.scss" as *;
 
 .gameTable {
 
-    &Container{
+    &Container {
         max-width: 768px;
         max-height: 768px;
         width: 100%;
@@ -16,7 +17,7 @@
         transform: translateY(40px);
     }
 
-    &CenterContents{
+    &CenterContents {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -27,7 +28,7 @@
 
 .player {
 
-    &Container{
+    &Container {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -35,7 +36,7 @@
         position: absolute;
     }
 
-    &Node{
+    &Node {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -45,7 +46,7 @@
         border-radius: 5px;
     }
 
-    &ClassName{
+    &ClassName {
         position: absolute;
         top: calc(-1rem - 10px);
         color: #fff;
@@ -55,7 +56,7 @@
         font-family: $font_point--B;
     }
 
-    &OrderCard{
+    &OrderCard {
         position: absolute;
         bottom: calc(-1rem - 10px);
         color: #fff;
@@ -65,8 +66,8 @@
 }
 
 .deck {
-    
-    &Node{
+
+    &Node {
         width: 130px;
         height: 200px;
         background-color: green;
@@ -75,7 +76,7 @@
         align-items: center;
     }
 
-    &Remain{
+    &Remain {
         background-color: crimson;
         color: #fff;
         width: 50px;
@@ -86,8 +87,8 @@
 }
 
 .pile {
-    
-    &Node{
+
+    &Node {
         width: 130px;
         height: 200px;
         background-color: green;
@@ -97,7 +98,7 @@
         position: relative;
     }
 
-    &Count{
+    &Count {
         width: 30px;
         height: 30px;
         background-color: #111;
@@ -107,17 +108,17 @@
         top: 0;
     }
 
-    &Card{
+    &Card {
         display: flex;
         align-items: center;
         justify-content: center;
         position: absolute;
 
-        > div {
+        >div {
             position: relative;
         }
 
-        > p {
+        >p {
             position: absolute;
             bottom: 0;
             right: 0;
@@ -129,8 +130,8 @@
 }
 
 .hand {
-    
-    &Node{
+
+    &Node {
         position: fixed;
         top: 50%;
         right: 0;
@@ -141,7 +142,7 @@
         height: 100%;
     }
 
-    &Btn{
+    &Btn {
         position: absolute;
         left: 0;
         top: 0;
@@ -156,7 +157,7 @@
         overflow: hidden;
     }
 
-    &Wrapper{
+    &Wrapper {
         height: fit-content;
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -164,7 +165,7 @@
         column-gap: 10px;
     }
 
-    &Dispenser{
+    &Dispenser {
         position: absolute;
         bottom: 0;
         left: 50%;
@@ -180,26 +181,26 @@
             padding: 30px 0;
         }
 
-        &TitleWrap{
+        &TitleWrap {
             display: flex;
             flex-direction: column;
             row-gap: 10px;
-            
-            > .title{
+
+            >.title {
                 color: rebeccapurple;
             }
 
-            > .amount{
+            >.amount {
                 color: brown;
             }
 
         }
 
-        &BtnWrap{
+        &BtnWrap {
             display: flex;
             align-items: center;
-            
-            > button{
+
+            >button {
                 width: 100%;
             }
 
@@ -211,7 +212,7 @@
 
 .card {
 
-    &Container{
+    &Container {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -219,30 +220,30 @@
         height: fit-content;
         cursor: pointer;
 
-        &.active{
+        &.active {
             background-color: yellow;
         }
 
     }
 
-    &Node{
+    &Node {
         color: #fff;
         background-color: seagreen;
-        
-        &--btn{
+
+        &--btn {
             cursor: pointer;
         }
 
     }
 
-    &Size{
+    &Size {
 
         &--normal {
             aspect-ratio: 1/1.5;
             width: 30px;
         }
 
-    }        
+    }
 
 }
 
@@ -252,8 +253,83 @@
         position: fixed;
         left: 0;
         bottom: 0;
-        background-color: #fff;
-        overflow-y: scroll;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+        max-height: 700px;
+        min-height: 200px;
+        color: #fff;
+        background-color: rgba($color: #000000, $alpha: 0.6);
+        border: 1px solid $color--primary;
+        overflow: hidden;
+
+        ul {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            row-gap: 25px;
+            overflow: hidden;
+        }
+
+    }
+
+    &Wrap {
+        padding: 30px 15px;
+        overflow: hidden auto;
+
+        &::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            width: 3px;
+            background-color: #fff;
+            border-radius: 10px;
+            border: 4px solid transparent;
+            background-clip: padding-box;
+        }
+
+
+    }
+
+    &Cursor {
+        width: 100%;
+        height: 10px;
+        cursor: row-resize;
+        background-color: rgba($color: $color--primary, $alpha: 0);
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        transition: 0.4s;
+
+        &:hover {
+            background-color: rgba($color: $color--primary, $alpha: 0.4);
+        }
+
+    }
+
+    &Time{
+        font-size: .9375rem;
+        opacity: 0.8;
+    }
+
+    &Chat{
+        display: flex;
+        flex-direction: column;
+        row-gap: 8px;
+        
+        .time{
+            font-size: .8125rem;
+            opacity: 0.6;
+        }
+
+        .contents{
+            word-break: keep-all;
+            line-height: 1.25;
+        }
+
     }
 
 }

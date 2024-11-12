@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { PlayerTypes } from "../../../features/types/featuresTypes";
 import { AnimatePresence, motion } from "framer-motion";
-import { CARD_NAME_TABLE, PLAYER_NUM } from "../../../config/contants";
+import { CARD_NAME_TABLE, HUMAN_ID, PLAYER_NUM } from "../../../config/contants";
 import styles from "../styles/HomeStyles.module.scss";
 import { calcCoordinate } from "../../../features/utils";
 import { useGameStore, useGameStoreAction } from "../../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
+import { setLogData } from "../../../features/setting";
+import { useLogStoreAction } from "../../../store/logStore";
 
 const Player = ({
   playerInfo,
@@ -24,7 +26,9 @@ const Player = ({
   );
   const { setSettingStep, setDealCard } = useGameStoreAction();
 
-  const { order, name, className, hand } = playerInfo;
+  const { setLog } = useLogStoreAction();
+
+  const { order, name, className, hand, id } = playerInfo;
   const [isOrderCard, setIsOrderCard] = useState(true);
   const lastCompCondition = componentIdx === PLAYER_NUM;
 
@@ -58,6 +62,7 @@ const Player = ({
       onAnimationComplete={async () => {
         if (settingStep === "setting" && lastCompCondition) {
           setSettingStep("dealForOrder");
+          setLog(setLogData("계급을 정하고 있습니다."))
         }
         if (
           settingStep === "rearrange" &&
@@ -71,7 +76,7 @@ const Player = ({
     >
       <motion.p layout className={styles.playerClassName}>
         {className}
-        {name === "YOU" ? "(당신)" : ""}
+        {id === HUMAN_ID ? "(당신)" : ""}
       </motion.p>
       <motion.div className={styles.playerNode}>
         {/* {CARD_NAME_TABLE[hand[0].rank] && 
@@ -105,6 +110,7 @@ const Player = ({
               ) {
                 setIsOrderCard(false);
                 await new Promise((resolve) => setTimeout(resolve, 2000));
+                setLog(setLogData("계급대로 순서를 재배치 합니다."))
                 setSettingStep("rearrange");
               }
             }}
