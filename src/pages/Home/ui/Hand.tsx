@@ -1,19 +1,23 @@
 import React, { useState } from "react";
 import styles from "../styles/HomeStyles.module.scss";
 import { motion, useCycle } from "framer-motion";
-import { CardTypes, PlayerTypes } from "../../../features/types/featuresTypes";
-import { HandGroupTypes } from "../types/HomeTypes";
+import { PlayerTypes } from "../../../features/types/featuresTypes";
 import HandCardGroup from "./HandCardGroup";
 import HandCardDispenser from "./HandCardDispenser";
 import { useHandDispenserStore } from "../../../store/store";
 import { getRankGroup } from "../../../features/utils";
+import { useShallow } from "zustand/react/shallow";
 
 const Hand = ({ human }: { human: PlayerTypes }) => {
   const [isOpen, toggleOpen] = useCycle(false, true);
 
   const {
     isDispenserOpen
-  } = useHandDispenserStore();
+  } = useHandDispenserStore(useShallow(
+    state => ({
+      isDispenserOpen: state.isDispenserOpen
+    })
+  ));
 
   const [isSelected, setIsSelected] = useState<number>(0);
 

@@ -3,10 +3,11 @@ import { HandGroupTypes } from "../../pages/Home/types/HomeTypes";
 
 export type SettingStepTypes =
   | "booting"
+  | "readyToSetting"
   | "setting"
   | "dealForOrder"
   | "rearrange"
-  | "ready"
+  | "readyToPlay"
   | "playing";
 
 export type GameStepTypes =
@@ -31,11 +32,31 @@ export type RoundStatusTypes = {
 
 export type GameStatusTypes = {
   gameStep: GameStepTypes;
-  gameStepCondition: GameStepTypes;
   currentTurn: number;
   latestPlayer: string;
   resultRank: Array<PlayerTypes>;
-  // roundCount: number;
+}
+
+export type GameActionsTypes = {
+  view: () => void;
+  setSettingStep: (value: SettingStepTypes, type?: "step" | "condition") => void;
+  setGameStep: (value: GameStepTypes) => void;
+  setShuffleDeck: () => void;
+  setDealCard: (value: GameSettingTypes) => void;
+  setInitializeDeck: (action?: GameActionTypes) => void;
+  setSortPlayer: (type: SortPlayersTypes) => void;
+  setPile: (pile: Array<CardTypes>[]) => void;
+  setDeck: (deck: Array<CardTypes>) => void;
+  setTurn: (value: number) => void;
+  // setTaxCollect: () => Promise<void> | null;
+  setGameOrder: (type: GameSettingTypes) => void;
+  setGameState: () => void;
+  setLatestPlayer: (value:string) => void;
+  setPlayers: (players:Array<PlayerTypes>) => void;
+  setResultRank: (players:Array<PlayerTypes>) => void;
+  runTaxCollect: () => Promise<void>;
+  runGame: () => Promise<void>;
+  settleRound: () => Promise<void>;
 }
 
 export type useGameStoreTypes = {
@@ -47,75 +68,79 @@ export type useGameStoreTypes = {
     settingStepCondition: SettingStepTypes;
   };
   gameStatus: GameStatusTypes;
-  // roundStatus: RoundStatusTypes;
-  view: () => void;
-  setSettingStep: (value: SettingStepTypes) => void;
-  setSettingStepCondition: (value: SettingStepTypes) => void;
-  setGameStep: (value: GameStepTypes) => void;
-  setGameStepCondition: (value: GameStepTypes) => void;
-  setShuffleDeck: () => void;
-  setDealCard: (value: GameSettingTypes) => void;
-  initDeck: (action?: GameActionTypes) => void;
-  setSortPlayer: (type: SortPlayersTypes) => void;
-  setPile: (pile: Array<CardTypes>[]) => void;
-  setDeck: (deck: Array<CardTypes>) => void;
-  getHuman: () => PlayerTypes;
-  getCurrentLeaderOrder: () => number;
-  setTurn: (nextTurn: number, nextPlayers?: PlayerTypes[]) => void;
-  setTaxCollect: () => Promise<void> | null;
-  setGameOrder: (type: GameSettingTypes) => void;
-  setGameState: () => void;
-  setLatestPlayer: (value:string) => void;
-  setPlayers: (players:Array<PlayerTypes>) => void;
-  setResultRank: (players:Array<PlayerTypes>) => void;
-
-
-
-
-  playGame: () => Promise<void>;
-
-  
-
-  settleRound: () => Promise<void>;
-
-
-
-
-  setRound: () => void;
-  setRoundLog: () => void;
-
-  // clearPile
-
+  actions: GameActionsTypes;
 };
+
+// export type useGameStoreTypes = {
+//   players: Array<PlayerTypes>;
+//   deck: Array<CardTypes>;
+//   pile: Array<CardTypes>[];
+//   settingStatus: {
+//     settingStep: SettingStepTypes;
+//     settingStepCondition: SettingStepTypes;
+//   };
+//   gameStatus: GameStatusTypes;
+//   view: () => void;
+//   setSettingStep: (value: SettingStepTypes, type?: "step" | "condition") => void;
+//   setGameStep: (value: GameStepTypes) => void;
+//   setShuffleDeck: () => void;
+//   setDealCard: (value: GameSettingTypes) => void;
+//   setInitializeDeck: (action?: GameActionTypes) => void;
+//   setSortPlayer: (type: SortPlayersTypes) => void;
+//   setPile: (pile: Array<CardTypes>[]) => void;
+//   setDeck: (deck: Array<CardTypes>) => void;
+//   getHuman: () => PlayerTypes;
+//   getCurrentLeaderOrder: () => number;
+//   setTurn: (nextTurn: number, nextPlayers?: PlayerTypes[]) => void;
+//   setTaxCollect: () => Promise<void> | null;
+//   setGameOrder: (type: GameSettingTypes) => void;
+//   setGameState: () => void;
+//   setLatestPlayer: (value:string) => void;
+//   setPlayers: (players:Array<PlayerTypes>) => void;
+//   setResultRank: (players:Array<PlayerTypes>) => void;
+//   playGame: () => Promise<void>;
+//   settleRound: () => Promise<void>;
+// };
 
 export type HumanCardStatusTypes = {
   rank: string;
   value: number;
   cards: CardTypes[];
-  selected: 0;
+  selected: number;
   jokerPicked: CardTypes[];
 };
 
 export type HumanLatestActionTypes = "passed" | "layDown" | "waiting";
 
-export type useHandDispenserStoreTypes = {
-  isDispenserOpen: boolean;
+export type HandDispenserActionsTypes = {
   view: () => void;
   setDispenserOpen: () => void;
   setDispenserClose: () => void;
+}
+
+export type useHandDispenserStoreTypes = {
+  isDispenserOpen: boolean;
+  actions: HandDispenserActionsTypes
 };
 
-export type useHumanStoreTypes = {
-  cardStatus: HumanCardStatusTypes;
-  latestAction: HumanLatestActionTypes,
+export type HumanActionsTypes = {
   view: () => void;
   setCardStatus: (
     cardGroup: HandGroupTypes,
     value?: string
   ) => void;
   setCardStatusSelected: (value:(string | number)) => void;
-  setCardStatusJokerPicked: (cardGroup: Omit<CardTypes, "rank">[]) => void;
+  setCardStatusJokerPicked: (cardGroup: CardTypes[]) => void;
   setCardStatusCombine: (value:number) => void;
   setLatestAction: (value:HumanLatestActionTypes) => void;
-  runHumanActionTrigger: () => void;
+  setHumanActionTrigger: (value:(() => void) | null) => void;
+}
+
+export type useHumanStoreTypes = {
+  cardStatus: HumanCardStatusTypes;
+  latestAction: HumanLatestActionTypes,
+  actions: HumanActionsTypes,
+  actionTrigger: (() => void) | null;
 };
+
+export type useLogStoreTypes = {};

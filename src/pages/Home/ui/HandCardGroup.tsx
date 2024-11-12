@@ -1,36 +1,47 @@
-import React, { useRef } from "react";
+import React from "react";
 import { HandGroupTypes } from "../types/HomeTypes";
 import Card from "./Card";
 import styles from "../styles/HomeStyles.module.scss";
-import { useHumanStore, useHandDispenserStore, useGameStore } from "../../../store/store";
+import {
+  useHumanStoreAction,
+  useHandDispenserStoreAction,
+} from "../../../store/store";
+import { useGameStore } from "../../../store/gameStore";
+import { useShallow } from "zustand/react/shallow";
 
 const HandCardGroup = ({
   group,
   selected,
-  onSelect
+  onSelect,
 }: {
   group: HandGroupTypes;
   selected: boolean;
-  onSelect: (val:number) => void;
+  onSelect: (val: number) => void;
 }) => {
-  const { setDispenserOpen } = useHandDispenserStore();
+  const { setDispenserOpen } = useHandDispenserStoreAction();
 
-  const { view, setCardStatus } = useHumanStore();
-  const { gameStatus } = useGameStore();
+  const { view, setCardStatus } = useHumanStoreAction();
+
+  const { gameStep } = useGameStore(
+    useShallow((state) => ({
+      gameStep: state.gameStatus.gameStep,
+    }))
+  );
 
   const { rank, cards } = group;
+
   // view();
 
   return (
     <div
       className={`${styles.cardContainer} ${selected ? styles.active : ""}`}
       onClick={() => {
-        if(gameStatus.gameStep === "inPlaying"){
+        if (gameStep === "inPlaying") {
           onSelect(group.cards[0].value);
           setCardStatus(group);
           setDispenserOpen();
         }
-        // view();
+        view();
       }}
     >
       <p>{rank}</p>

@@ -1,5 +1,5 @@
 import { HandGroupTypes } from "../pages/Home/types/HomeTypes";
-import { SettingStepTypes } from "../store/types/storeTypes";
+import { GameStatusTypes, SettingStepTypes } from "../store/types/storeTypes";
 import { CardTypes, PileTypes, PlayerTypes } from "./types/featuresTypes";
 
 export const randomNumBetween = (
@@ -14,6 +14,14 @@ export const randomNumBetween = (
     return Math.floor(Math.random() * (max - min) + min);
   }
   return 1;
+};
+
+export const calcCoordinate = (value: number, length: number, radius: number = 300) => {
+  const getRadians = (value / length) * (Math.PI * 2) - Math.PI;
+  const x = -Math.sin(getRadians) * 320;
+  const y = Math.cos(getRadians) * 320;
+
+  return { x, y };
 };
 
 export const copyPlayer = (players: PlayerTypes[]) => {
@@ -47,14 +55,6 @@ export const copyDeck = <T extends "deck" | "pile">(
   return copiedDeck;
 };
 
-export const calcCoordinate = (value: number, length: number, radius: number = 300) => {
-  const getRadians = (value / length) * (Math.PI * 2) - Math.PI;
-  const x = -Math.sin(getRadians) * 320;
-  const y = Math.cos(getRadians) * 320;
-
-  return { x, y };
-};
-
 export const getRankGroup = (hand: CardTypes[]) => {
   return Object.values(
     hand.reduce((acc: Record<string, HandGroupTypes>, cur) => {
@@ -78,17 +78,17 @@ export const getRankGroup = (hand: CardTypes[]) => {
 
 export const isStepCondition = (
   settingStep: SettingStepTypes,
-  type: "bootingToSettingReady" | "playing" | "readyToPlaying"
+  type: "bootingToReadyToSetting" | "playing" | "readyToPlaying"
 ) => {
   let condition: boolean = false;
 
   switch (type) {
-    case "bootingToSettingReady": {
-      condition = settingStep !== "booting" && settingStep !== "settingReady";
+    case "bootingToReadyToSetting": {
+      condition = settingStep !== "booting" && settingStep !== "readyToSetting";
       break
     }
     case "readyToPlaying": {
-      condition = settingStep === "ready" || settingStep === "playing";
+      condition = settingStep === "readyToPlay" || settingStep === "playing";
       break
     }
     case "playing": {
@@ -99,4 +99,30 @@ export const isStepCondition = (
 
   return condition;
   
+};
+
+export const getTargetPlayer = (
+  players: PlayerTypes[],
+  targetId: string
+) => {
+  const searchedPlayer = players.find(player => player.id === targetId);
+  return searchedPlayer;
+}
+
+export const getCurrentLeaderOrder = (
+  players: PlayerTypes[], 
+  latestPlayer: string
+) => {
+  const currentLeader = players.find(player => player.status.isLeader);
+
+  if(currentLeader?.id === latestPlayer) {
+    return currentLeader.order
+  }else{
+    return 0
+  }
+}
+
+export const calcPileCount = (pile: PileTypes) => {
+  const sumPileLength = pile.reduce((acc, cur) => (acc + cur.length), 0)
+  return sumPileLength;
 };

@@ -5,21 +5,34 @@ import {
   motion,
   useAnimationControls,
 } from "framer-motion";
-import { useGameStore } from "../store/store";
 import { isStepCondition } from "../features/utils";
+import { useGameStore, useGameStoreAction } from "../store/gameStore";
+import { useShallow } from 'zustand/react/shallow'
 
 const Nav = () => {
+
   const {
-    settingStatus,
-    setShuffleDeck,
-    setTaxCollect,
+    settingStep,
+    gameStep,
+    players,
+    deck,
+    actions
+  } = useGameStore(useShallow(state => ({
+    players: state.players,
+    deck: state.deck,
+    settingStep: state.settingStatus.settingStep,
+    gameStep: state.gameStatus.gameStep,
+    actions: state.actions
+  })));
+
+  const { 
+    setShuffleDeck, 
     setSettingStep,
     setGameOrder,
-    gameStatus,
     settleRound,
-  } = useGameStore();
+    runTaxCollect,
+  } = useGameStoreAction();
 
-  const { settingStep } = settingStatus;
 
   const [firstInitGame, setFirstInitGame] = useState(false);
   const headerMotionControls = useAnimationControls();
@@ -33,8 +46,8 @@ const Nav = () => {
       height: 80,
       backgroundColor: "rgba(0, 0, 0, 0.4)",
       transition: {
-        delay: isStepCondition(settingStep, "bootingToSettingReady") ? 0 : 0.4,
-        duration: isStepCondition(settingStep, "bootingToSettingReady")
+        delay: isStepCondition(settingStep, "bootingToReadyToSetting") ? 0 : 0.4,
+        duration: isStepCondition(settingStep, "bootingToReadyToSetting")
           ? 0.4
           : 1.6,
         ease: "circOut",
@@ -93,11 +106,13 @@ const Nav = () => {
     },
   };
 
+
+  // 여기 고민중이였음 사유) players 변경 마다 useEffect 발생 우려
   useEffect(() => {
     if (settingStep === "playing") {
-      setTaxCollect();
+      runTaxCollect();
     }
-  }, [settingStep, setTaxCollect]);
+  }, [ settingStep ]);
 
   return (
     <motion.header
@@ -106,12 +121,12 @@ const Nav = () => {
       animate={headerMotionControls}
       className={styles.headerNode}
       whileHover={
-        isStepCondition(settingStep, "bootingToSettingReady")
+        isStepCondition(settingStep, "bootingToReadyToSetting")
           ? "headerHover"
           : {}
       }
       onHoverEnd={() => {
-        if (isStepCondition(settingStep, "bootingToSettingReady")) {
+        if (isStepCondition(settingStep, "bootingToReadyToSetting")) {
           headerMotionControls.start("headerAnimate");
         }
       }}
@@ -139,7 +154,7 @@ const Nav = () => {
                     onClick={async () => {
                       if (!firstInitGame) {
                         headerMotionControls.start("headerAnimate");
-                        setSettingStep("settingReady");
+                        setSettingStep("readyToSetting");
 
                         await new Promise((resolve) =>
                           setTimeout(() => {
@@ -176,7 +191,7 @@ const Nav = () => {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {isStepCondition(settingStep, "bootingToSettingReady") && (
+        {isStepCondition(settingStep, "bootingToReadyToSetting") && (
           <div className={styles.headerNavBtnWrap}>
             <motion.button
               className={styles.btn}
@@ -185,7 +200,7 @@ const Nav = () => {
               animate="navBtnAnimate"
               exit="navBtnExit"
               onClick={() => {
-                if (settingStep === "ready") {
+                if (settingStep === "readyToPlay") {
                   setGameOrder("setting");
                   setSettingStep("playing");
                 }
@@ -200,9 +215,9 @@ const Nav = () => {
               initial="navBtnInit"
               animate="navBtnAnimate"
               exit="navBtnExit"
-              disabled={gameStatus.gameStep === "roundEnd" ? false : true}
+              disabled={gameStep === "roundEnd" ? false : true}
               onClick={() => {
-                if (gameStatus.gameStep === "roundEnd") {
+                if (gameStep === "roundEnd") {
                   setGameOrder("setting");
                   settleRound();
                 }

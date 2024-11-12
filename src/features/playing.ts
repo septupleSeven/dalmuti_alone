@@ -1,10 +1,11 @@
-import { useGameStore } from "../store/store";
 import {
+  GameActionsTypes,
   GameStatusTypes,
+  GameStepTypes,
   HumanCardStatusTypes,
   HumanLatestActionTypes,
 } from "../store/types/storeTypes";
-import { setDelay, setOrder, sortHand } from "./setting";
+import { setGRevolution, setOrder, sortHand } from "./setting";
 import {
   CardTypes,
   LayDownCardType,
@@ -90,6 +91,36 @@ export const actionSwapCard = (players: PlayerTypes[]) => {
   return sortHand(copiedPlayers);
 };
 
+const performLayDownCard = (
+  hand: CardTypes[],
+  selectedCards: CardTypes[],
+  drawNum: number
+) => {
+  const toSendCards = [];
+
+  for (let i = 0; i < drawNum; i++) {
+    toSendCards.push({ ...selectedCards[i] });
+    const targetCardIdx = hand.findIndex(
+      (card) => card.id === selectedCards[i].id
+    );
+    hand.splice(targetCardIdx, 1);
+  }
+
+  return toSendCards;
+};
+
+const performSwitchLeader = (
+  currentPlayer: PlayerTypes,
+  isFirstTurn: boolean = false,
+  currentLeaderPlayer?: PlayerTypes | undefined
+) => {
+  if (isFirstTurn && currentLeaderPlayer) {
+    currentLeaderPlayer.status.isLeader = false;
+  }
+
+  currentPlayer.status.isLeader = true;
+};
+
 export const layDownCard = (
   players: PlayerTypes[],
   pile: PileTypes,
@@ -103,7 +134,6 @@ export const layDownCard = (
   const currentPlayer = copiedPlayers.find(
     (player) => player.status.roundOrder === currentTurn
   )!;
-
   const { hand } = currentPlayer;
 
   if (!pile.length) {
@@ -117,18 +147,11 @@ export const layDownCard = (
     }
 
     const randomDraw = randomNumBetween(1, randomCards.length);
-    const toSendCards = [];
 
-    for (let i = 0; i < randomDraw; i++) {
-      toSendCards.push({ ...randomCards[i] });
-      const targetCardIdx = hand.findIndex(
-        (card) => card.id === randomCards[i].id
-      );
-      hand.splice(targetCardIdx, 1);
-    }
+    const toSendCards = performLayDownCard(hand, randomCards, randomDraw);
 
     copiedPile.push(toSendCards);
-    currentPlayer.status.isLeader = true;
+    performSwitchLeader(currentPlayer);
   } else if (pile.length && !isPass) {
     const currentLeaderPlayer = copiedPlayers.find(
       (player) => player.status.isLeader === true
@@ -150,9 +173,8 @@ export const layDownCard = (
       const groupedCards = pickedCards.reduce(
         (acc: Record<string, typeof pickedCards>, cur) => {
           const keyString = String(cur.value);
-          if (!acc[keyString]) {
-            acc[keyString] = [];
-          }
+
+          if (!acc[keyString]) acc[keyString] = [];
           acc[keyString].push(cur);
 
           return acc;
@@ -169,7 +191,7 @@ export const layDownCard = (
       }
 
       if (!entryCards.length && groupedCards["13"]) {
-        console.log("JOKER ACT");
+        // console.log("JOKER ACT");
         for (let val in groupedCards) {
           if (
             val !== "13" &&
@@ -200,21 +222,14 @@ export const layDownCard = (
         const randomDraw = randomNumBetween(0, entryCards.length - 1);
         const selectedCards = entryCards[randomDraw];
 
-        const toSendCards = [];
-
-        for (let i = 0; i < latestPileCards.length; i++) {
-          toSendCards.push(selectedCards[i]);
-          const targetCardIdx = hand.findIndex(
-            (card) => card.id === selectedCards[i].id
-          );
-          hand.splice(targetCardIdx, 1);
-        }
+        const toSendCards = performLayDownCard(
+          hand,
+          selectedCards,
+          latestPileCards.length
+        );
 
         copiedPile.push(toSendCards);
-        if (currentLeaderPlayer) {
-          currentLeaderPlayer.status.isLeader = false;
-        }
-        currentPlayer.status.isLeader = true;
+        performSwitchLeader(currentPlayer, true, currentLeaderPlayer);
       } else {
         isPass = true;
       }
@@ -242,6 +257,98 @@ export const layDownCard = (
       ...setNextTurn(copiedPlayers, currentTurn),
     };
   }
+
+  // return isPass
+  //   ? {
+  //       result: "pass",
+  //       ...setNextTurn(copiedPlayers, currentTurn),
+  //     }
+  //   : {
+  //       result: "layDown",
+  //       copiedPile: copiedPile,
+  //       ...setNextTurn(copiedPlayers, currentTurn),
+  //     };
+};
+
+export const playerLayDownCard = (
+  players: PlayerTypes[],
+  pile: Array<CardTypes>[],
+  currentTurn: number,
+  cardStatus: HumanCardStatusTypes,
+  actionType: HumanLatestActionTypes
+): LayDownCardType => {
+  const copiedPlayers = copyPlayer(players);
+  const copiedPile = copyDeck(pile, "pile");
+  const copiedCardStatus = Object.assign({}, cardStatus);
+
+  const humanPlayer = copiedPlayers.find((player) => player.id === "Human")!;
+  const { hand } = humanPlayer;
+
+  if (actionType === "layDown") {
+    const currentLeaderPlayer = copiedPlayers.find(
+      (player) => player.status.isLeader === true
+    );
+
+    if (!pile.length) {
+      const toSendCards = performLayDownCard(
+        hand,
+        copiedCardStatus.cards,
+        copiedCardStatus.selected
+      );
+
+      copiedPile.push(toSendCards);
+      performSwitchLeader(humanPlayer);
+    } else {
+      const latestPileCards = copiedPile[copiedPile.length - 1];
+
+      if (
+        (copiedCardStatus.cards[0].value < latestPileCards[0].value &&
+          copiedCardStatus.selected === latestPileCards.length) ||
+        copiedCardStatus.cards.some((card) => card.value === 13)
+      ) {
+        console.log("Human => ", copiedPlayers);
+        const toSendCards = performLayDownCard(
+          hand,
+          copiedCardStatus.cards,
+          copiedCardStatus.selected
+        );
+
+        copiedPile.push(toSendCards);
+        performSwitchLeader(humanPlayer, true, currentLeaderPlayer);
+      }
+    }
+  }
+
+  // if (actionType === "passed") {
+  //   console.log("Action: Pass ACT");
+  //   return {
+  //     result: "pass",
+  //     ...setNextTurn(copiedPlayers, currentTurn),
+  //   };
+  // }
+
+  // console.log(
+  //   "Action: LayDown ACT | value is =>",
+  //   copiedPile[copiedPile.length - 1][0].value,
+  //   " / length is =>",
+  //   copiedPile[copiedPile.length - 1].length
+  // );
+  // return {
+  //   result: "layDown",
+  //   copiedPile: copiedPile,
+  //   ...setNextTurn(copiedPlayers, currentTurn),
+  // };
+
+  return actionType === "passed"
+    ? {
+        result: "pass",
+        ...setNextTurn(copiedPlayers, currentTurn),
+      }
+    : {
+        result: "layDown",
+        copiedPile: copiedPile,
+        ...setNextTurn(copiedPlayers, currentTurn),
+      };
 };
 
 export const setNextTurn = (
@@ -282,89 +389,6 @@ export const setNextTurn = (
     latestPlayer: currentPlayer.id,
     nextTurn: currentTurn + 1 >= players.length ? 0 : currentTurn + 1,
     nextPlayers: copiedPlayers,
-  };
-};
-
-export const playerLayDownCard = (
-  players: PlayerTypes[],
-  pile: Array<CardTypes>[],
-  currentTurn: number,
-  cardStatus: HumanCardStatusTypes,
-  actionType: HumanLatestActionTypes
-): LayDownCardType => {
-  const copiedPlayers = copyPlayer(players);
-  const copiedPile = copyDeck(pile, "pile");
-  const copiedCardStatus = Object.assign({}, cardStatus);
-
-  const humanPlayer = copiedPlayers.find((player) => player.id === "Human")!;
-
-  const { hand } = humanPlayer;
-
-  if (actionType === "layDown") {
-    const currentLeaderPlayer = copiedPlayers.find(
-      (player) => player.status.isLeader === true
-    );
-
-    if (!pile.length) {
-      const toSendCards = [];
-
-      for (let i = 0; i < copiedCardStatus.selected; i++) {
-        toSendCards.push({ ...copiedCardStatus.cards[i] });
-        const targetCardIdx = hand.findIndex(
-          (card) => card.id === copiedCardStatus.cards[i].id
-        );
-        hand.splice(targetCardIdx, 1);
-      }
-
-      copiedPile.push(toSendCards);
-      humanPlayer.status.isLeader = true;
-    } else {
-      const latestPileCards = copiedPile[copiedPile.length - 1];
-
-      if (
-        (copiedCardStatus.cards[0].value < latestPileCards[0].value &&
-          copiedCardStatus.selected === latestPileCards.length) ||
-        copiedCardStatus.cards.some((card) => card.value === 13)
-      ) {
-        console.log("Human => ", copiedPlayers);
-        const toSendCards = [];
-
-        for (let i = 0; i < copiedCardStatus.selected; i++) {
-          toSendCards.push({ ...copiedCardStatus.cards[i] });
-          const targetCardIdx = hand.findIndex(
-            (card) => card.id === copiedCardStatus.cards[i].id
-          );
-          hand.splice(targetCardIdx, 1);
-        }
-
-        copiedPile.push(toSendCards);
-
-        if (currentLeaderPlayer) {
-          currentLeaderPlayer.status.isLeader = false;
-        }
-        humanPlayer.status.isLeader = true;
-      }
-    }
-  }
-
-  if (actionType === "passed") {
-    console.log("Action: Pass ACT");
-    return {
-      result: "pass",
-      ...setNextTurn(copiedPlayers, currentTurn),
-    };
-  }
-
-  console.log(
-    "Action: LayDown ACT | value is =>",
-    copiedPile[copiedPile.length - 1][0].value,
-    " / length is =>",
-    copiedPile[copiedPile.length - 1].length
-  );
-  return {
-    result: "layDown",
-    copiedPile: copiedPile,
-    ...setNextTurn(copiedPlayers, currentTurn),
   };
 };
 
@@ -412,15 +436,15 @@ export const setWinner = (
     .forEach((player, idx) => {
       player.status.roundOrder = idx;
 
-      if (player.status.roundOrder === 0) {
+      if (player.status.roundOrder === copiedTargetPlayer.status.roundOrder) {
         player.status.gameState = "inAction";
       }
     });
 
   copiedResultRank.push(copiedTargetPlayer);
 
-  console.log(filteredPlayers);
-  console.log(copiedResultRank);
+  // console.log(filteredPlayers);
+  // console.log(copiedResultRank);
 
   return {
     remainedPlayers: filteredPlayers,
@@ -428,4 +452,49 @@ export const setWinner = (
     currentTurn:
       gameStatus.currentTurn - 1 < 0 ? 0 : gameStatus.currentTurn - 1,
   };
+};
+
+export const performTaxCollect = async (
+  deck: CardTypes[],
+  players: PlayerTypes[],
+  gameStep: GameStepTypes,
+  actions: GameActionsTypes,
+  isRevolution: "revolution" | "gRevolution" | "continue"
+) => {
+  const { setGameStep, setGameState, setPlayers, runGame } = actions;
+
+  if (gameStep === "inPlaying") return;
+
+  if (isRevolution === "continue") {
+    console.log("Tax Collect result => continue");
+    setPlayers(actionSwapCard(players));
+  } else if (isRevolution === "gRevolution") {
+    console.log("Tax Collect result => gRevolution");
+    setPlayers(setGRevolution(deck, players, true));
+  } else if (isRevolution === "revolution") {
+    console.log("Tax Collect result => revolution");
+  }
+
+  setGameStep("inPlaying");
+  setGameState();
+
+  const isComplete = await new Promise<string>((resolve) =>
+    setTimeout(() => {
+      return resolve("inPlaying");
+    }, 2000)
+  );
+
+  if (isComplete) {
+    await runGame();
+  }
+};
+
+export const runHumanActionTrigger = (
+  trigger: (() => void) | null,
+  action: (value: (() => void) | null) => void
+) => {
+  if (trigger) {
+    trigger();
+    action(null);
+  }
 };

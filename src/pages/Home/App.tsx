@@ -2,27 +2,30 @@ import React, { useEffect, useRef } from "react";
 import Player from "./ui/Player";
 import styles from "./styles/HomeStyles.module.scss";
 import Container from "../../shared/Container";
-import { useGameStore } from "../../store/store";
 import Pile from "./ui/Pile";
 import Hand from "./ui/Hand";
-import { isStepCondition } from "../../features/utils";
+import { getTargetPlayer, isStepCondition } from "../../features/utils";
 import Log from "./ui/Log";
+import { useGameStore, useGameStoreAction } from "../../store/gameStore";
+import { useShallow } from "zustand/react/shallow";
 
 function App() {
+  
   const {
     players,
     pile,
-    settingStatus,
-    view,
-    setDealCard,
-    setSortPlayer,
-    initDeck,
-    getHuman,
-  } = useGameStore();
+    settingStep,
+  } = useGameStore(useShallow(state => ({
+    players: state.players,
+    pile: state.pile,
+    settingStep: state.settingStatus.settingStep,
+  })));
+  const { view, setDealCard, setSortPlayer, setInitializeDeck } = useGameStoreAction();
+
   view();
 
-  const { settingStep } = settingStatus;
-  const gameTableRef = useRef(null)
+  const gameTableRef = useRef(null);
+  const humanPlayer = getTargetPlayer(players, "Human")!;
 
   useEffect(() => {
     if (settingStep === "dealForOrder") {
@@ -30,14 +33,14 @@ function App() {
     }
     if (settingStep === "rearrange") {
       setSortPlayer("setting");
-      initDeck("shuffle");
+      setInitializeDeck("shuffle");
     }
-  }, [settingStep, setDealCard, setSortPlayer, initDeck]);
+  }, [settingStep, setDealCard, setSortPlayer, setInitializeDeck]);
 
   return (
     <Container>
       <div className={styles.gameTableContainer} ref={gameTableRef}>
-        {isStepCondition(settingStep, "bootingToSettingReady") &&
+        {isStepCondition(settingStep, "bootingToReadyToSetting") &&
           players.map((player, idx) => {
             return (
               <Player
@@ -54,9 +57,9 @@ function App() {
         )}
       </div>
       {isStepCondition(settingStep, "readyToPlaying") && (
-        <Hand human={getHuman()} />
+        <Hand human={humanPlayer} />
       )}
-      {isStepCondition(settingStep, "bootingToSettingReady") && (
+      {isStepCondition(settingStep, "bootingToReadyToSetting") && (
         <Log />
       )}
     </Container>

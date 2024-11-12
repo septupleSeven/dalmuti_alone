@@ -2,7 +2,6 @@ import { PLAYER_NAME_TABLE } from "../config/contants";
 import { HandGroupTypes } from "../pages/Home/types/HomeTypes";
 import {
   HumanCardStatusTypes,
-  RoundStatusTypes,
 } from "../store/types/storeTypes";
 import { CardTypes, PlayerTypes } from "./types/featuresTypes";
 import { copyDeck, copyPlayer } from "./utils";

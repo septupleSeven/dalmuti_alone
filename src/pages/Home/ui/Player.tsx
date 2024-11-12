@@ -2,9 +2,10 @@ import React, { useMemo, useState } from "react";
 import { PlayerTypes } from "../../../features/types/featuresTypes";
 import { AnimatePresence, motion } from "framer-motion";
 import { CARD_NAME_TABLE, PLAYER_NUM } from "../../../config/contants";
-import { useGameStore } from "../../../store/store";
 import styles from "../styles/HomeStyles.module.scss";
 import { calcCoordinate } from "../../../features/utils";
+import { useGameStore, useGameStoreAction } from "../../../store/gameStore";
+import { useShallow } from "zustand/react/shallow";
 
 const Player = ({
   playerInfo,
@@ -13,8 +14,15 @@ const Player = ({
   playerInfo: PlayerTypes;
   componentIdx: number;
 }) => {
-  const { settingStatus, setSettingStep, setDealCard } = useGameStore();
-  const { settingStep, settingStepCondition } = settingStatus;
+  
+  const { settingStep, settingStepCondition } = useGameStore(
+    useShallow(
+      (state) => ({
+        settingStep: state.settingStatus.settingStep,
+        settingStepCondition: state.settingStatus.settingStepCondition,
+    }))
+  );
+  const { setSettingStep, setDealCard } = useGameStoreAction();
 
   const { order, name, className, hand } = playerInfo;
   const [isOrderCard, setIsOrderCard] = useState(true);
@@ -35,7 +43,7 @@ const Player = ({
     }),
     [order]
   );
-  
+
   return (
     <motion.div
       variants={pContainerMotionVariant}
@@ -45,15 +53,18 @@ const Player = ({
       transition={{
         duration: 1.2,
         delay: order / 20,
-        ease: "easeOut"
+        ease: "easeOut",
       }}
       onAnimationComplete={async () => {
         if (settingStep === "setting" && lastCompCondition) {
           setSettingStep("dealForOrder");
         }
-        if (settingStep === "rearrange" && settingStepCondition !== "rearrange") {
+        if (
+          settingStep === "rearrange" &&
+          settingStepCondition !== "rearrange"
+        ) {
           setSettingStep("rearrange", "condition");
-          setSettingStep("ready");
+          setSettingStep("readyToPlay");
           setDealCard("game");
         }
       }}
@@ -87,7 +98,11 @@ const Player = ({
               delay: order / 8,
             }}
             onAnimationComplete={async () => {
-              if (settingStep === "dealForOrder" && lastCompCondition && isOrderCard) {
+              if (
+                settingStep === "dealForOrder" &&
+                lastCompCondition &&
+                isOrderCard
+              ) {
                 setIsOrderCard(false);
                 await new Promise((resolve) => setTimeout(resolve, 2000));
                 setSettingStep("rearrange");
@@ -98,7 +113,8 @@ const Player = ({
               opacity: 0,
             }}
           >
-           {CARD_NAME_TABLE[hand[0].rank].name}{`(${hand[0].rank})`}
+            {CARD_NAME_TABLE[hand[0].rank].name}
+            {`(${hand[0].rank})`}
           </motion.p>
         ) : null}
       </AnimatePresence>

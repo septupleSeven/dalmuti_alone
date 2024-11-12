@@ -3,27 +3,44 @@ import styles from "../styles/HomeStyles.module.scss";
 import {
   useHumanStore,
   useHandDispenserStore,
-  useGameStore,
+  useHandDispenserStoreAction,
+  useHumanStoreAction,
 } from "../../../store/store";
 import { getRankGroup } from "../../../features/utils";
+import { useGameStore } from "../../../store/gameStore";
+import { runHumanActionTrigger } from "../../../features/playing";
+import { useShallow } from "zustand/react/shallow";
 
 const HandCardDispenser = ({
   onSelect,
 }: {
   onSelect: (val: number) => void;
 }) => {
-  const { setDispenserClose } = useHandDispenserStore();
+  const { setDispenserClose } = useHandDispenserStoreAction();
+
+  const { cardStatus, actionTrigger } = useHumanStore(
+    useShallow((state) => ({
+      cardStatus: state.cardStatus,
+      actionTrigger: state.actionTrigger,
+    }))
+  );
+
   const {
-    cardStatus,
+    setHumanActionTrigger,
+    setCardStatusJokerPicked,
+    setCardStatusCombine,
     setCardStatusSelected,
     setLatestAction,
     view,
-    runHumanActionTrigger,
-    setCardStatusJokerPicked,
-    setCardStatusCombine,
-  } = useHumanStore();
+  } = useHumanStoreAction();
 
-  const { players, pile, gameStatus } = useGameStore();
+  const { players, pile, gameStep } = useGameStore(
+    useShallow((state) => ({
+      players: state.players,
+      pile: state.pile,
+      gameStep: state.gameStatus.gameStep,
+    }))
+  );
 
   const [inputVal, setInputVal] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -151,18 +168,18 @@ const HandCardDispenser = ({
 
                 // view();
 
-                if (gameStatus.gameStep === "inPlaying") {
+                if (gameStep === "inPlaying") {
                   chkBtn();
                   setLatestAction("layDown");
-                  runHumanActionTrigger();
+
+                  runHumanActionTrigger(actionTrigger, setHumanActionTrigger);
+
                   onSelect(0);
                   setDispenserClose();
                 }
               }}
               disabled={
-                isHumanTurn() && gameStatus.gameStep === "inPlaying"
-                  ? false
-                  : true
+                isHumanTurn() && gameStep === "inPlaying" ? false : true
               }
             >
               확인
@@ -180,7 +197,7 @@ const HandCardDispenser = ({
             onClick={() => {
               if (pile.length) {
                 setLatestAction("passed");
-                runHumanActionTrigger();
+                runHumanActionTrigger(actionTrigger, setHumanActionTrigger);
                 onSelect(0);
                 setDispenserClose();
               }
