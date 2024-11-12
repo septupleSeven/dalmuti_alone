@@ -24,8 +24,8 @@ import {
   setWinner,
 } from "../features/playing";
 import { LayDownCardType } from "../features/types/featuresTypes";
-import { useHumanStore } from "./store";
 import { useShallow } from "zustand/react/shallow";
+import { useHumanStore } from "./humanStore";
 
 export const useGameStore = create<useGameStoreTypes>((set, get) => ({
   players: [...setPlayer(PLAYER_NUM)],

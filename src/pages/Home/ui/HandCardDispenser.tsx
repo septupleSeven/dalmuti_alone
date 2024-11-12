@@ -1,15 +1,11 @@
 import React, { FormEvent, useRef, useState } from "react";
 import styles from "../styles/HomeStyles.module.scss";
-import {
-  useHumanStore,
-  useHandDispenserStore,
-  useHandDispenserStoreAction,
-  useHumanStoreAction,
-} from "../../../store/store";
 import { getRankGroup } from "../../../features/utils";
 import { useGameStore } from "../../../store/gameStore";
 import { runHumanActionTrigger } from "../../../features/playing";
 import { useShallow } from "zustand/react/shallow";
+import { useHandDispenserStoreAction } from "../../../store/handStore";
+import { useHumanStore, useHumanStoreAction } from "../../../store/humanStore";
 
 const HandCardDispenser = ({
   onSelect,

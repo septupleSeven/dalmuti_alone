@@ -112,7 +112,7 @@ const Nav = () => {
     if (settingStep === "playing") {
       runTaxCollect();
     }
-  }, [ settingStep ]);
+  }, [ settingStep, runTaxCollect ]);
 
   return (
     <motion.header

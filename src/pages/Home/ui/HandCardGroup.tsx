@@ -2,12 +2,10 @@ import React from "react";
 import { HandGroupTypes } from "../types/HomeTypes";
 import Card from "./Card";
 import styles from "../styles/HomeStyles.module.scss";
-import {
-  useHumanStoreAction,
-  useHandDispenserStoreAction,
-} from "../../../store/store";
 import { useGameStore } from "../../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
+import { useHandDispenserStoreAction } from "../../../store/handStore";
+import { useHumanStoreAction } from "../../../store/humanStore";
 
 const HandCardGroup = ({
   group,

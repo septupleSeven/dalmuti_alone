@@ -3,7 +3,11 @@ import styles from "../styles/HomeStyles.module.scss";
 
 const Log = () => {
   return (
-    <div className={styles.logContainer}>Log</div>
+    <div className={styles.logContainer}>
+      <ul>
+        <li>텍스트</li>
+      </ul>
+    </div>
   )
 }
 
