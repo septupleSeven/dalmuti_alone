@@ -1,12 +1,13 @@
 import React, { FormEvent, useRef, useState } from "react";
 import styles from "../styles/HomeStyles.module.scss";
-import { getRankGroup } from "../../../features/utils";
+import { getRankGroup, isHumanTurn } from "../../../features/utils";
 import { useGameStore } from "../../../store/gameStore";
 import { runHumanActionTrigger } from "../../../features/playing";
 import { useShallow } from "zustand/react/shallow";
 import { useHandDispenserStoreAction } from "../../../store/handStore";
 import { useHumanStore, useHumanStoreAction } from "../../../store/humanStore";
 import { CARD_NAME_TABLE, HUMAN_ID } from "../../../config/contants";
+import { PlayerTypes } from "../../../features/types/featuresTypes";
 
 const HandCardDispenser = ({
   onSelect,
@@ -53,11 +54,6 @@ const HandCardDispenser = ({
     if (inputRef.current) {
       setCardStatusSelected(inputRef.current.value);
     }
-  };
-
-  const isHumanTurn = () => {
-    const humanPlayer = players.find((player) => player.id === HUMAN_ID);
-    return humanPlayer?.status.gameState === "inAction";
   };
 
   const hasJoker = () => {
@@ -123,7 +119,6 @@ const HandCardDispenser = ({
         </div>
 
         <div className={styles.handDispenserSubmitContainer}>
-          
           <div className={styles.textWrap}>
             <input
               type="text"
@@ -131,7 +126,7 @@ const HandCardDispenser = ({
                 pile.length ? String(pile[pile.length - 1].length) : inputVal
               }
               onInput={(e) => onlyNumber(e)}
-              disabled={isHumanTurn() && pile.length ? true : false}
+              disabled={isHumanTurn(players) && pile.length ? true : false}
               ref={inputRef}
             />
             <span>장</span>
@@ -195,7 +190,9 @@ const HandCardDispenser = ({
                   }
                 }}
                 disabled={
-                  isHumanTurn() && gameStep === "inPlaying" ? false : true
+                  isHumanTurn(players) && gameStep === "inPlaying"
+                    ? false
+                    : true
                 }
               >
                 확인
@@ -218,9 +215,9 @@ const HandCardDispenser = ({
                   setDispenserClose();
                 }
               }}
-              disabled={isHumanTurn() && pile.length ? false : true}
+              disabled={isHumanTurn(players) && pile.length ? false : true}
             >
-              패스
+              패스하기
             </button>
           </div>
         </div>

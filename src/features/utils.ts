@@ -1,3 +1,4 @@
+import { HUMAN_ID } from "../config/contants";
 import { HandGroupTypes } from "../pages/Home/types/HomeTypes";
 import { GameStatusTypes, SettingStepTypes } from "../store/types/storeTypes";
 import { CardTypes, PileTypes, PlayerTypes } from "./types/featuresTypes";
@@ -16,7 +17,11 @@ export const randomNumBetween = (
   return 1;
 };
 
-export const calcCoordinate = (value: number, length: number, radius: number = 300) => {
+export const calcCoordinate = (
+  value: number,
+  length: number,
+  radius: number = 300
+) => {
   const getRadians = (value / length) * (Math.PI * 2) - Math.PI;
   const x = -Math.sin(getRadians) * 320;
   const y = Math.cos(getRadians) * 320;
@@ -85,44 +90,49 @@ export const isStepCondition = (
   switch (type) {
     case "bootingToReadyToSetting": {
       condition = settingStep !== "booting" && settingStep !== "readyToSetting";
-      break
+      break;
     }
     case "readyToPlaying": {
       condition = settingStep === "readyToPlay" || settingStep === "playing";
-      break
+      break;
     }
     case "playing": {
       condition = settingStep === "playing";
-      break
+      break;
     }
   }
 
   return condition;
-  
 };
 
-export const getTargetPlayer = (
-  players: PlayerTypes[],
-  targetId: string
-) => {
-  const searchedPlayer = players.find(player => player.id === targetId);
+export const getTargetPlayer = (players: PlayerTypes[], targetId: string) => {
+  const searchedPlayer = players.find((player) => player.id === targetId);
   return searchedPlayer;
-}
+};
 
 export const getCurrentLeaderOrder = (
-  players: PlayerTypes[], 
+  players: PlayerTypes[],
   latestPlayer: string
 ) => {
-  const currentLeader = players.find(player => player.status.isLeader);
+  const currentLeader = players.find((player) => player.status.isLeader);
 
-  if(currentLeader?.id === latestPlayer) {
-    return currentLeader.order
-  }else{
-    return 0
+  if (currentLeader?.id === latestPlayer) {
+    return currentLeader.order;
+  } else {
+    return 0;
   }
-}
+};
 
 export const calcPileCount = (pile: PileTypes) => {
-  const sumPileLength = pile.reduce((acc, cur) => (acc + cur.length), 0)
+  const sumPileLength = pile.reduce((acc, cur) => acc + cur.length, 0);
   return sumPileLength;
 };
+
+export const isHumanTurn = (players: PlayerTypes[]) => {
+  const humanPlayer = players.find((player) => player.id === HUMAN_ID);
+  return humanPlayer?.status.gameState === "inAction";
+};
+
+export const setDelay = async (ms:number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

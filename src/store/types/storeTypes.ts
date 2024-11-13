@@ -14,9 +14,7 @@ export type GameStepTypes =
   | "collectingTax"
   | "inPlaying"
   | "roundEnd"
-  | "rearrange"
-  | "ready"
-  | "playing";
+  | "GAMEOVER"
 
 export type GameSettingTypes = "game" | "setting";
 export type GameActionTypes = "shuffle" | "deal";

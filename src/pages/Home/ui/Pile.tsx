@@ -20,8 +20,6 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
     }))
   );
 
-  console.log("pile => ", pile)
-
   const pileCardMotionVariant = useMemo(() => {
     const xVal = getCurrentLeaderOrder(players, latestPlayer);
     const yVal = getCurrentLeaderOrder(players, latestPlayer);

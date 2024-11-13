@@ -28,6 +28,7 @@ import { LayDownCardType } from "../features/types/featuresTypes";
 import { useShallow } from "zustand/react/shallow";
 import { useHumanStore } from "./humanStore";
 import { useLogStore } from "./logStore";
+import { setDelay } from "../features/utils";
 
 export const useGameStore = create<useGameStoreTypes>((set, get) => ({
   players: [...setPlayer(PLAYER_NUM)],
@@ -241,6 +242,8 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
         setPlayers(actionResult.nextPlayers);
       }
 
+      await setDelay(1000)
+
       const isGameContinue = await new Promise<void>((resolve, reject) =>
         setTimeout(() => {
           const playerChk = get().players.find(
@@ -277,6 +280,11 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
         .catch(() => false);
 
       if (!isGameContinue) {
+        const updatedPlayer = get().players
+        const resultData = setWinner(updatedPlayer, updatedPlayer[0], get().gameStatus);
+        setPlayers(resultData.remainedPlayers);
+        setResultRank(resultData.updatedResultRank);
+        setGameStep("GAMEOVER");
         return;
       }
 
@@ -291,24 +299,19 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
       const { runGame, setGameStep, setGameOrder, setPile, setDeck, view } =
         actions;
 
+        const getLogStoreAction = useLogStore.getState().actions;
+        const { setLog } = getLogStoreAction;
+
       if (players.length > 1) {
         const settledData = getSettleRoundData(players, pile, deck);
-        // console.log("setGameOrder");
         setGameOrder("game");
-        // view();
-        // console.log("setPile");
         setPile(settledData!.clearPile);
-        // view();
-        // console.log("setDeck");
         setDeck(settledData!.updatedDeck);
-        // view();
-        // console.log("setcurrentTurn");
         set(
           produce((state) => {
             state.gameStatus.currentTurn = 0;
           })
         );
-        // view();
       }
 
       const isComplete = await new Promise<string>((resolve) =>
@@ -320,6 +323,7 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
 
       if (isComplete) {
         console.log("Round Restart");
+        setLog(setLogData(`다음 라운드가 시작됩니다.`))
         runGame();
       }
     },

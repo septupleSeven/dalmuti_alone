@@ -18,8 +18,6 @@ const Nav = () => {
     settingStep,
     gameStep,
     players,
-    deck,
-    actions
   } = useGameStore(useShallow(state => ({
     players: state.players,
     deck: state.deck,

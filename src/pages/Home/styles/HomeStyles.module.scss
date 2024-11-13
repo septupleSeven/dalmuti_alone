@@ -162,7 +162,7 @@
         position: fixed;
         top: 0;
         right: 0;
-        z-index: 9999;
+        z-index: 9998;
         display: flex;
         align-items: center;
         height: 100%;
@@ -198,10 +198,44 @@
         display: flex;
         flex-direction: column;
         row-gap: 30px;
+    }
+
+    &TitleWrap{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
         h1{
             font-size: 1.625rem;
             font-family: $font_point--B;
+        }
+        
+        button{
+            display: flex;
+            align-items: center;
+            column-gap: 10px;
+            background-color: transparent;
+            color: #fff;
+            border: 0;
+            font-size: 1.0625rem;
+            opacity: 0.6;
+            transition: 0.4s;
+
+            img{
+                width: 18px;
+                height: 18px;
+                transition: 0.4s;
+            }
+
+            &:hover{
+                opacity: 1;
+
+                img{
+                    transform: translateY(-5px);
+                }
+            }
+
         }
 
     }
@@ -603,6 +637,97 @@
         .contents{
             word-break: keep-all;
             line-height: 1.25;
+        }
+
+    }
+
+}
+
+.ending {
+
+    &Container{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background-color: #111;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        row-gap: 50px;
+        color: #fff;
+    }
+
+    &TitleWrap{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        row-gap: 10px;
+
+        >h1{
+            font-family: $font_point--B;
+            font-size: 3.125rem;
+            color: $color--primary;
+            text-align: center;
+        }
+
+        >p{
+            font-size: 1.25rem;
+            text-align: center;
+        }
+
+    }
+
+    &Contents{
+
+        ul{
+            display: flex;
+            flex-direction: column;
+            row-gap: 30px;
+
+            li{
+                display: grid;
+                grid-template-columns: 70px 1fr;
+                align-items: center;
+                column-gap: 20px;
+
+                figure{
+                    display: flex;
+                    justify-content: center;
+                    aspect-ratio: 1/1;
+                    width: 100%;
+                    overflow: hidden;
+                    border-radius: 5px;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+
+                }
+
+                .nameWrap{
+                    display: flex;
+                    flex-direction: column;
+                    row-gap: 15px;
+
+                    .order{
+                        font-family: $font_point--B;
+                        font-size: 1.125rem;
+                    }
+
+                    .name{
+                        
+                    }
+
+                }
+
+            }
+
         }
 
     }

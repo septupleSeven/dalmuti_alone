@@ -4,9 +4,12 @@ import { motion, useCycle } from "framer-motion";
 import { PlayerTypes } from "../../../features/types/featuresTypes";
 import HandCardGroup from "./HandCardGroup";
 import HandCardDispenser from "./HandCardDispenser";
-import { getRankGroup } from "../../../features/utils";
+import { getRankGroup, isHumanTurn } from "../../../features/utils";
 import { useShallow } from "zustand/react/shallow";
 import { useHandDispenserStore } from "../../../store/handStore";
+import { useHumanStore, useHumanStoreAction } from "../../../store/humanStore";
+import { runHumanActionTrigger } from "../../../features/playing";
+import { useGameStore } from "../../../store/gameStore";
 
 const Hand = ({ human }: { human: PlayerTypes }) => {
   const [isOpen, toggleOpen] = useCycle(true, false);
@@ -14,6 +17,20 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
   const { isDispenserOpen } = useHandDispenserStore(
     useShallow((state) => ({
       isDispenserOpen: state.isDispenserOpen,
+    }))
+  );
+
+  const { actionTrigger } = useHumanStore(
+    useShallow((state) => ({
+      actionTrigger: state.actionTrigger,
+    }))
+  );
+  const { setHumanActionTrigger, setLatestAction } = useHumanStoreAction();
+
+  const { players, pile, } = useGameStore(
+    useShallow((state) => ({
+      players: state.players,
+      pile: state.pile,
     }))
   );
 
@@ -49,7 +66,21 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
         />
       </button>
       <motion.div className={styles.handContainer}>
-        <h1>당신의 패</h1>
+        <div className={styles.handTitleWrap}>
+          <h1>당신의 패</h1>
+          <button
+            onClick={() => {
+              if (pile.length) {
+                setLatestAction("passed");
+                runHumanActionTrigger(actionTrigger, setHumanActionTrigger);
+              }
+            }}
+            disabled={isHumanTurn(players) && pile.length ? false : true}
+          >
+            <img src={require("../../../assets/img/turn__up.png")} alt="패스하기" />
+            패스하기
+          </button>
+        </div>
         <motion.div className={styles.handWrapper}>
           {human &&
             human.hand &&

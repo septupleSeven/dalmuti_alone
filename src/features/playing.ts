@@ -435,7 +435,11 @@ export const setWinner = (
     .forEach((player, idx) => {
       player.status.roundOrder = idx;
 
-      if (player.status.roundOrder === copiedTargetPlayer.status.roundOrder) {
+      const getNextRoundOrder = 
+      copiedTargetPlayer.status.roundOrder === (copiedPlayers.length - 1)
+      ? 0 : copiedTargetPlayer.status.roundOrder;
+
+      if (player.status.roundOrder === getNextRoundOrder) {
         player.status.gameState = "inAction";
       }
     });

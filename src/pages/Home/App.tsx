@@ -9,6 +9,7 @@ import Log from "./ui/Log";
 import { useGameStore, useGameStoreAction } from "../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
 import { HUMAN_ID } from "../../config/contants";
+import Ending from "./ui/Ending";
 
 function App() {
   
@@ -16,10 +17,12 @@ function App() {
     players,
     pile,
     settingStep,
+    gameStep,
   } = useGameStore(useShallow(state => ({
     players: state.players,
     pile: state.pile,
     settingStep: state.settingStatus.settingStep,
+    gameStep: state.gameStatus.gameStep
   })));
   const { view, setDealCard, setSortPlayer, setInitializeDeck } = useGameStoreAction();
 
@@ -63,6 +66,7 @@ function App() {
       {isStepCondition(settingStep, "bootingToReadyToSetting") && (
         <Log />
       )}
+      {gameStep === "GAMEOVER" && <Ending />}
     </Container>
   );
 }

@@ -79,3 +79,11 @@ export const REVOLUTION_TEXT:Record<string, string> = {
     "gRevolution": "대혁명! 달무티와 총리대신의 손에 농기구가 쥐어 집니다.",
     "continue": "아무 일도 없었습니다. 세금이 징수됩니다. 농노와 소작농의 희망도 징수됩니다.",
 }
+
+export const ENDING_TEXT:Record<string, string> = {
+    "ORDER0": "훌륭합니다. 당신이 바로 진정한 달무티입니다.",
+    "ORDER1": "어떤 때는 2인자가 더 기억에 남는 법이죠.",
+    "ORDER2": "이 리스트에선 센터 포지션이군요.",
+    "ORDER3": "원래 인생은 불공평합니다.",
+    "ORDER4": "..."
+}

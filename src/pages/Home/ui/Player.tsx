@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { PlayerTypes } from "../../../features/types/featuresTypes";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -20,7 +20,7 @@ const Player = ({
   playerInfo: PlayerTypes;
   componentIdx: number;
 }) => {
-  const { players, settingStep, settingStepCondition } = useGameStore(
+  const { settingStep, settingStepCondition } = useGameStore(
     useShallow((state) => ({
       settingStep: state.settingStatus.settingStep,
       settingStepCondition: state.settingStatus.settingStepCondition,
@@ -33,7 +33,6 @@ const Player = ({
 
   const { order, className, hand, id, status } = playerInfo;
   const [isOrderCard, setIsOrderCard] = useState(true);
-  const [isInAction, setIsInAction] = useState(false);
   const lastCompCondition = componentIdx === PLAYER_NUM;
 
   const pContainerMotionVariant = useMemo(
@@ -48,6 +47,9 @@ const Player = ({
         x: calcCoordinate(order, PLAYER_NUM).x,
         y: calcCoordinate(order, PLAYER_NUM).y,
       },
+      exit: {
+        opacity: 0,
+      }
     }),
     [order]
   );
@@ -57,6 +59,7 @@ const Player = ({
       variants={pContainerMotionVariant}
       initial="init"
       animate="getPosition"
+      exit="exit"
       className={styles.playerContainer}
       transition={{
         duration: 1.2,
