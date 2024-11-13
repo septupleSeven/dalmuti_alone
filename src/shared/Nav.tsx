@@ -213,12 +213,15 @@ const Nav = () => {
                   setSettingStep("playing");
                 }
               }}
-              disabled={isStepCondition(settingStep, "playing") ? true : false}
+              disabled={
+                isStepCondition(settingStep, "playing") 
+                ? true : false
+              }
             >
               게임시작
             </motion.button>
             <motion.button
-              className={styles.btn}
+              className={gameStep === "roundEnd" ? `${styles.btn} ${styles.active}` : styles.btn}
               variants={navBtnVariants}
               initial="navBtnInit"
               animate="navBtnAnimate"

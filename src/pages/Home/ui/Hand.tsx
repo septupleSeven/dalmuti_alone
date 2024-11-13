@@ -9,7 +9,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useHandDispenserStore } from "../../../store/handStore";
 
 const Hand = ({ human }: { human: PlayerTypes }) => {
-  const [isOpen, toggleOpen] = useCycle(false, true);
+  const [isOpen, toggleOpen] = useCycle(true, false);
 
   const { isDispenserOpen } = useHandDispenserStore(
     useShallow((state) => ({
@@ -20,19 +20,36 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
   const [isSelected, setIsSelected] = useState<number>(0);
 
   return (
-    <div className={styles.handNode}>
+    <motion.div
+      className={styles.handNode}
+      initial={{
+        x: "100%",
+      }}
+      animate={{
+        x: isOpen ? 0 : "100%",
+      }}
+    >
       <button className={styles.handBtn} onClick={() => toggleOpen()}>
-        HandBtn
+        <motion.img
+          src={require(`../../../assets/img/${
+            isOpen ? "fists__icon" : "hands__icon"
+          }.png`)}
+          alt="Open Hand"
+          initial={{
+            filter: "brightness(0) invert(1)",
+          }}
+          whileHover={{
+            filter: "brightness(1) invert(0)",
+            rotate: isOpen ? 15 : -15,
+            transition: {
+              delay: 0,
+              duration: 0.2,
+            },
+          }}
+        />
       </button>
-      <motion.div
-        className={styles.handContainer}
-        initial={{
-          width: 0,
-        }}
-        animate={{
-          width: 400,
-        }}
-      >
+      <motion.div className={styles.handContainer}>
+        <h1>당신의 패</h1>
         <motion.div className={styles.handWrapper}>
           {human &&
             human.hand &&
@@ -49,7 +66,7 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
           <HandCardDispenser onSelect={(val: number) => setIsSelected(val)} />
         )}
       </motion.div>
-    </div>
+    </motion.div>
   );
 };
 

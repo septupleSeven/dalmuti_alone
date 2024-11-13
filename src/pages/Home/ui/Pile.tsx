@@ -41,6 +41,10 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
         x: 0,
         y: 0,
       },
+      exit: {
+        opacity: 0,
+        y: 30
+      }
     };
   }, [players, latestPlayer]);
 
@@ -69,6 +73,7 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
                 variants={pileCardMotionVariant}
                 initial="init"
                 animate="getCenter"
+                exit="exit"
                 className={styles.pileCard}
                 transition={{
                   duration: 1.2,

@@ -6,7 +6,7 @@ import { runHumanActionTrigger } from "../../../features/playing";
 import { useShallow } from "zustand/react/shallow";
 import { useHandDispenserStoreAction } from "../../../store/handStore";
 import { useHumanStore, useHumanStoreAction } from "../../../store/humanStore";
-import { HUMAN_ID } from "../../../config/contants";
+import { CARD_NAME_TABLE, HUMAN_ID } from "../../../config/contants";
 
 const HandCardDispenser = ({
   onSelect,
@@ -77,13 +77,19 @@ const HandCardDispenser = ({
     <div className={styles.handDispenser}>
       <div className={styles.handDispenserContents}>
         <div className={styles.handDispenserTitleWrap}>
-          <p className={styles.title}>{cardStatus.rank} 몇 장 내시겠습니까?</p>
+          <p className={styles.title}>
+            <span>
+              {CARD_NAME_TABLE[`RANK${cardStatus.value}`].name}&#40;
+              {cardStatus.rank}&#41;
+            </span>
+            을 몇 장 내시겠습니까?
+          </p>
           <p className={styles.amount}>
-            최대 : {cardStatus.cards.length}장 가능
+            최대 : <span>{cardStatus.cards.length}</span>장 가능
           </p>
         </div>
 
-        <div className={styles.JokerWrap}>
+        <div className={styles.handDispenserJokerWrap}>
           <div className={styles.inputContainer}>
             <input
               type="checkbox"
@@ -107,104 +113,116 @@ const HandCardDispenser = ({
               ref={jokerRef}
               defaultChecked={false}
             />
+            <label htmlFor="joker">조커 사용</label>
           </div>
-          <label htmlFor="joker">조커 사용</label>
-          {hasJoker() ? <p>남은 수 {jokerGroup()?.cards.length}/2 장</p> : null}
+          {hasJoker() ? (
+            <p className={styles.remain}>
+              남은 수 {jokerGroup()?.cards.length}/2 장
+            </p>
+          ) : null}
         </div>
 
-        <input
-          type="text"
-          value={pile.length ? String(pile[pile.length - 1].length) : inputVal}
-          onInput={(e) => onlyNumber(e)}
-          disabled={isHumanTurn() && pile.length ? true : false}
-          ref={inputRef}
-        />
+        <div className={styles.handDispenserSubmitContainer}>
+          
+          <div className={styles.textWrap}>
+            <input
+              type="text"
+              value={
+                pile.length ? String(pile[pile.length - 1].length) : inputVal
+              }
+              onInput={(e) => onlyNumber(e)}
+              disabled={isHumanTurn() && pile.length ? true : false}
+              ref={inputRef}
+            />
+            <span>장</span>
+          </div>
 
-        <div className={styles.handDispenserBtnContainer}>
-          <div className={styles.handDispenserBtnWrap}>
-            <button
-              onClick={() => {
-                if (!pile.length && !inputVal) {
-                  alert("제출 카드를 선택해주세요.");
-                  return false;
-                }
-
-                if (
-                  !pile.length &&
-                  cardStatus.cards.length < Number(inputVal)
-                ) {
-                  alert("선택한 카드가 충분하지 않습니다.");
-                  return false;
-                }
-
-                if (
-                  pile.length &&
-                  !cardStatus.cards.some((card) => card.value === 13) &&
-                  cardStatus.cards[0].value >= pile[pile.length - 1][0].value
-                ) {
-                  alert("숫자가 안맞습니다.");
-                  return false;
-                }
-
-                if (
-                  pile.length &&
-                  cardStatus.cards.length < pile[pile.length - 1].length
-                ) {
-                  if (
-                    jokerRef.current &&
-                    jokerRef.current.checked &&
-                    cardStatus.rank !== "JOKER"
-                  ) {
-                    setCardStatusCombine(pile[pile.length - 1].length);
-                    setCardStatusSelected(
-                      useHumanStore.getState().cardStatus.cards.length
-                    );
-                  } else {
-                    alert("조건에 맞는 카드가 충분하지 않습니다.");
+          <div className={styles.handDispenserBtnContainer}>
+            <div className={styles.handDispenserBtnWrap}>
+              <button
+                onClick={() => {
+                  if (!pile.length && !inputVal) {
+                    alert("제출 카드를 선택해주세요.");
                     return false;
                   }
+
+                  if (
+                    !pile.length &&
+                    cardStatus.cards.length < Number(inputVal)
+                  ) {
+                    alert("선택한 카드가 충분하지 않습니다.");
+                    return false;
+                  }
+
+                  if (
+                    pile.length &&
+                    !cardStatus.cards.some((card) => card.value === 13) &&
+                    cardStatus.cards[0].value >= pile[pile.length - 1][0].value
+                  ) {
+                    alert("선택한 카드의 등급이 낮습니다.");
+                    return false;
+                  }
+
+                  if (
+                    pile.length &&
+                    cardStatus.cards.length < pile[pile.length - 1].length
+                  ) {
+                    if (
+                      jokerRef.current &&
+                      jokerRef.current.checked &&
+                      cardStatus.rank !== "JOKER"
+                    ) {
+                      setCardStatusCombine(pile[pile.length - 1].length);
+                      setCardStatusSelected(
+                        useHumanStore.getState().cardStatus.cards.length
+                      );
+                    } else {
+                      alert("조건에 맞는 카드가 충분하지 않습니다.");
+                      return false;
+                    }
+                  }
+
+                  // view();
+
+                  if (gameStep === "inPlaying") {
+                    chkBtn();
+                    setLatestAction("layDown");
+
+                    runHumanActionTrigger(actionTrigger, setHumanActionTrigger);
+
+                    onSelect(0);
+                    setDispenserClose();
+                  }
+                }}
+                disabled={
+                  isHumanTurn() && gameStep === "inPlaying" ? false : true
                 }
-
-                // view();
-
-                if (gameStep === "inPlaying") {
-                  chkBtn();
-                  setLatestAction("layDown");
-
+              >
+                확인
+              </button>
+              <button
+                onClick={() => {
+                  onSelect(0);
+                  setDispenserClose();
+                }}
+              >
+                취소
+              </button>
+            </div>
+            <button
+              onClick={() => {
+                if (pile.length) {
+                  setLatestAction("passed");
                   runHumanActionTrigger(actionTrigger, setHumanActionTrigger);
-
                   onSelect(0);
                   setDispenserClose();
                 }
               }}
-              disabled={
-                isHumanTurn() && gameStep === "inPlaying" ? false : true
-              }
+              disabled={isHumanTurn() && pile.length ? false : true}
             >
-              확인
-            </button>
-            <button
-              onClick={() => {
-                onSelect(0);
-                setDispenserClose();
-              }}
-            >
-              취소
+              패스
             </button>
           </div>
-          <button
-            onClick={() => {
-              if (pile.length) {
-                setLatestAction("passed");
-                runHumanActionTrigger(actionTrigger, setHumanActionTrigger);
-                onSelect(0);
-                setDispenserClose();
-              }
-            }}
-            disabled={isHumanTurn() && pile.length ? false : true}
-          >
-            패스
-          </button>
         </div>
       </div>
     </div>

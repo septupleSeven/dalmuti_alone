@@ -198,8 +198,8 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
           "background: #bada55; color: #111",
           getCurrentPlayer
         );
-        setLog(setLogData(`라운드 종료. 승자는 ${getCurrentPlayer?.className}(${getCurrentPlayer?.name})입니다. 
-          다음 라운드는 이 플레이어 기준 시계방향으로 시작됩니다.`))
+        setLog(setLogData(`라운드 종료. 이번 라운드 승자는 ${getCurrentPlayer?.className}(${getCurrentPlayer?.name})입니다. 
+          다음 라운드는 이 플레이어 기준 시계방향으로 시작됩니다. 상단 '다음 라운드 시작' 버튼을 눌러서 계속 진행할 수 있습니다.`))
         setGameStep("roundEnd");
         return;
       }
@@ -257,6 +257,8 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
               "background: #820e0e; color: #111",
               playerChk.name
             );
+            setLog(setLogData(`${playerChk.className}(${playerChk.name})은 더이상 수중에 패가 없습니다. 
+              ${playerChk.className}은 게임의 승리자 입니다! 이후 순번에서 제외됩니다.`))
             const resultData = setWinner(players, playerChk, get().gameStatus);
             setPlayers(resultData.remainedPlayers);
             setResultRank(resultData.updatedResultRank);
