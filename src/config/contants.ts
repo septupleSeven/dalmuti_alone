@@ -1,12 +1,27 @@
 export const PLAYER_NUM = 5;
 export const MAXIMUM_CARDRANK = 11;
 export const HUMAN_ID = "Human";
-export const PLAYER_NAME_TABLE:Record<string, string> = {
-    "ORDER0": "달무티",
-    "ORDER1": "총리대신",
-    "ORDER2": "상인",
-    "ORDER3": "소작농",
-    "ORDER4": "농노",
+export const PLAYER_NAME_TABLE:Record<string, {src: string; name: string}> = {
+    "ORDER0": {
+        src: "",
+        name: "달무티"
+    },
+    "ORDER1": {
+        src: "",
+        name: "총리대신"
+    },
+    "ORDER2": {
+        src: "",
+        name: "상인"
+    },
+    "ORDER3": {
+        src: "",
+        name: "소작농"
+    },
+    "ORDER4": {
+        src: "",
+        name: "농노"
+    },
 }
 export const CARD_NAME_TABLE:Record<string, {src: string; name: string}> = {
     "RANK1": {
@@ -15,7 +30,7 @@ export const CARD_NAME_TABLE:Record<string, {src: string; name: string}> = {
     },
     "RANK2": {
         src: "",
-        name: "대주고"
+        name: "대주교"
     },
     "RANK3": {
         src: "",
@@ -55,7 +70,7 @@ export const CARD_NAME_TABLE:Record<string, {src: string; name: string}> = {
     },
     "RANK13": {
         src: "",
-        name: "조커"
+        name: "광대"
     },
 }
 

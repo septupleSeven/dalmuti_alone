@@ -1,13 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { PlayerTypes } from "../../../features/types/featuresTypes";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  CARD_NAME_TABLE,
+  HUMAN_ID,
+  PLAYER_NUM,
+} from "../../../config/contants";
+import styles from "../styles/HomeStyles.module.scss";
+import { calcCoordinate } from "../../../features/utils";
 import { useGameStore, useGameStoreAction } from "../../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
-import { useLogStoreAction } from "../../../store/logStore";
-import { CARD_NAME_TABLE, HUMAN_ID, PLAYER_NUM } from "../../../config/contants";
-import { calcCoordinate } from "../../../features/utils";
-import { AnimatePresence, motion } from "framer-motion";
-import styles from "../styles/HomeStyles.module.scss";
 import { setLogData } from "../../../features/setting";
+import { useLogStoreAction } from "../../../store/logStore";
 
 const Player = ({
   playerInfo,

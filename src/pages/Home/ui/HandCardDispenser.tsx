@@ -83,29 +83,31 @@ const HandCardDispenser = ({
           </p>
         </div>
 
-        <div>
-          <input
-            type="checkbox"
-            id="joker"
-            disabled={
-              hasJoker() &&
-              pile.length &&
-              useHumanStore.getState().cardStatus.cards.length <
-                pile[pile.length - 1].length
-                ? false
-                : true
-            }
-            onChange={(e) => {
-              const groupedJoker = jokerGroup();
-              if (e.target.checked && groupedJoker) {
-                setCardStatusJokerPicked(groupedJoker.cards);
-              } else {
-                setCardStatusJokerPicked([]);
+        <div className={styles.JokerWrap}>
+          <div className={styles.inputContainer}>
+            <input
+              type="checkbox"
+              id="joker"
+              disabled={
+                hasJoker() &&
+                pile.length &&
+                useHumanStore.getState().cardStatus.cards.length <
+                  pile[pile.length - 1].length
+                  ? false
+                  : true
               }
-            }}
-            ref={jokerRef}
-            defaultChecked={false}
-          />
+              onChange={(e) => {
+                const groupedJoker = jokerGroup();
+                if (e.target.checked && groupedJoker) {
+                  setCardStatusJokerPicked(groupedJoker.cards);
+                } else {
+                  setCardStatusJokerPicked([]);
+                }
+              }}
+              ref={jokerRef}
+              defaultChecked={false}
+            />
+          </div>
           <label htmlFor="joker">조커 사용</label>
           {hasJoker() ? <p>남은 수 {jokerGroup()?.cards.length}/2 장</p> : null}
         </div>

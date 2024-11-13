@@ -181,7 +181,7 @@ export const setPlayerClass = (players: PlayerTypes[]) => {
   let sortedPlayers = copyPlayer(players);
 
   sortedPlayers.forEach((player) => {
-    player.className = `${PLAYER_NAME_TABLE[`ORDER${player.order}`]}`;
+    player.className = `${PLAYER_NAME_TABLE[`ORDER${player.order}`].name}`;
   });
 
   return sortedPlayers;

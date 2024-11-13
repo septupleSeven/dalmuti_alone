@@ -20,6 +20,8 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
     }))
   );
 
+  console.log("pile => ", pile)
+
   const pileCardMotionVariant = useMemo(() => {
     const xVal = getCurrentLeaderOrder(players, latestPlayer);
     const yVal = getCurrentLeaderOrder(players, latestPlayer);
@@ -27,11 +29,15 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
     return {
       init: {
         opacity: 0,
+        rotate: 180,
+        scale: 0.2,
         x: calcCoordinate(xVal, PLAYER_NUM).x,
         y: calcCoordinate(yVal, PLAYER_NUM).y,
       },
       getCenter: {
         opacity: 1,
+        rotate: 0,
+        scale: 1,
         x: 0,
         y: 0,
       },
@@ -50,7 +56,10 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
         opacity: 1,
       }}
     >
-      <p className={styles.pileCount}>{calcPileCount(pile)}</p>
+      <p className={styles.pileCount}>
+        <span>요구 수</span>
+        {pile.length ? pile[0].length : 0}
+      </p>
       <AnimatePresence>
         {pile.length &&
           pile.map((cards) => {
@@ -66,13 +75,13 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
                 }}
               >
                 <div>
-                  <Card cardVal={cards[0].value} />
-                  <p>{cards.length}</p>
+                  <Card cardVal={cards[0].value} size="pile"/>
                 </div>
               </motion.div>
             );
           })}
       </AnimatePresence>
+      <p className={styles.pileAmount}>제출한 카드 수 : <span>{calcPileCount(pile)}</span></p>
     </motion.div>
   );
 };

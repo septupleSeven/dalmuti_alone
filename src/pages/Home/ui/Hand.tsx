@@ -30,10 +30,10 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
           width: 0,
         }}
         animate={{
-          width: 300,
+          width: 400,
         }}
       >
-        <div className={styles.handWrapper}>
+        <motion.div className={styles.handWrapper}>
           {human &&
             human.hand &&
             getRankGroup(human.hand).map((el) => (
@@ -44,7 +44,7 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
                 onSelect={(val: number) => setIsSelected(val)}
               />
             ))}
-        </div>
+        </motion.div>
         {isDispenserOpen && (
           <HandCardDispenser onSelect={(val: number) => setIsSelected(val)} />
         )}

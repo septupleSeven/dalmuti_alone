@@ -7,7 +7,7 @@ const Card = ({
     button = false
 }:{
     cardVal: number;
-    size?: string;
+    size?: "normal" | "hand" | "pile";
     button?: boolean
 }) => {
 
@@ -15,10 +15,10 @@ const Card = ({
 
   return (
     <div className={`${styles.cardNode} ${isBtnClass} ${styles[`cardSize--${size}`]}`}>
-        {/* <figure>
-            <img src="" alt="" />
-        </figure> */}
-        {cardVal}
+        <figure>
+            <img src={require(`../../../assets/img/cards/rank${cardVal}.jpg`)} alt="Card" />
+        </figure>
+        {/* {cardVal} */}
     </div>
   )
 }
