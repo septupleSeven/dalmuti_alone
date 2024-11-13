@@ -251,9 +251,8 @@ export const useGameStore = create<useGameStoreTypes>((set, get) => ({
           );
 
           if (
-            // playerChk && !playerChk.hand.length
-            playerChk &&
-            playerChk.hand.length < 12
+            playerChk && !playerChk.hand.length
+            // playerChk && playerChk.hand.length < 12
           ) {
             console.log(
               "%cGame Set winner is=> ",
