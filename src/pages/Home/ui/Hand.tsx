@@ -6,10 +6,12 @@ import HandCardGroup from "./HandCardGroup";
 import HandCardDispenser from "./HandCardDispenser";
 import { getRankGroup, isHumanTurn } from "../../../features/utils";
 import { useShallow } from "zustand/react/shallow";
-import { useHandDispenserStore } from "../../../store/handStore";
+import { useHandDispenserStore, useHandDispenserStoreAction } from "../../../store/handStore";
 import { useHumanStore, useHumanStoreAction } from "../../../store/humanStore";
 import { runHumanActionTrigger } from "../../../features/playing";
 import { useGameStore } from "../../../store/gameStore";
+import HandsIcon from "../../../assets/img/hands__icon.png"
+import FistsIcon from "../../../assets/img/fists__icon.png"
 
 const Hand = ({ human }: { human: PlayerTypes }) => {
   const [isOpen, toggleOpen] = useCycle(true, false);
@@ -26,6 +28,9 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
     }))
   );
   const { setHumanActionTrigger, setLatestAction } = useHumanStoreAction();
+
+  const { setDispenserClose } = useHandDispenserStoreAction();
+
 
   const { players, pile, } = useGameStore(
     useShallow((state) => ({
@@ -48,9 +53,7 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
     >
       <button className={styles.handBtn} onClick={() => toggleOpen()}>
         <motion.img
-          src={require(`../../../assets/img/${
-            isOpen ? "fists__icon" : "hands__icon"
-          }.png`)}
+          src={isOpen ? HandsIcon : FistsIcon}
           alt="Open Hand"
           initial={{
             filter: "brightness(0) invert(1)",
@@ -73,6 +76,8 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
               if (pile.length) {
                 setLatestAction("passed");
                 runHumanActionTrigger(actionTrigger, setHumanActionTrigger);
+                setIsSelected(0);
+                setDispenserClose();
               }
             }}
             disabled={isHumanTurn(players) && pile.length ? false : true}

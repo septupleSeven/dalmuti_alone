@@ -4,7 +4,7 @@ import styles from "./styles/HomeStyles.module.scss";
 import Container from "../../shared/Container";
 import Pile from "./ui/Pile";
 import Hand from "./ui/Hand";
-import { getTargetPlayer, isStepCondition } from "../../features/utils";
+import { findPlayerWithId, isStepCondition } from "../../features/utils";
 import Log from "./ui/Log";
 import { useGameStore, useGameStoreAction } from "../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
@@ -29,7 +29,7 @@ function App() {
   view();
 
   const gameTableRef = useRef(null);
-  const humanPlayer = getTargetPlayer(players, HUMAN_ID)!;
+  const humanPlayer = findPlayerWithId(players, HUMAN_ID)!;
 
   useEffect(() => {
     if (settingStep === "dealForOrder") {

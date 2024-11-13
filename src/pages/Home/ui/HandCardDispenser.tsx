@@ -1,13 +1,12 @@
 import React, { FormEvent, useRef, useState } from "react";
 import styles from "../styles/HomeStyles.module.scss";
-import { getRankGroup, isHumanTurn } from "../../../features/utils";
+import { hasJoker, isHumanTurn, jokerGroup } from "../../../features/utils";
 import { useGameStore } from "../../../store/gameStore";
 import { runHumanActionTrigger } from "../../../features/playing";
 import { useShallow } from "zustand/react/shallow";
 import { useHandDispenserStoreAction } from "../../../store/handStore";
 import { useHumanStore, useHumanStoreAction } from "../../../store/humanStore";
-import { CARD_NAME_TABLE, HUMAN_ID } from "../../../config/contants";
-import { PlayerTypes } from "../../../features/types/featuresTypes";
+import { CARD_NAME_TABLE } from "../../../config/contants";
 
 const HandCardDispenser = ({
   onSelect,
@@ -29,7 +28,6 @@ const HandCardDispenser = ({
     setCardStatusCombine,
     setCardStatusSelected,
     setLatestAction,
-    view,
   } = useHumanStoreAction();
 
   const { players, pile, gameStep } = useGameStore(
@@ -56,19 +54,6 @@ const HandCardDispenser = ({
     }
   };
 
-  const hasJoker = () => {
-    const humanPlayer = players.find((player) => player.id === HUMAN_ID);
-    return humanPlayer?.hand.some((card) => card.value === 13);
-  };
-
-  const jokerGroup = () => {
-    const humanPlayer = players.find((player) => player.id === HUMAN_ID)!;
-    const joker = getRankGroup(humanPlayer.hand).find(
-      (group) => group.rank === "JOKER"
-    );
-    return joker ? joker : null;
-  };
-
   return (
     <div className={styles.handDispenser}>
       <div className={styles.handDispenserContents}>
@@ -91,7 +76,7 @@ const HandCardDispenser = ({
               type="checkbox"
               id="joker"
               disabled={
-                hasJoker() &&
+                hasJoker(players) &&
                 pile.length &&
                 useHumanStore.getState().cardStatus.cards.length <
                   pile[pile.length - 1].length
@@ -99,7 +84,7 @@ const HandCardDispenser = ({
                   : true
               }
               onChange={(e) => {
-                const groupedJoker = jokerGroup();
+                const groupedJoker = jokerGroup(players);
                 if (e.target.checked && groupedJoker) {
                   setCardStatusJokerPicked(groupedJoker.cards);
                 } else {
@@ -111,9 +96,9 @@ const HandCardDispenser = ({
             />
             <label htmlFor="joker">조커 사용</label>
           </div>
-          {hasJoker() ? (
+          {hasJoker(players) ? (
             <p className={styles.remain}>
-              남은 수 {jokerGroup()?.cards.length}/2 장
+              남은 수 {jokerGroup(players)?.cards.length}/2 장
             </p>
           ) : null}
         </div>

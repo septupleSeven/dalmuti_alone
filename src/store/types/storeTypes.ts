@@ -1,4 +1,4 @@
-import { CardTypes, PlayerTypes } from "../../features/types/featuresTypes";
+import { CardTypes, PlayerGameStateTypes, PlayerTypes } from "../../features/types/featuresTypes";
 import { HandGroupTypes } from "../../pages/Home/types/HomeTypes";
 
 export type SettingStepTypes =
@@ -53,13 +53,21 @@ export type GameActionsTypes = {
   setDeck: (deck: Array<CardTypes>) => void;
   setTurn: (value: number) => void;
   setGameOrder: (type: GameSettingTypes) => void;
-  setGameState: () => void;
+  setFirstInAction: () => void;
   setLatestPlayer: (value: string) => void;
   setPlayers: (players: Array<PlayerTypes>) => void;
   setResultRank: (players: Array<PlayerTypes>) => void;
   runTaxCollect: () => Promise<void>;
   runGame: () => Promise<void>;
   settleRound: () => Promise<void>;
+  setLeader: (
+    playerId: string,
+    isNotFirstTurn: boolean,
+    // currentLeaderPlayer?: PlayerTypes | undefined
+  ) => void;
+  setPushPile: (card:CardTypes[]) => void
+  setPlayerState: (playerId:string, gameState:PlayerGameStateTypes) => void
+  setPlayerHand: (playerId:string, hand:CardTypes[]) => void
 };
 
 export type useGameStoreTypes = {
@@ -120,7 +128,6 @@ export type LogTypes = {
 export type LogActionsTypes = {
   view: () => void;
   setLog: (logData:LogTypes) => void;
-  clearLog: (type: "all" | "first") => void;
 };
 
 export type useLogStoreTypes = {

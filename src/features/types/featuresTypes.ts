@@ -6,6 +6,8 @@ export type CardTypes = {
 
 export type PileTypes = Array<CardTypes>[];
 
+export type PlayerGameStateTypes = "waiting" | "setting" | "inAction" | "turnEnd" | "win"
+
 export type PlayerTypes = {
   id: string;
   name: string;
@@ -13,7 +15,7 @@ export type PlayerTypes = {
   hand: CardTypes[];
   order: number;
   status: {
-    gameState: "waiting" | "setting" | "inAction" | "turnEnd" | "win";
+    gameState: PlayerGameStateTypes;
     isLeader: boolean;
     roundOrder: number;
   };

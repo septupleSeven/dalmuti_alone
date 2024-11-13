@@ -105,8 +105,8 @@ export const isStepCondition = (
   return condition;
 };
 
-export const getTargetPlayer = (players: PlayerTypes[], targetId: string) => {
-  const searchedPlayer = players.find((player) => player.id === targetId);
+export const findPlayerWithId = (players: PlayerTypes[], playerId: string) => {
+  const searchedPlayer = players.find((player) => player.id === playerId);
   return searchedPlayer;
 };
 
@@ -136,3 +136,20 @@ export const isHumanTurn = (players: PlayerTypes[]) => {
 export const setDelay = async (ms:number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export const hasJoker = (
+  players:PlayerTypes[]
+) => {
+  const humanPlayer = players.find((player) => player.id === HUMAN_ID);
+  return humanPlayer?.hand.some((card) => card.value === 13);
+};
+
+export const jokerGroup = (
+  players:PlayerTypes[]
+) => {
+  const humanPlayer = players.find((player) => player.id === HUMAN_ID)!;
+  const joker = getRankGroup(humanPlayer.hand).find(
+    (group) => group.rank === "JOKER"
+  );
+  return joker ? joker : null;
+};

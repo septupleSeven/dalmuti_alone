@@ -24,7 +24,7 @@ const Player = ({
     useShallow((state) => ({
       settingStep: state.settingStatus.settingStep,
       settingStepCondition: state.settingStatus.settingStepCondition,
-      players: state.players
+      players: state.players,
     }))
   );
   const { setSettingStep, setDealCard } = useGameStoreAction();
@@ -49,7 +49,7 @@ const Player = ({
       },
       exit: {
         opacity: 0,
-      }
+      },
     }),
     [order]
   );
@@ -81,21 +81,27 @@ const Player = ({
         }
       }}
     >
-      <motion.p 
-      layout 
-      className={styles.playerClassName}
-      style={{
-        color: status.gameState === "inAction" ? "#feda85" : "#fff"
-      }}
+      <motion.p
+        layout
+        className={styles.playerClassName}
+        style={{
+          color: status.gameState === "inAction" ? "#feda85" : "#fff",
+        }}
       >
         {className}
         {id === HUMAN_ID ? "(당신)" : ""}
       </motion.p>
-      <motion.div className={styles.playerNode} 
-      style={{
-        border: `2px solid ${status.gameState === "inAction" ? "#feda85" : "#fff"}`,
-        boxShadow: status.gameState === "inAction" ? "0px 0px 5px 5px rgba(254,218,133,0.45)" : "0px 0px 5px 5px rgba(254,218,133,0)"
-      }}
+      <motion.div
+        className={styles.playerNode}
+        style={{
+          border: `2px solid ${
+            status.gameState === "inAction" ? "#feda85" : "#fff"
+          }`,
+          boxShadow:
+            status.gameState === "inAction"
+              ? "0px 0px 5px 5px rgba(254,218,133,0.45)"
+              : "0px 0px 5px 5px rgba(254,218,133,0)",
+        }}
       >
         <AnimatePresence>
           {settingStep === "playing" && (
@@ -107,7 +113,7 @@ const Player = ({
                 clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
                 transition: {
                   duration: 1.2,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 },
               }}
             >
@@ -157,6 +163,34 @@ const Player = ({
               CARD_NAME_TABLE[hand[0].rank].name}
             {`(${hand[0].rank})`}
           </motion.p>
+        ) : null}
+        {settingStep === "playing" && hand ? (
+          <motion.div
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            transition={{
+              duration: 0.4,
+              delay: order / 8,
+            }}
+            className={styles.playerGameInfo}
+          >
+            <p
+              className={styles.playerCardLength}
+              key={`CARDLENGTH-${componentIdx}`}
+            >
+              남은 카드 : <span>{hand.length}</span>
+            </p>
+            <p
+              className={styles.playerRoundOrder}
+              key={`ROUNDORDER-${componentIdx}`}
+            >
+              현재 순서 : {playerInfo.status.roundOrder}
+            </p>
+          </motion.div>
         ) : null}
       </AnimatePresence>
     </motion.div>

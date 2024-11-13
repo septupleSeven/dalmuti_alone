@@ -6,6 +6,8 @@ import {
   HumanCardStatusTypes,
   HumanLatestActionTypes,
   LogTypes,
+  useGameStoreTypes,
+  useHumanStoreTypes,
 } from "../store/types/storeTypes";
 import { setGRevolution, setLogData, setOrder, sortHand } from "./setting";
 import {
@@ -16,12 +18,12 @@ import {
 } from "./types/featuresTypes";
 import { copyDeck, copyPlayer, randomNumBetween } from "./utils";
 
+// ! ==================== 수정됨 (immer.js)
 export const isRevolution = async (
   players: PlayerTypes[]
 ): Promise<"revolution" | "gRevolution" | "continue"> => {
-  const copiedPlayers = copyPlayer(players);
 
-  const filteredPlayers = copiedPlayers.filter((player) => {
+  const filteredPlayers = players.filter((player) => {
     const getJoker = player.hand.filter((card) => card.value === 13);
     if (getJoker.length >= 2) {
       return getJoker;
@@ -43,7 +45,12 @@ export const isRevolution = async (
   });
 };
 
-export const actionSwapCard = (players: PlayerTypes[]) => {
+
+// ! ==================== 수정됨 (immer.js)
+export const actionSwapCard = (
+  players: PlayerTypes[],
+  setPlayers: (players: Array<PlayerTypes>) => void
+) => {
   const copiedPlayers = copyPlayer(players);
 
   copiedPlayers.forEach((player) => {
@@ -90,54 +97,70 @@ export const actionSwapCard = (players: PlayerTypes[]) => {
     }
   });
 
-  return sortHand(copiedPlayers);
+  // return sortHand(copiedPlayers);
+  sortHand(copiedPlayers);
+  setPlayers(copiedPlayers);
 };
 
+// ! ==================== 수정됨 (immer.js)
 const performLayDownCard = (
   hand: CardTypes[],
   selectedCards: CardTypes[],
   drawNum: number,
-) => {
+):Record<"toSendCards" | "copiedHand", CardTypes[]> => {
   const toSendCards = [];
+  const copiedHand = [...hand]
 
   for (let i = 0; i < drawNum; i++) {
     toSendCards.push({ ...selectedCards[i] });
     const targetCardIdx = hand.findIndex(
       (card) => card.id === selectedCards[i].id
     );
-    hand.splice(targetCardIdx, 1);
+    copiedHand.splice(targetCardIdx, 1);
   }
 
-  return toSendCards;
+  return {
+    toSendCards,
+    copiedHand
+  };
 };
 
-const performSwitchLeader = (
-  currentPlayer: PlayerTypes,
-  isFirstTurn: boolean = false,
-  currentLeaderPlayer?: PlayerTypes | undefined
+const getLaDownCardData = (
+  pile: CardTypes[][],
 ) => {
-  if (isFirstTurn && currentLeaderPlayer) {
-    currentLeaderPlayer.status.isLeader = false;
+  return {
+    value: `RANK${pile[pile.length - 1][0].value}`,
+    length: pile[pile.length - 1].length
   }
+}
 
-  currentPlayer.status.isLeader = true;
-};
 
+
+//   currentPlayer.status.isLeader = true;
+// };
+
+// ! ==================== 수정됨 (immer.js)
 export const layDownCard = (
-  players: PlayerTypes[],
-  pile: PileTypes,
-  currentTurn: number,
+  // players: PlayerTypes[],
+  // pile: PileTypes,
+  // currentTurn: number,
+  gameStore: useGameStoreTypes,
+  get: () => useGameStoreTypes,
+  // humanStore: useHumanStoreTypes,
   setLog: (logData:LogTypes) => void,
-): LayDownCardType => {
-  const copiedPlayers = copyPlayer(players);
-  const copiedPile = copyDeck(pile, "pile");
+): void => {
+  const { players, pile, gameStatus, actions } = gameStore;
+  const { setLeader, setPushPile, setTurn, setPlayerState, setPlayerHand, setLatestPlayer } = actions;
+
+  // const copiedPlayers = copyPlayer(players);
+  // const copiedPile = copyDeck(pile, "pile");
 
   let isPass = Math.floor(Math.random() * 10) > 7 ? true : false;
 
-  const currentPlayer = copiedPlayers.find(
-    (player) => player.status.roundOrder === currentTurn
+  const currentPlayer = players.find(
+    (player) => player.status.roundOrder === gameStatus.currentTurn
   )!;
-  const { hand, className, name } = currentPlayer;
+  const { hand, className, name, id } = currentPlayer;
 
   if (!pile.length) {
     isPass = false;
@@ -151,30 +174,43 @@ export const layDownCard = (
 
     const randomDraw = randomNumBetween(1, randomCards.length);
 
-    const toSendCards = performLayDownCard(hand, randomCards, randomDraw);
+    // const toSendCards = performLayDownCard(hand, randomCards, randomDraw);ㅁㅁ
+    const { toSendCards, copiedHand } = performLayDownCard(hand, randomCards, randomDraw);
+    // copiedPile.push(toSendCards);
 
-    copiedPile.push(toSendCards);
-    performSwitchLeader(currentPlayer);
+    setLatestPlayer(id);
+    setPlayerHand(id, copiedHand);
+    setPushPile(toSendCards);
+    setLeader(id, false);
+    
+    // performSwitchLeader(currentPlayer);
   } else if (pile.length && !isPass) {
-    const currentLeaderPlayer = copiedPlayers.find(
+
+    // const currentLeaderPlayer = copiedPlayers.find(
+    //   (player) => player.status.isLeader === true
+    // );
+    const currentLeaderPlayer = players.find(
       (player) => player.status.isLeader === true
     );
 
     if (currentLeaderPlayer && currentLeaderPlayer.id === currentPlayer.id) {
-      return {
-        result: "roundEnd",
-        latestPlayer: currentLeaderPlayer.id,
-      };
+      // return {
+      //   result: "roundEnd",
+      //   latestPlayer: currentLeaderPlayer.id,
+      // };
+      setLatestPlayer(currentLeaderPlayer.id);
+      return;
     }
 
-    const latestPileCards = copiedPile[copiedPile.length - 1];
-    const pickedCards = hand.filter(
+    // const latestPileCards = copiedPile[copiedPile.length - 1];
+    const latestPileCards = pile[pile.length - 1];
+    const rankFulfilledCards = hand.filter(
       (card) => card.value < latestPileCards[0].value || card.value === 13
     );
 
-    if (pickedCards.length) {
-      const groupedCards = pickedCards.reduce(
-        (acc: Record<string, typeof pickedCards>, cur) => {
+    if (rankFulfilledCards.length) {
+      const lengthFulfilledCards = rankFulfilledCards.reduce(
+        (acc: Record<string, typeof rankFulfilledCards>, cur) => {
           const keyString = String(cur.value);
 
           if (!acc[keyString]) acc[keyString] = [];
@@ -185,54 +221,59 @@ export const layDownCard = (
         {}
       );
 
-      let entryCards = [];
+      let finalEntryCards = [];
 
-      for (let val in groupedCards) {
-        if (groupedCards[val].length >= latestPileCards.length) {
-          entryCards.push(groupedCards[val]);
+      for (let val in lengthFulfilledCards) {
+        if (lengthFulfilledCards[val].length >= latestPileCards.length) {
+          finalEntryCards.push(lengthFulfilledCards[val]);
         }
       }
 
-      if (!entryCards.length && groupedCards["13"]) {
+      if (!finalEntryCards.length && lengthFulfilledCards["13"]) {
         // console.log("JOKER ACT");
-        for (let val in groupedCards) {
+        for (let val in lengthFulfilledCards) {
           if (
             val !== "13" &&
-            groupedCards["13"].length &&
-            groupedCards[val].length + groupedCards["13"].length >=
+            lengthFulfilledCards["13"].length &&
+            lengthFulfilledCards[val].length + lengthFulfilledCards["13"].length >=
               latestPileCards.length
           ) {
-            const jokerEntry = groupedCards[val].concat(
-              groupedCards["13"].slice(
+            const jokerEntry = lengthFulfilledCards[val].concat(
+              lengthFulfilledCards["13"].slice(
                 0,
-                latestPileCards.length - groupedCards[val].length
+                latestPileCards.length - lengthFulfilledCards[val].length
               )
             );
 
-            entryCards.push(jokerEntry);
+            finalEntryCards.push(jokerEntry);
           }
         }
 
         if (
-          !entryCards.length &&
-          groupedCards["13"].length >= latestPileCards.length
+          !finalEntryCards.length &&
+          lengthFulfilledCards["13"].length >= latestPileCards.length
         ) {
-          entryCards.push(groupedCards["13"]);
+          finalEntryCards.push(lengthFulfilledCards["13"]);
         }
       }
 
-      if (entryCards.length) {
-        const randomDraw = randomNumBetween(0, entryCards.length - 1);
-        const selectedCards = entryCards[randomDraw];
+      if (finalEntryCards.length) {
+        const randomDraw = randomNumBetween(0, finalEntryCards.length - 1);
+        const selectedCards = finalEntryCards[randomDraw];
 
-        const toSendCards = performLayDownCard(
+        const { toSendCards, copiedHand } = performLayDownCard(
           hand,
           selectedCards,
           latestPileCards.length
         );
 
-        copiedPile.push(toSendCards);
-        performSwitchLeader(currentPlayer, true, currentLeaderPlayer);
+        // copiedPile.push(toSendCards);
+        // performSwitchLeader(currentPlayer, true, currentLeaderPlayer);
+
+        setLatestPlayer(id);
+        setPushPile(toSendCards);
+        setPlayerHand(id, copiedHand);
+        setLeader(id, true);
       } else {
         isPass = true;
       }
@@ -242,165 +283,265 @@ export const layDownCard = (
   }
 
   if (isPass) {
-    console.log("Action: Pass ACT");
+    // console.log("Action: Pass ACT");
     setLog(setLogData(`${className}(${name})은 턴을 넘겼습니다.`));
-    return {
-      result: "pass",
-      ...setNextTurn(copiedPlayers, currentTurn),
-    };
+    // return {
+    //   result: "pass",
+    //   ...setNextTurn(copiedPlayers, currentTurn),
+    // };
   } else {
-    console.log(
-      "Action: LayDown ACT | value is =>",
-      copiedPile[copiedPile.length - 1][0].value,
-      " / length is =>",
-      copiedPile[copiedPile.length - 1].length
-    );
+    // console.log(
+    //   "Action: LayDown ACT | value is =>",
+    //   copiedPile[copiedPile.length - 1][0].value,
+    //   " / length is =>",
+    //   copiedPile[copiedPile.length - 1].length
+    // );
 
-    const getLayDownCardData = {
-      value: `RANK${copiedPile[copiedPile.length - 1][0].value}`,
-      length: copiedPile[copiedPile.length - 1].length
-    }
+    // const getLayDownCardData = {
+    //   value: `RANK${pile[pile.length - 1][0].value}`,
+    //   length: pile[pile.length - 1].length
+    // }
+    const { value:logPileVal, length: logPileLength } = getLaDownCardData(get().pile);
+    
     setLog(setLogData(`${className}(${name})은 
-      ${CARD_NAME_TABLE[`${getLayDownCardData.value}`].name}(${getLayDownCardData.value}) 카드를 
-      ${getLayDownCardData.length}장 냈습니다.`));
-    return {
-      result: "layDown",
-      copiedPile: copiedPile,
-      ...setNextTurn(copiedPlayers, currentTurn),
-    };
+      ${CARD_NAME_TABLE[logPileVal].name}(${logPileVal}) 카드를 
+      ${logPileLength}장 냈습니다.`));
+
+    // return {
+    //   result: "layDown",
+    //   copiedPile: copiedPile,
+    //   ...setNextTurn(copiedPlayers, currentTurn),
+    // };
   }
+
+  setPlayerState(id, "waiting");
+
+  const nextPlayer = players.find(
+    (player) => player.status.roundOrder === gameStatus.currentTurn + 1
+  );
+
+  if(nextPlayer){    
+    setPlayerState(nextPlayer.id, "inAction");
+  }else{
+    const firstPlayer = players.find(
+      (player) => player.status.roundOrder === 0
+    );
+    setPlayerState(firstPlayer!.id, "inAction");
+  }
+
+  const getTurnVal = (gameStatus.currentTurn + 1) >= players.length 
+  ? 0 
+  : gameStatus.currentTurn + 1;
+  setTurn(getTurnVal)
 };
 
+// ! ==================== 수정됨 (immer.js)
 export const playerLayDownCard = (
-  players: PlayerTypes[],
-  pile: Array<CardTypes>[],
-  currentTurn: number,
-  cardStatus: HumanCardStatusTypes,
-  actionType: HumanLatestActionTypes,
+  // players: PlayerTypes[],
+  // pile: Array<CardTypes>[],
+  // currentTurn: number,
+  gameStore: useGameStoreTypes,
+  humanStore: useHumanStoreTypes,
+  // humanCardStatus: HumanCardStatusTypes,
+  // humanActionType: HumanLatestActionTypes,
+  get: () => useGameStoreTypes,
   setLog: (logData:LogTypes) => void,
-): LayDownCardType => {
-  const copiedPlayers = copyPlayer(players);
-  const copiedPile = copyDeck(pile, "pile");
-  const copiedCardStatus = Object.assign({}, cardStatus);
+):void => {
+  const { players, pile, gameStatus, actions } = gameStore;
+  const { cardStatus, latestAction } = humanStore;
+  const { setLeader, setPushPile, setTurn, setPlayerState, setPlayerHand } = actions;
 
-  const humanPlayer = copiedPlayers.find((player) => player.id === HUMAN_ID)!;
+  // const copiedPlayers = copyPlayer(players);
+  // const copiedPile = copyDeck(pile, "pile");
+  // const copiedCardStatus = Object.assign({}, cardStatus); // 쓸모 없어 보임
+
+  // const humanPlayer = copiedPlayers.find((player) => player.id === HUMAN_ID)!;
+  const humanPlayer = players.find((player) => player.id === HUMAN_ID)!;
   const { hand, className } = humanPlayer;
 
-  if (actionType === "layDown") {
-    const currentLeaderPlayer = copiedPlayers.find(
-      (player) => player.status.isLeader === true
-    );
+
+
+
+
+  // IF 카드 낼 떄
+  if (latestAction === "layDown") {
+    // 현재 리드하고 있는 플레이어 찾기 / 이거 setLeader 사용 시 삭제해야함
+    // const currentLeaderPlayer = copiedPlayers.find(
+    //   (player) => player.status.isLeader === true
+    // );
+    // const currentLeaderPlayer = players.find(
+    //   (player) => player.status.isLeader === true
+    // );
 
     if (!pile.length) {
-      const toSendCards = performLayDownCard(
+      // pile 에 보낼 카드 모음 이건 배열 필요할듯
+      const { toSendCards, copiedHand } = performLayDownCard(
         hand,
-        copiedCardStatus.cards,
-        copiedCardStatus.selected
+        cardStatus.cards,
+        cardStatus.selected
       );
 
-      copiedPile.push(toSendCards);
-      performSwitchLeader(humanPlayer);
+
+      // copiedPile.push(toSendCards); // 여기 게임스토어 사용해야함
+      // pile.push(toSendCards); // 여기서 파일 직접 변경
+
+
+      // 게임스토어 액션으로 대체하는 것을 권장
+      // performSwitchLeader(humanPlayer); // 직접 변경 시 일단 인간 플레이어 수정
+
+      setPushPile(toSendCards);
+      setPlayerHand(HUMAN_ID, copiedHand);
+      setLeader(HUMAN_ID, false);
+
     } else {
-      const latestPileCards = copiedPile[copiedPile.length - 1];
+      // const latestPileCards = copiedPile[copiedPile.length - 1];
+      const latestPileCards = pile[pile.length - 1];
 
       if (
-        (copiedCardStatus.cards[0].value < latestPileCards[0].value &&
-          copiedCardStatus.selected === latestPileCards.length) ||
-        copiedCardStatus.cards.some((card) => card.value === 13)
+        (cardStatus.cards[0].value < latestPileCards[0].value &&
+          cardStatus.selected === latestPileCards.length) ||
+          cardStatus.cards.some((card) => card.value === 13)
       ) {
-        console.log("Human => ", copiedPlayers);
-        const toSendCards = performLayDownCard(
+        // console.log("Human => ", copiedPlayers);
+        const { toSendCards, copiedHand } = performLayDownCard(
           hand,
-          copiedCardStatus.cards,
-          copiedCardStatus.selected
+          cardStatus.cards,
+          cardStatus.selected
         );
 
-        copiedPile.push(toSendCards);
-        performSwitchLeader(humanPlayer, true, currentLeaderPlayer);
+        // copiedPile.push(toSendCards);
+        setPushPile(toSendCards);
+        setPlayerHand(HUMAN_ID, copiedHand);
+
+        // pile.push(toSendCards); // 교체 시 setPile 대체 가능
+        // performSwitchLeader(humanPlayer, true, currentLeaderPlayer); // 직접 변경 시 일단 인간 플레이어 수정
+        setLeader(HUMAN_ID, true);
       }
     }
   }
 
-  if (actionType === "passed") {
-    console.log("Action: Pass ACT");
+  if (latestAction === "passed") {
+    // console.log("Action: Pass ACT");
     setLog(setLogData(`당신(${className})은 턴을 넘겼습니다.`));
-    return {
-      result: "pass",
-      ...setNextTurn(copiedPlayers, currentTurn),
-    };
+    // return {
+    //   result: "pass",
+    //   ...setNextTurn(copiedPlayers, currentTurn),
+    // };
   }
 
-  console.log(
-    "Action: LayDown ACT | value is =>",
-    copiedPile[copiedPile.length - 1][0].value,
-    " / length is =>",
-    copiedPile[copiedPile.length - 1].length
-  );
-  const getLayDownCardData = {
-    value: `RANK${copiedPile[copiedPile.length - 1][0].value}`,
-    length: copiedPile[copiedPile.length - 1].length
-  }
+  // console.log(
+  //   "Action: LayDown ACT | value is =>",
+  //   copiedPile[copiedPile.length - 1][0].value,
+  //   " / length is =>",
+  //   copiedPile[copiedPile.length - 1].length
+  // );
+  // const getLayDownCardData = {
+  //   value: `RANK${pile[pile.length - 1][0].value}`,
+  //   length: pile[pile.length - 1].length
+  // }
+
+  const { value:logPileVal, length: logPileLength } = getLaDownCardData(get().pile);
+    
   setLog(setLogData(`당신(${className})은 
-    ${CARD_NAME_TABLE[`${getLayDownCardData.value}`].name}(${getLayDownCardData.value}) 카드를 
-    ${getLayDownCardData.length}장 냈습니다.`));
-  return {
-    result: "layDown",
-    copiedPile: copiedPile,
-    ...setNextTurn(copiedPlayers, currentTurn),
-  };
+    ${CARD_NAME_TABLE[logPileVal].name}(${logPileVal}) 카드를 
+    ${logPileLength}장 냈습니다.`));
+
+
+  // return {
+  //   result: "layDown",
+  //   copiedPile: copiedPile,
+  //   ...setNextTurn(copiedPlayers, currentTurn),
+  // };
+
+  // setNextTurn(copiedPlayers, currentTurn) // 패쓰나 카드 제출 둘의 공통 적인 실행함수가 될듯
+  
+  setPlayerState(HUMAN_ID, "waiting");
+
+  const nextPlayer = players.find(
+    (player) => player.status.roundOrder === gameStatus.currentTurn + 1
+  );
+
+  if(nextPlayer){    
+    setPlayerState(nextPlayer.id, "inAction");
+  }else{
+    const firstPlayer = players.find(
+      (player) => player.status.roundOrder === 0
+    );
+    setPlayerState(firstPlayer!.id, "inAction");
+  }
+
+  const getTurnVal = (gameStatus.currentTurn + 1) >= players.length 
+  ? 0 
+  : gameStatus.currentTurn + 1;
+  setTurn(getTurnVal)
 };
 
-export const setNextTurn = (
+
+
+
+// ! ==================== 현재 안쓰임
+export const setNextTurn = (// 여기서 현재 플레이어 waiting, 다음 플레이어 InAction, 현재 턴 값 변경 하고 있음
   players: PlayerTypes[],
   currentTurn: number
-): {
-  latestPlayer: string;
-  nextTurn: number;
-  nextPlayers: PlayerTypes[];
-} => {
-  const copiedPlayers = copyPlayer(players);
+): void => {
+  // const copiedPlayers = copyPlayer(players); // 복사 중복되고 있음
 
-  const currentPlayer = copiedPlayers.find(
+  // const currentPlayer = copiedPlayers.find(
+  //   (player) => player.status.gameState === "inAction"
+  // )!;
+  const currentPlayer = players.find(
     (player) => player.status.gameState === "inAction"
-  )!;
-  currentPlayer.status.gameState = "waiting";
+  )!; // 현재 InAction인 플레이어 조회
+  currentPlayer.status.gameState = "waiting"; // 현재 InAction인 플레이어 웨이팅으로
 
-  const nextPlayer = copiedPlayers.find(
+  // const nextPlayer = copiedPlayers.find(
+  //   (player) => player.status.roundOrder === currentTurn + 1
+  // );
+  const nextPlayer = players.find(
     (player) => player.status.roundOrder === currentTurn + 1
-  );
+  ); // 다음 플레이어
 
   // console.log("setNextTurn currentPlayer => ", currentPlayer)
   // console.log("setNextTurn nextPlayer => ", nextPlayer)
 
-  if (nextPlayer) {
-    nextPlayer.status.gameState = "inAction";
-  } else {
-    const firstPlayer = copiedPlayers.find(
+  if (nextPlayer) {// 다음 플레이어 조회
+    nextPlayer.status.gameState = "inAction"; // 다음 플레이어 InAction
+  } else {// 없으면 0번으로
+    // const firstPlayer = copiedPlayers.find(
+    //   (player) => player.status.roundOrder === 0
+    // );
+    const firstPlayer = players.find(
       (player) => player.status.roundOrder === 0
     );
 
     if (firstPlayer) {
-      firstPlayer.status.gameState = "inAction";
+      firstPlayer.status.gameState = "inAction"; // 첫 플레이어로 InAction
     }
   }
 
-  return {
-    latestPlayer: currentPlayer.id,
-    nextTurn: currentTurn + 1 >= players.length ? 0 : currentTurn + 1,
-    nextPlayers: copiedPlayers,
-  };
+  currentTurn = currentTurn + 1 >= players.length ? 0 : currentTurn + 1;
+
+  // return {
+  //   latestPlayer: currentPlayer.id,
+  //   nextTurn: currentTurn + 1 >= players.length ? 0 : currentTurn + 1,
+  //   nextPlayers: copiedPlayers,
+  // };
 };
 
-export const getSettleRoundData = (
-  players: PlayerTypes[],
-  pile: PileTypes,
-  deck: CardTypes[]
-) => {
-  const copiedPlayers = copyPlayer(players);
-  const copiedDeck = deck.length ? copyDeck(deck, "deck") : [];
 
-  if (copiedPlayers.length > 1) {
-    const rearrangedPlayers = setOrder(copiedPlayers, "game");
+
+// ! ==================== 수정됨 (immer.js)
+export const getSettleRoundData = (
+  playersLength: number,
+  pile: PileTypes,
+):(CardTypes[] | null) => {
+  // const copiedPlayers = copyPlayer(players);
+  // const copiedDeck = deck.length ? copyDeck(deck, "deck") : [];
+
+  if (playersLength > 1) {
+
+    // const rearrangedPlayers = setOrder(players, "game");
+
     const untiePile = pile.reduce(
       (acc: Array<CardTypes>, cur: Array<CardTypes>) => {
         acc.push(...cur);
@@ -408,27 +549,50 @@ export const getSettleRoundData = (
       },
       []
     );
-    copiedDeck.push(...untiePile);
 
-    return {
-      rearrangedPlayers: rearrangedPlayers,
-      clearPile: [],
-      updatedDeck: copiedDeck,
-    };
+    // copiedDeck.push(...untiePile);ㅁ
+
+    return untiePile;
   }
+
+  return null;
 };
 
+
+// ! ==================== 수정됨 (immer.js)
 export const setWinner = (
   players: PlayerTypes[],
   targetPlayer: PlayerTypes,
-  gameStatus: GameStatusTypes
-) => {
-  const copiedPlayers = copyPlayer(players);
-  const copiedTargetPlayer = Object.assign({}, targetPlayer);
-  const filteredPlayers = copiedPlayers.filter(
-    (player) => player.id !== copiedTargetPlayer.id
+  gameStatus: GameStatusTypes,
+  actions: GameActionsTypes
+):void => {
+  // const copiedPlayers = copyPlayer(players);
+  // const copiedTargetPlayer = Object.assign({}, targetPlayer);
+  // const filteredPlayers = copiedPlayers.filter(
+  //   (player) => player.id !== copiedTargetPlayer.id
+  // );
+
+  const { setResultRank, setPlayers, setPlayerState, setTurn  } = actions;
+
+  const filteredPlayers = players.filter(
+    (player) => player.id !== targetPlayer.id
   );
-  const copiedResultRank = [...gameStatus.resultRank];
+
+  // const copiedResultRank = [...gameStatus.resultRank];aa
+
+  // filteredPlayersaasd
+  //   .sort((a, b) => a.status.roundOrder - b.status.roundOrder)
+  //   .forEach((player, idx) => {
+  //     player.status.roundOrder = idx;
+
+  //     const getNextRoundOrder = 
+  //     copiedTargetPlayer.status.roundOrder === (copiedPlayers.length - 1)
+  //     ? 0 : copiedTargetPlayer.status.roundOrder;
+
+  //     if (player.status.roundOrder === getNextRoundOrder) {
+  //       player.status.gameState = "inAction";
+  //     }
+  //   });
 
   filteredPlayers
     .sort((a, b) => a.status.roundOrder - b.status.roundOrder)
@@ -436,27 +600,35 @@ export const setWinner = (
       player.status.roundOrder = idx;
 
       const getNextRoundOrder = 
-      copiedTargetPlayer.status.roundOrder === (copiedPlayers.length - 1)
-      ? 0 : copiedTargetPlayer.status.roundOrder;
+      targetPlayer.status.roundOrder === (players.length - 1)
+      ? 0 : targetPlayer.status.roundOrder;
 
       if (player.status.roundOrder === getNextRoundOrder) {
-        player.status.gameState = "inAction";
+        setPlayerState(player.id, "inAction")
       }
     });
 
-  copiedResultRank.push(copiedTargetPlayer);
+  // copiedResultRank.push(copiedTargetPlayer);
+  setResultRank([{...targetPlayer}]);
+  setPlayers(filteredPlayers)
 
   // console.log(filteredPlayers);
-  // console.log(copiedResultRank);
+  // console.log(copiedResultRank);asd
 
-  return {
-    remainedPlayers: filteredPlayers,
-    updatedResultRank: copiedResultRank,
-    currentTurn:
-      gameStatus.currentTurn - 1 < 0 ? 0 : gameStatus.currentTurn - 1,
-  };
+  const getTurnVal = gameStatus.currentTurn - 1 < 0 
+  ? 0 
+  : gameStatus.currentTurn - 1;
+  setTurn(getTurnVal)
+
+  // return {
+  //   remainedPlayers: filteredPlayers,
+  //   updatedResultRank: copiedResultRank,
+  //   currentTurn:
+  //     gameStatus.currentTurn - 1 < 0 ? 0 : gameStatus.currentTurn - 1,
+  // };
 };
 
+// ! ==================== 수정됨 (immer.js)
 export const performTaxCollect = async (
   deck: CardTypes[],
   players: PlayerTypes[],
@@ -464,25 +636,34 @@ export const performTaxCollect = async (
   actions: GameActionsTypes,
   setLog: (logData:LogTypes) => void,
   isRevolution: "revolution" | "gRevolution" | "continue"
-) => {
-  const { setGameStep, setGameState, setPlayers, runGame } = actions;
+):Promise<void> => {
+  // const { setGameStep, setFirstInAction, setPlayers, runGame } = actions;
+  const { setGameStep, setFirstInAction, runGame, setPlayers } = actions;
 
   if (gameStep === "inPlaying") return;
 
   setLog(setLogData(`[세금 징수 결과] ${REVOLUTION_TEXT[isRevolution]}`));
 
   if (isRevolution === "continue") {
-    console.log("Tax Collect result => continue");
-    setPlayers(actionSwapCard(players));
+    // console.log("Tax Collect result => continue");
+    // setPlayers(actionSwapCard(players));
+    // setPlayers();
+    actionSwapCard(players, setPlayers)
   } else if (isRevolution === "gRevolution") {
-    console.log("Tax Collect result => gRevolution");
-    setPlayers(setGRevolution(deck, players, true));
-  } else if (isRevolution === "revolution") {
-    console.log("Tax Collect result => revolution");
-  }
+    // console.log("Tax Collect result => gRevolution");
+
+    // setPlayers(
+    // );
+    setGRevolution(deck, players, true)
+    
+  } 
+  
+  // else if (isRevolution === "revolution") {
+  //   // console.log("Tax Collect result => revolution");
+  // }
 
   setGameStep("inPlaying");
-  setGameState();
+  setFirstInAction();
 
   const isComplete = await new Promise<string>((resolve) =>
     setTimeout(() => {

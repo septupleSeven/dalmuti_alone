@@ -27,9 +27,7 @@ const HandCardGroup = ({
     }))
   );
 
-  const { rank, cards } = group;
-
-  // view();
+  const { cards } = group;
 
   return (
     <motion.div

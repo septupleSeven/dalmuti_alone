@@ -11,17 +11,11 @@ export const useLogStore = create<useLogStoreTypes>((set, get) => ({
         setLog: (logData) => set(
             produce((state) => {
                 state.log.push(logData);
+                if(state.log.length > 20){
+                    state.log.splice(0, 10)
+                }
             })
-        ),
-        clearLog: (type) => set(
-            produce(state => {
-                // if(type === "all"){
-                //     state.log = []
-                // }else{
-                //     state.log = 
-                // }
-            })
-        ),
+        )
     }
 }));
 

@@ -7,7 +7,7 @@ import {
 import { CardTypes, PlayerTypes } from "./types/featuresTypes";
 import { copyDeck, copyPlayer } from "./utils";
 
-export const setPlayer = (playerNum: number) => {
+export const setPlayer = (playerNum: number):PlayerTypes[] => {
   const players: PlayerTypes[] = [];
 
   for (let i = 0; i < playerNum; i++) {
@@ -31,7 +31,7 @@ export const setPlayer = (playerNum: number) => {
   return players;
 };
 
-export const createDeck = (maxRank: number) => {
+export const createDeck = (maxRank: number):CardTypes[] => {
   const deck: CardTypes[] = [];
 
   for (let i = 1; i <= maxRank; i++) {
@@ -57,58 +57,48 @@ export const createDeck = (maxRank: number) => {
   return deck;
 };
 
-export const shuffleDeck = (deck: CardTypes[]) => {
+// ! ==================== 수정됨 (immer.js) / 검토 완
+export const shuffleDeck = (deck: CardTypes[]):void => {
   for (let i = deck.length - 1; i > 0; i--) {
     const targetIdx = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[targetIdx]] = [deck[targetIdx], deck[i]];
   }
-  return deck;
 };
 
+const distributeCards = (players: PlayerTypes[], deck: CardTypes[]) => {
+  for (let i = 0; i < players.length; i++) {
+    if (deck.length) {
+      players[i].hand.push(deck.pop()!);
+    }
+  }
+};
+
+// ! ==================== 수정됨 (immer.js) / 검토 완
 export const dealDeck = (
   deck: CardTypes[],
   players: PlayerTypes[],
   type: "setting" | "game"
-) => {
-  const copiedDeck = copyDeck(deck);
-  const copiedPlayers = copyPlayer(players);
-
-  const distributeCards = (players: PlayerTypes[], deck: CardTypes[]) => {
-    for (let i = 0; i < players.length; i++) {
-      if (deck.length) {
-        players[i].hand.push(deck.pop()!);
-      }
-    }
-  };
+):void => {
 
   if (type === "game") {
-    while (copiedDeck.length > 0) {
-      distributeCards(copiedPlayers, copiedDeck);
+    while (deck.length > 0) {
+      distributeCards(players, deck);
     }
   } else {
-    distributeCards(copiedPlayers, copiedDeck);
+    distributeCards(players, deck);
   }
-
-  return {
-    players: copiedPlayers as PlayerTypes[],
-    deck: copiedDeck as CardTypes[],
-  };
 };
 
+// ! ==================== 수정됨 (immer.js) / 검토 완
 export const sortPlayer = (
   deck: CardTypes[],
   players: PlayerTypes[],
   type: "setting" | "game" | "gRevolution"
-) => {
-  let sortedPlayers;
-  let copiedDeck: CardTypes[];
+):void => {
 
   switch (type) {
     case "setting": {
-      copiedDeck = copyDeck(deck);
-      sortedPlayers = copyPlayer(players);
-
-      sortedPlayers.sort((a, b) => {
+      players.sort((a, b) => {
         const { value: aVal } = a.hand[0];
         const { value: bVal } = b.hand[0];
 
@@ -117,11 +107,11 @@ export const sortPlayer = (
           let dVal;
 
           do {
-            if (copiedDeck.length < 2) {
+            if (deck.length < 2) {
               return 0;
             }
-            cVal = copiedDeck.pop()!.value;
-            dVal = copiedDeck.pop()!.value;
+            cVal = deck.pop()!.value;
+            dVal = deck.pop()!.value;
           } while (cVal !== dVal);
 
           return cVal - dVal;
@@ -130,7 +120,7 @@ export const sortPlayer = (
         }
       });
 
-      sortedPlayers.forEach((player, idx) => {
+      players.forEach((player, idx) => {
         player.status.roundOrder = idx;
         player.order = idx;
       });
@@ -138,69 +128,57 @@ export const sortPlayer = (
       break;
     }
     case "gRevolution": {
-      sortedPlayers = copyPlayer(players)
-        .reverse()
-        .map((player, idx) => {
-          player.status.roundOrder = idx;
-          player.order = idx;
-          return player;
-        });
+      players
+      .reverse()
+      .forEach((player, idx) => {
+        player.status.roundOrder = idx;
+        player.order = idx;
+      });
 
       break;
     }
-
-    // case "game": {
-
-    //   break;
-    // }
-
     default:
       break;
   }
 
-  return sortedPlayers as PlayerTypes[];
 };
 
-export const sortHand = (players: PlayerTypes[], isCopy?: boolean) => {
-  let sortedPlayers;
-
-  if (isCopy) {
-    sortedPlayers = copyPlayer(players);
-  } else {
-    sortedPlayers = players;
-  }
-
-  sortedPlayers.forEach((player) => {
+// ! ==================== 수정됨 (immer.js) / 검토 완
+export const sortHand = (players: PlayerTypes[]):void => {
+  players.forEach((player) => {
     player.hand.sort((a, b) => a.value - b.value);
   });
-
-  return sortedPlayers;
 };
 
-export const setPlayerClass = (players: PlayerTypes[]) => {
-  let sortedPlayers = copyPlayer(players);
-
-  sortedPlayers.forEach((player) => {
+// ! ==================== 수정됨 (immer.js) / 검토 완
+export const setPlayerClass = (players: PlayerTypes[]):void => {
+  players.forEach((player) => {
     player.className = `${PLAYER_NAME_TABLE[`ORDER${player.order}`].name}`;
   });
-
-  return sortedPlayers;
 };
 
+
+
+// ! ==================== 현재 안쓰임
 export const setReadyForPlay = (players: PlayerTypes[], isCopy?: boolean) => {
-  let copiedPlayers;
+  // let copiedPlayers;
 
-  if (isCopy) {
-    copiedPlayers = copyPlayer(players);
-  } else {
-    copiedPlayers = players;
-  }
+  // if (isCopy) {
+  //   copiedPlayers = copyPlayer(players);
+  // } else {
+  //   copiedPlayers = players;
+  // }
 
-  const handSortedPlayers = sortHand(copiedPlayers);
-  const grantedPlayers = setPlayerClass(handSortedPlayers);
+  // const handSortedPlayers = sortHand(copiedPlayers);
+  // const grantedPlayers = setPlayerClass(handSortedPlayers);
 
-  return grantedPlayers;
+  // return grantedPlayers;
 };
+
+
+
+
+
 
 export const clearHand = (players: PlayerTypes[]) => {
   const copiedPlayers = copyPlayer(players);
@@ -209,6 +187,11 @@ export const clearHand = (players: PlayerTypes[]) => {
   return copiedPlayers;
 };
 
+
+
+
+
+// ! ==================== 수정됨 (immer.js) / 검토 완, 로직이 복잡해서 복사 필요해보임
 export const setOrder = (players: PlayerTypes[], type: "setting" | "game") => {
   const copiedPlayers = copyPlayer(players);
 
@@ -245,6 +228,15 @@ export const setOrder = (players: PlayerTypes[], type: "setting" | "game") => {
   return copiedPlayers;
 };
 
+
+
+
+
+
+
+
+
+
 export const setPlayerGameState = (players: PlayerTypes[]) => {
   const copiedPlayers = copyPlayer(players);
   const firstPlayer = copiedPlayers.find((el) => el.order === 0);
@@ -256,24 +248,36 @@ export const setPlayerGameState = (players: PlayerTypes[]) => {
   return copiedPlayers;
 };
 
+
+
+
+
+
+
+
+
+// ! ==================== 수정됨 (immer.js)
 export const setGRevolution = (
   deck: CardTypes[],
   players: PlayerTypes[],
-  isCopy?: boolean
+  isCopy?: boolean // 바뀐 방식에 따라 삭제
 ) => {
-  let copiedPlayers;
+  // let copiedPlayers;
 
-  if (isCopy) {
-    copiedPlayers = copyPlayer(players);
-  } else {
-    copiedPlayers = players;
-  }
+  // if (isCopy) {
+  //   copiedPlayers = copyPlayer(players);
+  // } else {
+  //   copiedPlayers = players;
+  // }
 
-  const sortedPlayers = sortPlayer(deck, copiedPlayers, "gRevolution");
-  const grantedPlayers = setPlayerClass(sortedPlayers);
+  // const sortedPlayers = sortPlayer(deck, players, "gRevolution");
+  // const grantedPlayers = setPlayerClass(sortedPlayers);
 
-  return grantedPlayers;
+  sortPlayer(deck, players, "gRevolution");
+  setPlayerClass(players);
+
 };
+
 
 export const setPlayerCardStatus = (
   group: HandGroupTypes,

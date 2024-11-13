@@ -5,7 +5,7 @@ import {
   motion,
   useAnimationControls,
 } from "framer-motion";
-import { getTargetPlayer, isStepCondition } from "../features/utils";
+import { findPlayerWithId, isStepCondition } from "../features/utils";
 import { useGameStore, useGameStoreAction } from "../store/gameStore";
 import { useShallow } from 'zustand/react/shallow'
 import { useLogStoreAction } from "../store/logStore";
@@ -204,7 +204,7 @@ const Nav = () => {
               exit="navBtnExit"
               onClick={() => {
                 if (settingStep === "readyToPlay") {
-                  const human = getTargetPlayer(players, HUMAN_ID);
+                  const human = findPlayerWithId(players, HUMAN_ID);
                   setLog(setLogData("게임 시작!"))
                   setLog(setLogData(`당신은 ${human?.className} 입니다.`))
                   setGameOrder("setting");
