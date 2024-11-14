@@ -1,46 +1,41 @@
-# Getting Started with Create React App
+# 나홀로 달무티
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 달무티 소개
+- [게임 설명 영상](https://youtu.be/sO-vxnoL31A?si=ls5eMAc9QKEPIoIs)
 
-## Available Scripts
+## 프로젝트 소개
+달무티라는 카드 게임을 베이스로 남은 패가 5장인 플레이어가 승리하면 끝나는 룰을 적용하여 혼자서도 간단하게 즐길 수 있는 게임 웹앱을 제작했습니다. 컴퓨터 행동, 플레이어 행동, 진행 상황 로그 등의 기능이 있습니다.<br/>
+플레이어의 선택과 행동에 따른 결과와 컴퓨터가 확률적으로 처리하는 결과, 둘에 대한 상호작용이 베이스가 되는 룰에 어긋나지 않도록 제작하고 애니메이션을 통해 실제 플레이 경험에 다가가고자 하면서도 웹이라는 공간에 맞춰 UI를 설계했습니다.<br/>
+### 미리보기
+- []()
+<br/>
 
-In the project directory, you can run:
+## STACKS   
+### Base
+- React.js
+- TypeScript
+### lib
+- SCSS
+- Zustand
+- Framer-motion
+<br/>
 
-### `npm start`
+## 시작하기
+### 사전 요구 사항
+- Node.js v20 이상
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### 설치
+```bash
+npm install
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 프로젝트 실행, 빌드
+```bash
+npm run dev
+npm run build
+npm start
+```
+<br/>
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 사용법   
+- 게임 시작 버튼을 누르고 진행 상황 로그를 보며 게임을 진행하면 됩니다.
