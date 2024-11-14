@@ -192,9 +192,9 @@ export const useGameStore = create<useGameStoreTypes>()(
             );
 
             if (
-              currentLatestPlayer &&
-              !currentLatestPlayer.hand.length
-              // currentLatestPlayer && currentLatestPlayer.hand.length < 12
+              // currentLatestPlayer &&
+              // !currentLatestPlayer.hand.length
+              currentLatestPlayer && currentLatestPlayer.hand.length < 6
             ) {
               // console.log(
               //   "%cGame Set winner is=> ",
@@ -213,10 +213,13 @@ export const useGameStore = create<useGameStoreTypes>()(
                 currentState.actions
               );
 
-              if (get().players.length === 1) {
-                alert("게임 종료");
-                return reject();
-              }
+              alert("게임 종료");
+              return reject();
+
+              // if (get().players.length === 1) {
+              //   alert("게임 종료");
+              //   return reject();
+              // }
             }
 
             return resolve();
@@ -230,7 +233,7 @@ export const useGameStore = create<useGameStoreTypes>()(
 
           setWinner(
             updatedState.players,
-            updatedState.players[0],
+            updatedState.gameStatus.resultRank[0],
             updatedState.gameStatus,
             updatedState.actions
           );

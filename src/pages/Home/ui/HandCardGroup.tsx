@@ -39,7 +39,7 @@ const HandCardGroup = ({
           setCardStatus(group);
           setDispenserOpen();
         }
-        view();
+        // view();
       }}
     >
       <p className={styles.cardRank}>

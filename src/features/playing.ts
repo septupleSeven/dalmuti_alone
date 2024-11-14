@@ -141,7 +141,7 @@ export const layDownCard = (
   )!;
   const { hand, className, name, id } = currentPlayer;
 
-  const passProb = hand.length < 5 ? 0 : 7;
+  const passProb = hand.length < 8 ? 0 : 7;
   let isPass = Math.floor(Math.random() * 10) > passProb ? true : false;
 
   if (!pile.length) {

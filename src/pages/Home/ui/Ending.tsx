@@ -41,7 +41,8 @@ const Ending = () => {
                 </figure>
                 <div className={styles.nameWrap}>
                   <p className={styles.order}>
-                    {idx + 1}. {player.name}
+                    {/* {idx + 1}. {player.name} */}
+                    {player.name}
                   </p>
                   <p className={styles.name}>{ENDING_TEXT[`ORDER${idx}`]}</p>
                 </div>

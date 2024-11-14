@@ -190,6 +190,10 @@ body {
         bottom: 100px;
         left: 50%;
         transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        row-gap: 25px;
 
         > .guideAnchor {
             font-size: 1.25rem;
@@ -218,6 +222,10 @@ body {
     
             }
     
+        }
+
+        > p{
+            font-size: .875rem;
         }
 
     }

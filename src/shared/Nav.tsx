@@ -32,7 +32,10 @@ const Nav = () => {
   const [firstInitGame, setFirstInitGame] = useState(false);
   const headerMotionControls = useAnimationControls();
 
-  const isBootingToReadyToSetting = useMemo(() => isStepCondition(settingStep, "bootingToReadyToSetting"), [])
+  const isBootingToReadyToSetting = useMemo(
+    () => isStepCondition(settingStep, "bootingToReadyToSetting"),
+    []
+  );
 
   const headerMotionVariants = {
     headerInit: {
@@ -43,16 +46,12 @@ const Nav = () => {
       height: 80,
       backgroundColor: "rgba(0, 0, 0, 0.4)",
       transition: {
-        delay: isBootingToReadyToSetting
-          ? 0
-          : 0.4,
-        duration: isBootingToReadyToSetting
-          ? 0.4
-          : 1.6,
+        delay: isBootingToReadyToSetting ? 0 : 0.4,
+        duration: isBootingToReadyToSetting ? 0.4 : 1.6,
         ease: "circOut",
       },
     },
-  }
+  };
 
   const bootingScreenVariants = {
     titleInit: {
@@ -167,6 +166,14 @@ const Nav = () => {
               >
                 게임 설명 보기
               </motion.a>
+              <motion.p
+                variants={bootingScreenVariants}
+                initial="menuInit"
+                animate="menuAnimate"
+                exit="menuExit"
+              >
+                ✨ 위 설명을 토대로 먼저 패에 5장 남은 플레이어가 승리합니다. ✨
+              </motion.p>
             </div>
           </>
         )}
