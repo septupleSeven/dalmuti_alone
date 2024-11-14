@@ -1,0 +1,34 @@
+{
+  "files": {
+    "main.css": "/dalmuti_alone/static/css/main.c504e8f1.css",
+    "main.js": "/dalmuti_alone/static/js/main.7ab94772.js",
+    "static/js/453.4af10311.chunk.js": "/dalmuti_alone/static/js/453.4af10311.chunk.js",
+    "static/media/bg.jpg": "/dalmuti_alone/static/media/bg.39f54a27c2d3a090d0b4.jpg",
+    "static/media/rank1.jpg": "/dalmuti_alone/static/media/rank1.7b296ac9bc4d71935943.jpg",
+    "static/media/rank2.jpg": "/dalmuti_alone/static/media/rank2.24902b5a509170c42a65.jpg",
+    "static/media/rank4.jpg": "/dalmuti_alone/static/media/rank4.399f953811c6defb533a.jpg",
+    "static/media/rank13.jpg": "/dalmuti_alone/static/media/rank13.614ba25eaa7a7e1f4653.jpg",
+    "static/media/rank7.jpg": "/dalmuti_alone/static/media/rank7.c9bc73cdce0584f766fa.jpg",
+    "static/media/rank3.jpg": "/dalmuti_alone/static/media/rank3.673845abcf1cda701dbe.jpg",
+    "static/media/rank9.jpg": "/dalmuti_alone/static/media/rank9.fa2a7da331b350c0d5d5.jpg",
+    "static/media/rank8.jpg": "/dalmuti_alone/static/media/rank8.840c031b7075f674af4e.jpg",
+    "static/media/order0.jpg": "/dalmuti_alone/static/media/order0.3c1db5addb59f6b9f0bd.jpg",
+    "static/media/rank6.jpg": "/dalmuti_alone/static/media/rank6.2abce4118a0bffde794b.jpg",
+    "static/media/rank5.jpg": "/dalmuti_alone/static/media/rank5.ad5511b076dddaf80955.jpg",
+    "static/media/rank10.jpg": "/dalmuti_alone/static/media/rank10.752f07963bdd5288b0d0.jpg",
+    "static/media/rank11.jpg": "/dalmuti_alone/static/media/rank11.c4a6ebada5e2be2833d0.jpg",
+    "static/media/order2.jpg": "/dalmuti_alone/static/media/order2.298a48ae2de454678722.jpg",
+    "static/media/order3.jpg": "/dalmuti_alone/static/media/order3.c49d8a72188ac61363cd.jpg",
+    "static/media/order1.jpg": "/dalmuti_alone/static/media/order1.ef7a41ba17a1830c5e84.jpg",
+    "static/media/order4.jpg": "/dalmuti_alone/static/media/order4.bf18e83683b78088fe2a.jpg",
+    "index.html": "/dalmuti_alone/index.html",
+    "static/media/checkbox__check.svg": "/dalmuti_alone/static/media/checkbox__check.78cf34c5b157eb31966c.svg",
+    "main.c504e8f1.css.map": "/dalmuti_alone/static/css/main.c504e8f1.css.map",
+    "main.7ab94772.js.map": "/dalmuti_alone/static/js/main.7ab94772.js.map",
+    "453.4af10311.chunk.js.map": "/dalmuti_alone/static/js/453.4af10311.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c504e8f1.css",
+    "static/js/main.7ab94772.js"
+  ]
+}
