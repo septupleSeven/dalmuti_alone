@@ -1,6 +1,6 @@
 # 나홀로 달무티
 <p align="center">
-    <img src=".readme/preview.jpg" height="495" />
+    <img src=".readme/preview.jpg" />
 </p>
 
 ## 달무티 소개
