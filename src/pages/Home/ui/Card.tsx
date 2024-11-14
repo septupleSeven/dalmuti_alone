@@ -1,26 +1,33 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styles from "../styles/HomeStyles.module.scss";
 
-const Card = ({
+const Card = memo(
+  ({
     cardVal,
     size = "normal",
-    button = false
-}:{
+    button = false,
+  }: {
     cardVal: number;
     size?: "normal" | "hand" | "pile";
-    button?: boolean
-}) => {
+    button?: boolean;
+  }) => {
+    const isBtnClass = button ? `${styles[`cardNode--btn`]}` : ``;
 
-  const isBtnClass = button ? `${styles[`cardNode--btn`]}` : ``;
-
-  return (
-    <div className={`${styles.cardNode} ${isBtnClass} ${styles[`cardSize--${size}`]}`}>
+    return (
+      <div
+        className={`${styles.cardNode} ${isBtnClass} ${
+          styles[`cardSize--${size}`]
+        }`}
+      >
         <figure>
-            <img src={require(`../../../assets/img/cards/rank${cardVal}.jpg`)} alt="Card" />
+          <img
+            src={require(`../../../assets/img/cards/rank${cardVal}.jpg`)}
+            alt="Card"
+          />
         </figure>
-        {/* {cardVal} */}
-    </div>
-  )
-}
+      </div>
+    );
+  }
+);
 
 export default Card

@@ -108,7 +108,7 @@ export type HumanActionsTypes = {
   setCardStatus: (cardGroup: HandGroupTypes, value?: string) => void;
   setCardStatusSelected: (value: string | number) => void;
   setCardStatusJokerPicked: (cardGroup: CardTypes[]) => void;
-  setCardStatusCombine: (value: number) => void;
+  setCardStatusJokerCombine: (value: number) => void;
   setLatestAction: (value: HumanLatestActionTypes) => void;
   setHumanActionTrigger: (value: (() => void) | null) => void;
 };

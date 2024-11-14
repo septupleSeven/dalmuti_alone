@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { HandGroupTypes } from "../types/HomeTypes";
 import Card from "./Card";
 import styles from "../styles/HomeStyles.module.scss";

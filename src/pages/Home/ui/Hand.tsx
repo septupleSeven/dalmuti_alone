@@ -22,11 +22,6 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
     }))
   );
 
-  const { actionTrigger } = useHumanStore(
-    useShallow((state) => ({
-      actionTrigger: state.actionTrigger,
-    }))
-  );
   const { setHumanActionTrigger, setLatestAction } = useHumanStoreAction();
 
   const { setDispenserClose } = useHandDispenserStoreAction();
@@ -75,7 +70,7 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
             onClick={() => {
               if (pile.length) {
                 setLatestAction("passed");
-                runHumanActionTrigger(actionTrigger, setHumanActionTrigger);
+                runHumanActionTrigger(useHumanStore.getState().actionTrigger, setHumanActionTrigger);
                 setIsSelected(0);
                 setDispenserClose();
               }

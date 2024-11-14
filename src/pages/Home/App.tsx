@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo } from "react";
 import Player from "./ui/Player";
 import styles from "./styles/HomeStyles.module.scss";
 import Container from "../../shared/Container";
@@ -12,24 +12,30 @@ import { HUMAN_ID } from "../../config/contants";
 import Ending from "./ui/Ending";
 
 function App() {
+  const { players, pile, settingStep, gameStep } = useGameStore(
+    useShallow((state) => ({
+      players: state.players,
+      pile: state.pile,
+      settingStep: state.settingStatus.settingStep,
+      gameStep: state.gameStatus.gameStep,
+    }))
+  );
+  const { view, setDealCard, setSortPlayer, setInitializeDeck } =
+    useGameStoreAction();
+
+  // view();
+
+  const isBootingToReadyToSetting = useMemo(
+    () => isStepCondition(settingStep, "bootingToReadyToSetting"),
+    [settingStep]
+  );
   
-  const {
-    players,
-    pile,
-    settingStep,
-    gameStep,
-  } = useGameStore(useShallow(state => ({
-    players: state.players,
-    pile: state.pile,
-    settingStep: state.settingStatus.settingStep,
-    gameStep: state.gameStatus.gameStep
-  })));
-  const { view, setDealCard, setSortPlayer, setInitializeDeck } = useGameStoreAction();
+  const isReadyToPlaying = useMemo(
+    () => isStepCondition(settingStep, "readyToPlaying"),
+    [settingStep]
+  );
 
-  view();
-
-  const gameTableRef = useRef(null);
-  const humanPlayer = findPlayerWithId(players, HUMAN_ID)!;
+  const humanPlayer = useMemo(() => findPlayerWithId(players, HUMAN_ID)!, [players]);
 
   useEffect(() => {
     if (settingStep === "dealForOrder") {
@@ -43,8 +49,8 @@ function App() {
 
   return (
     <Container>
-      <div className={styles.gameTableContainer} ref={gameTableRef}>
-        {isStepCondition(settingStep, "bootingToReadyToSetting") &&
+      <div className={styles.gameTableContainer} >
+        {isBootingToReadyToSetting &&
           players.map((player, idx) => {
             return (
               <Player
@@ -54,18 +60,16 @@ function App() {
               />
             );
           })}
-        {isStepCondition(settingStep, "readyToPlaying") && (
+        {isReadyToPlaying && (
           <div className={styles.gameTableCenterContents}>
             <Pile pile={pile} />
           </div>
         )}
       </div>
-      {isStepCondition(settingStep, "readyToPlaying") && (
+      {isReadyToPlaying && (
         <Hand human={humanPlayer} />
       )}
-      {isStepCondition(settingStep, "bootingToReadyToSetting") && (
-        <Log />
-      )}
+      {isBootingToReadyToSetting && <Log />}
       {gameStep === "GAMEOVER" && <Ending />}
     </Container>
   );

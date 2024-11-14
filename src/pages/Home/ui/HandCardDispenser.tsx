@@ -25,7 +25,7 @@ const HandCardDispenser = ({
   const {
     setHumanActionTrigger,
     setCardStatusJokerPicked,
-    setCardStatusCombine,
+    setCardStatusJokerCombine,
     setCardStatusSelected,
     setLatestAction,
   } = useHumanStoreAction();
@@ -152,7 +152,7 @@ const HandCardDispenser = ({
                       jokerRef.current.checked &&
                       cardStatus.rank !== "JOKER"
                     ) {
-                      setCardStatusCombine(pile[pile.length - 1].length);
+                      setCardStatusJokerCombine(pile[pile.length - 1].length);
                       setCardStatusSelected(
                         useHumanStore.getState().cardStatus.cards.length
                       );
@@ -161,9 +161,7 @@ const HandCardDispenser = ({
                       return false;
                     }
                   }
-
-                  // view();
-
+                  
                   if (gameStep === "inPlaying") {
                     chkBtn();
                     setLatestAction("layDown");

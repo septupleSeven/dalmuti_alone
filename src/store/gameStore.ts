@@ -1,14 +1,11 @@
 import { create } from "zustand";
 import { useGameStoreTypes } from "./types/storeTypes";
 import {
-  clearHand,
   createDeck,
   dealDeck,
   setLogData,
   setOrder,
   setPlayer,
-  setPlayerGameState,
-  setReadyForPlay,
   shuffleDeck,
   sortPlayer,
 } from "../features/setting";
@@ -18,16 +15,13 @@ import {
   PLAYER_NAME_TABLE,
   PLAYER_NUM,
 } from "../config/contants";
-import { produce } from "immer";
 import {
-  getSettleRoundData,
   isRevolution,
   layDownCard,
   performTaxCollect,
   playerLayDownCard,
   setWinner,
 } from "../features/playing";
-import { LayDownCardType } from "../features/types/featuresTypes";
 import { useShallow } from "zustand/react/shallow";
 import { useHumanStore } from "./humanStore";
 import { useLogStore } from "./logStore";
@@ -108,8 +102,10 @@ export const useGameStore = create<useGameStoreTypes>()(
         }),
       setFirstInAction: () =>
         set((state) => {
-          const fitstPlayer = state.players.find(player => player.order === 0);
-          if(fitstPlayer) fitstPlayer.status.gameState ="inAction"
+          const fitstPlayer = state.players.find(
+            (player) => player.order === 0
+          );
+          if (fitstPlayer) fitstPlayer.status.gameState = "inAction";
         }),
       setPlayers: (players) =>
         set((state) => {
@@ -117,11 +113,11 @@ export const useGameStore = create<useGameStoreTypes>()(
         }),
       setResultRank: (players) =>
         set((state) => {
-            state.gameStatus.resultRank = players;
+          state.gameStatus.resultRank = players;
         }),
       setLatestPlayer: (value) =>
         set((state) => {
-          state.gameStatus.latestPlayer = value
+          state.gameStatus.latestPlayer = value;
         }),
       runTaxCollect: async () => {
         const { deck, players, gameStatus, actions } = get();
@@ -133,30 +129,16 @@ export const useGameStore = create<useGameStoreTypes>()(
           players,
           gameStatus.gameStep,
           actions,
+          get,
           getLogStore.actions.setLog,
           isRevolutionVal
         );
       },
 
-
-
-
-
-      
       runGame: async () => {
-        const { players, 
-          // gameStatus, 
-          // pile, 
-          actions } = get();
+        const { players, actions } = get();
 
-        const {
-          // setTurn,
-          // setPile,
-          setGameStep,
-          // setLatestPlayer,
-          // setPlayers,
-          // setResultRank,
-        } = actions;
+        const { setGameStep } = actions;
 
         const getLogStoreAction = useLogStore.getState().actions;
         const { setLog } = getLogStoreAction;
@@ -190,52 +172,15 @@ export const useGameStore = create<useGameStoreTypes>()(
           return;
         }
 
-        // let actionResult: LayDownCardType;
-
         if (getCurrentPlayer && getCurrentPlayer.id === HUMAN_ID) {
           await new Promise<void>((resolve) => {
-            useHumanStore.getState().actionTrigger = resolve;
+            useHumanStore.getState().actions.setHumanActionTrigger(resolve);
           });
           const getHumanStore = useHumanStore.getState();
           playerLayDownCard(get(), getHumanStore, get, setLog);
-
-          // actionResult = playerLayDownCard(
-          //   // players,
-          //   // pile,
-          //   // gameStatus.currentTurn,
-          //   get(),
-          //   getHumanStore,
-          //   // getHumanStore.cardStatus,
-          //   // getHumanStore.latestAction,
-          //   setLog
-          // );
         } else {
-          // actionResult = layDownCard(
-          //   players,
-          //   pile,
-          //   gameStatus.currentTurn,
-          //   setLog
-          // )!;
-          layDownCard(
-            get(),
-            get,
-            setLog
-          );
+          layDownCard(get(), get, setLog);
         }
-
-        // setLatestPlayer(actionResult.latestPlayer);
-
-        // if (actionResult.result === "layDown") {
-        //   setTurn(actionResult.nextTurn);// layDownCard에서 하도록 실행하면 삭제해야함
-          
-        //   setPlayers(actionResult.nextPlayers);// layDownCard에서 하도록 실행하면 삭제해야함
-        //   setPile(actionResult.copiedPile);// layDownCard에서 하도록 실행하면 삭제해야함
-
-        // } else if (actionResult.result === "pass") {
-
-        //   setTurn(actionResult.nextTurn);
-        //   setPlayers(actionResult.nextPlayers);
-        // }
 
         await setDelay(1000);
 
@@ -249,7 +194,7 @@ export const useGameStore = create<useGameStoreTypes>()(
             if (
               currentLatestPlayer &&
               !currentLatestPlayer.hand.length
-              // playerChk && playerChk.hand.length < 12
+              // currentLatestPlayer && currentLatestPlayer.hand.length < 12
             ) {
               // console.log(
               //   "%cGame Set winner is=> ",
@@ -261,23 +206,12 @@ export const useGameStore = create<useGameStoreTypes>()(
                   ${currentLatestPlayer.className}은 게임의 승리자 입니다! 이후 순번에서 제외됩니다.`)
               );
 
-              // const resultData = setWinner(
-              //   currentState.players,
-              //   currentLatestPlayer,
-              //   currentState.gameStatus,
-              //   currentState.actions
-              // );
-
               setWinner(
                 currentState.players,
                 currentLatestPlayer,
                 currentState.gameStatus,
                 currentState.actions
               );
-
-              // setPlayers(resultData.remainedPlayers);
-              // setResultRank(resultData.updatedResultRank);
-              // setTurn(resultData.currentTurn);
 
               if (get().players.length === 1) {
                 alert("게임 종료");
@@ -294,13 +228,6 @@ export const useGameStore = create<useGameStoreTypes>()(
         if (!isGameContinue) {
           const updatedState = get();
 
-          // const updatedPlayers = get().players;
-          // const resultData = setWinner(
-          //   updatedPlayers,
-          //   updatedPlayers[0],
-          //   get().gameStatus
-          // );
-
           setWinner(
             updatedState.players,
             updatedState.players[0],
@@ -308,8 +235,6 @@ export const useGameStore = create<useGameStoreTypes>()(
             updatedState.actions
           );
 
-          // setPlayers(resultData.remainedPlayers);
-          // setResultRank(resultData.updatedResultRank);
           setGameStep("GAMEOVER");
           return;
         }
@@ -319,41 +244,17 @@ export const useGameStore = create<useGameStoreTypes>()(
         }
       },
 
-
-
-
-
-
-
       settleRound: async () => {
-        const { 
-          players, 
-          // pile, 
-          // deck, 
-          actions 
-        } = get();
+        const { players, actions } = get();
 
-        const { 
-          runGame, 
-          setGameStep, 
-          setGameOrder, 
-          setPile,
-          // setDeck, 
-          // view 
-        } =
-          actions;
+        const { runGame, setGameStep, setGameOrder, setPile } = actions;
 
         const getLogStoreAction = useLogStore.getState().actions;
         const { setLog } = getLogStoreAction;
 
         if (players.length > 1) {
-        
           setGameOrder("game");
           setPile([]);
-
-          // ↓ 리셋 기능 추가 시 활성화
-          // const settledData = getSettleRoundData(players.length, pile);
-          // setDeck(settledData);
 
           set((state) => {
             state.gameStatus.currentTurn = 0;
@@ -374,50 +275,36 @@ export const useGameStore = create<useGameStoreTypes>()(
         }
       },
 
+      setLeader: (playerId, isNotFirstTurn = false) =>
+        set((state) => {
+          const currentPlayer = findPlayerWithId(state.players, playerId)!;
 
-
-
-
-
-
-
-
-
-      setLeader: (
-        playerId, 
-        isNotFirstTurn = false, 
-        // currentLeaderPlayer
-      ) => set(
-        (state) => {
-          const currentPlayer = findPlayerWithId(state.players, playerId)!
-          
           if (isNotFirstTurn) {
             const currentLeaderPlayer = state.players.find(
               (player) => player.status.isLeader === true
             );
-            
-            if(currentLeaderPlayer){
+
+            if (currentLeaderPlayer) {
               currentLeaderPlayer.status.isLeader = false;
             }
           }
-          
+
           currentPlayer.status.isLeader = true;
-        }
-      ),
+        }),
       setPushPile: (cards) =>
         set((state) => {
           state.pile.push(cards);
         }),
-      setPlayerState: (playerId, gameState) => set(
-        (state) => {
-          const currentPlayer = findPlayerWithId(state.players, playerId)!
-          currentPlayer.status.gameState = gameState
-        }
-      ),
-      setPlayerHand: (playerId, hand) => set(state => {
-        const currentPlayer = findPlayerWithId(state.players, playerId)!
-        currentPlayer.hand = hand
-      })
+      setPlayerState: (playerId, gameState) =>
+        set((state) => {
+          const currentPlayer = findPlayerWithId(state.players, playerId)!;
+          currentPlayer.status.gameState = gameState;
+        }),
+      setPlayerHand: (playerId, hand) =>
+        set((state) => {
+          const currentPlayer = findPlayerWithId(state.players, playerId)!;
+          currentPlayer.hand = hand;
+        }),
     },
   }))
 );

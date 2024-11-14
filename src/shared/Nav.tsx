@@ -1,33 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./styles/GlobalStyles.module.scss";
-import {
-  AnimatePresence,
-  motion,
-  useAnimationControls,
-} from "framer-motion";
+import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { findPlayerWithId, isStepCondition } from "../features/utils";
 import { useGameStore, useGameStoreAction } from "../store/gameStore";
-import { useShallow } from 'zustand/react/shallow'
+import { useShallow } from "zustand/react/shallow";
 import { useLogStoreAction } from "../store/logStore";
 import { setLogData } from "../features/setting";
 import { HUMAN_ID } from "../config/contants";
 
 const Nav = () => {
+  const { settingStep, gameStep, players } = useGameStore(
+    useShallow((state) => ({
+      players: state.players,
+      deck: state.deck,
+      settingStep: state.settingStatus.settingStep,
+      gameStep: state.gameStatus.gameStep,
+      actions: state.actions,
+    }))
+  );
 
   const {
-    settingStep,
-    gameStep,
-    players,
-  } = useGameStore(useShallow(state => ({
-    players: state.players,
-    deck: state.deck,
-    settingStep: state.settingStatus.settingStep,
-    gameStep: state.gameStatus.gameStep,
-    actions: state.actions
-  })));
-
-  const { 
-    setShuffleDeck, 
+    setShuffleDeck,
     setSettingStep,
     setGameOrder,
     settleRound,
@@ -36,9 +29,10 @@ const Nav = () => {
 
   const { setLog } = useLogStoreAction();
 
-
   const [firstInitGame, setFirstInitGame] = useState(false);
   const headerMotionControls = useAnimationControls();
+
+  const isBootingToReadyToSetting = useMemo(() => isStepCondition(settingStep, "bootingToReadyToSetting"), [])
 
   const headerMotionVariants = {
     headerInit: {
@@ -49,21 +43,16 @@ const Nav = () => {
       height: 80,
       backgroundColor: "rgba(0, 0, 0, 0.4)",
       transition: {
-        delay: isStepCondition(settingStep, "bootingToReadyToSetting") ? 0 : 0.4,
-        duration: isStepCondition(settingStep, "bootingToReadyToSetting")
+        delay: isBootingToReadyToSetting
+          ? 0
+          : 0.4,
+        duration: isBootingToReadyToSetting
           ? 0.4
           : 1.6,
         ease: "circOut",
       },
     },
-    headerHover: {
-      height: 120,
-      transition: {
-        delay: 0,
-        duration: 0.4,
-      },
-    },
-  };
+  }
 
   const bootingScreenVariants = {
     titleInit: {
@@ -113,7 +102,7 @@ const Nav = () => {
     if (settingStep === "playing") {
       runTaxCollect();
     }
-  }, [ settingStep, runTaxCollect ]);
+  }, [settingStep, runTaxCollect]);
 
   return (
     <motion.header
@@ -121,16 +110,6 @@ const Nav = () => {
       initial="headerInit"
       animate={headerMotionControls}
       className={styles.headerNode}
-      whileHover={
-        isStepCondition(settingStep, "bootingToReadyToSetting")
-          ? "headerHover"
-          : {}
-      }
-      onHoverEnd={() => {
-        if (isStepCondition(settingStep, "bootingToReadyToSetting")) {
-          headerMotionControls.start("headerAnimate");
-        }
-      }}
     >
       <AnimatePresence>
         {settingStep === "booting" && (
@@ -156,16 +135,15 @@ const Nav = () => {
                       if (!firstInitGame) {
                         headerMotionControls.start("headerAnimate");
                         setSettingStep("readyToSetting");
-                        
+
                         await new Promise((resolve) =>
                           setTimeout(() => {
                             setShuffleDeck();
                             setSettingStep("setting");
-                            setLog(setLogData("플레이어와 덱을 구성합니다."))
+                            setLog(setLogData("플레이어와 덱을 구성합니다."));
                             return resolve;
                           }, 2000)
                         );
-
                       }
                       setFirstInitGame(true);
                     }}
@@ -205,21 +183,22 @@ const Nav = () => {
               onClick={() => {
                 if (settingStep === "readyToPlay") {
                   const human = findPlayerWithId(players, HUMAN_ID);
-                  setLog(setLogData("게임 시작!"))
-                  setLog(setLogData(`당신은 ${human?.className} 입니다.`))
+                  setLog(setLogData("게임 시작!"));
+                  setLog(setLogData(`당신은 ${human?.className} 입니다.`));
                   setGameOrder("setting");
                   setSettingStep("playing");
                 }
               }}
-              disabled={
-                isStepCondition(settingStep, "playing") 
-                ? true : false
-              }
+              disabled={isStepCondition(settingStep, "playing") ? true : false}
             >
               게임시작
             </motion.button>
             <motion.button
-              className={gameStep === "roundEnd" ? `${styles.btn} ${styles.active}` : styles.btn}
+              className={
+                gameStep === "roundEnd"
+                  ? `${styles.btn} ${styles.active}`
+                  : styles.btn
+              }
               variants={navBtnVariants}
               initial="navBtnInit"
               animate="navBtnAnimate"

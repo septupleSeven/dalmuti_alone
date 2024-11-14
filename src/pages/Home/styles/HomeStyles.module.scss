@@ -258,6 +258,19 @@
                 }
             }
 
+            &:disabled{
+                opacity: 0.1;
+
+                &:hover{
+                    opacity: 0.1;
+    
+                    img{
+                        transform: translateY(0);
+                    }
+                }
+
+            }
+
         }
 
     }

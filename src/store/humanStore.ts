@@ -1,69 +1,55 @@
 import { create } from "zustand";
 import { useHumanStoreTypes } from "./types/storeTypes";
-import { produce } from "immer";
 import { useShallow } from "zustand/react/shallow";
-import { setJokerCombine, setPlayerCardStatus } from "../features/setting";
+import { immer } from "zustand/middleware/immer";
 
-export const useHumanStore = create<useHumanStoreTypes>((set, get) => ({
-  cardStatus: {
-    rank: "",
-    value: 0,
-    cards: [],
-    selected: 0,
-    jokerPicked: [],
-  },
-  actionTrigger: null,
-  latestAction: "waiting",
+export const useHumanStore = create<useHumanStoreTypes>()(
+  immer((set, get) => ({
+    cardStatus: {
+      rank: "",
+      value: 0,
+      cards: [],
+      selected: 0,
+      jokerPicked: [],
+    },
+    actionTrigger: null,
+    latestAction: "waiting",
 
-  actions: {
-    view: () => console.log(get()),
-    setCardStatus: (cardGroup, value) =>
-      set(
-        produce((state) => {
-          state.cardStatus = {
-            ...state.cardStatus,
-            ...setPlayerCardStatus(cardGroup, value),
-          };
-        })
-      ),
-    setCardStatusSelected: (value) =>
-      set((state) => {
-        const numVal = typeof value === "string" ? Number(value) : value;
-        return {
-          ...state,
-          cardStatus: {
-            ...state.cardStatus,
-            selected: numVal,
-          },
-        };
-      }),
-    setCardStatusJokerPicked: (cardGroup) =>
-      set(
-        produce((state) => {
+    actions: {
+      view: () => console.log(get()),
+      setCardStatus: (cardGroup, value) =>
+        set((state) => {
+          const numVal = value ? Number(value) : 0;
+          state.cardStatus.cards = cardGroup.cards;
+          state.cardStatus.value = cardGroup.cards[0].value;
+          state.cardStatus.rank = cardGroup.rank;
+          state.cardStatus.selected = numVal;
+        }),
+      setCardStatusSelected: (value) =>
+        set((state) => {
+          const numVal = typeof value === "string" ? Number(value) : value;
+          state.cardStatus.selected = numVal;
+        }),
+      setCardStatusJokerPicked: (cardGroup) =>
+        set((state) => {
           state.cardStatus.jokerPicked = cardGroup;
-        })
-      ),
-    setCardStatusCombine: (value) =>
-      set(
-        produce((state) => {
-          state.cardStatus.cards = setJokerCombine(state.cardStatus, value);
-        })
-      ),
-    setLatestAction: (value) =>
-      set((state) => {
-        return {
-          ...state,
-          latestAction: value,
-        };
-      }),
-    setHumanActionTrigger: (value) =>
-      set(
-        produce((state) => {
+        }),
+      setCardStatusJokerCombine: (value) =>
+        set((state) => {
+          const jokerNeeds = state.cardStatus.jokerPicked.slice(0, value);
+          state.cardStatus.cards.push(...jokerNeeds);
+        }),
+      setLatestAction: (value) =>
+        set((state) => {
+          state.latestAction = value;
+        }),
+      setHumanActionTrigger: (value) =>
+        set((state) => {
           state.actionTrigger = value;
-        })
-      ),
-  },
-}));
+        }),
+    },
+  }))
+);
 
 export let humanActionTrigger: (() => void) | null = null;
 

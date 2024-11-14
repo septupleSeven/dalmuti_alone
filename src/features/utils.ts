@@ -134,7 +134,7 @@ export const isHumanTurn = (players: PlayerTypes[]) => {
 };
 
 export const setDelay = async (ms:number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export const hasJoker = (
@@ -147,7 +147,7 @@ export const hasJoker = (
 export const jokerGroup = (
   players:PlayerTypes[]
 ) => {
-  const humanPlayer = players.find((player) => player.id === HUMAN_ID)!;
+  const humanPlayer = findPlayerWithId(players, HUMAN_ID)!;
   const joker = getRankGroup(humanPlayer.hand).find(
     (group) => group.rank === "JOKER"
   );

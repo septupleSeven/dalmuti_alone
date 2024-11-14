@@ -18,7 +18,7 @@ const Log = () => {
 
   const y = useMotionValue(200);
   const height = useTransform(y, (y) => Math.max(y + 0.5 * 100, 200));
-  
+
   const logContainerRef = useRef<HTMLDivElement>(null);
   const logWrapRef = useRef<HTMLDivElement>(null);
 
@@ -69,11 +69,11 @@ const Log = () => {
                 <motion.li
                   initial={{
                     opacity: 0,
-                    y: 20
+                    y: 20,
                   }}
                   animate={{
                     opacity: 1,
-                    y: 0
+                    y: 0,
                   }}
                   key={`${data.time}-${idx}`}
                   className={styles.logChat}
