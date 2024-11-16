@@ -7,25 +7,47 @@ import { useShallow } from "zustand/react/shallow";
 import { useLogStoreAction } from "../store/logStore";
 import { setLogData } from "../features/setting";
 import { HUMAN_ID } from "../config/contants";
+import { useSettingStore, useSettingStoreAction } from "../store/settingStore";
 
 const Nav = () => {
-  const { settingStep, gameStep, players } = useGameStore(
+  // const { settingStep, gameStep, players } = useGameStore(
+  //   useShallow((state) => ({
+  //     players: state.players,
+  //     deck: state.deck,
+  //     settingStep: state.settingStatus.settingStep,
+  //     gameStep: state.gameStatus.gameStep,
+  //     actions: state.actions,
+  //   }))
+  // );
+
+  // const {
+  //   setShuffleDeck,
+  //   setSettingStep,
+  //   setGameOrder,
+  //   settleRound,
+  //   runTaxCollect,
+  // } = useGameStoreAction();
+
+  const { gameStep, players } = useGameStore(
     useShallow((state) => ({
       players: state.players,
       deck: state.deck,
-      settingStep: state.settingStatus.settingStep,
       gameStep: state.gameStatus.gameStep,
       actions: state.actions,
     }))
   );
-
   const {
     setShuffleDeck,
-    setSettingStep,
     setGameOrder,
     settleRound,
     runTaxCollect,
   } = useGameStoreAction();
+
+  const { settingStep } = useSettingStore(useShallow((state) => ({
+    settingStep: state.settingStatus.settingStep,
+    settingStepCondition: state.settingStatus.settingStepCondition
+  })));
+  const { setSettingStep } = useSettingStoreAction();
 
   const { setLog } = useLogStoreAction();
 
@@ -34,7 +56,7 @@ const Nav = () => {
 
   const isBootingToReadyToSetting = useMemo(
     () => isStepCondition(settingStep, "bootingToReadyToSetting"),
-    []
+    [settingStep]
   );
 
   const headerMotionVariants = {

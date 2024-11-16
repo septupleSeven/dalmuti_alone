@@ -92,29 +92,7 @@ export const actionSwapCard = (
   setPlayers(copiedPlayers);
 };
 
-const performLayDownCard = (
-  hand: CardTypes[],
-  selectedCards: CardTypes[],
-  drawNum: number
-): Record<"toSendCards" | "copiedHand", CardTypes[]> => {
-  const toSendCards = [];
-  const copiedHand = hand.map((card) => card);
-
-  for (let i = 0; i < drawNum; i++) {
-    toSendCards.push({ ...selectedCards[i] });
-    const targetCardIdx = copiedHand.findIndex(
-      (card) => card.id === selectedCards[i].id
-    );
-    copiedHand.splice(targetCardIdx, 1);
-  }
-
-  return {
-    toSendCards,
-    copiedHand,
-  };
-};
-
-const getLaDownCardData = (pile: CardTypes[][]) => {
+const getLayDownCardData = (pile: CardTypes[][]) => {
   return {
     value: `RANK${pile[pile.length - 1][0].value}`,
     length: pile[pile.length - 1].length,
@@ -129,11 +107,10 @@ export const layDownCard = (
   const { players, pile, gameStatus, actions } = gameStore;
   const {
     setLeader,
-    setPushPile,
     setTurn,
     setPlayerState,
-    setPlayerHand,
     setLatestPlayer,
+    setLayDownCard,
   } = actions;
 
   const currentPlayer = players.find(
@@ -155,15 +132,7 @@ export const layDownCard = (
     }
 
     const randomDraw = randomNumBetween(1, randomCards.length);
-
-    const { toSendCards, copiedHand } = performLayDownCard(
-      hand,
-      randomCards,
-      randomDraw
-    );
-
-    setPlayerHand(id, copiedHand);
-    setPushPile(toSendCards);
+    setLayDownCard(id, randomCards, randomDraw);
     setLeader(id, false);
   } else if (pile.length && !isPass) {
     const currentLeaderPlayer = players.find(
@@ -234,14 +203,7 @@ export const layDownCard = (
         const randomDraw = randomNumBetween(0, finalEntryCards.length - 1);
         const selectedCards = finalEntryCards[randomDraw];
 
-        const { toSendCards, copiedHand } = performLayDownCard(
-          hand,
-          selectedCards,
-          latestPileCards.length
-        );
-
-        setPushPile(toSendCards);
-        setPlayerHand(id, copiedHand);
+        setLayDownCard(id, selectedCards, latestPileCards.length);
         setLeader(id, true);
       } else {
         isPass = true;
@@ -254,7 +216,7 @@ export const layDownCard = (
   if (isPass) {
     setLog(setLogData(`${className}(${name})은 턴을 넘겼습니다.`));
   } else {
-    const { value: logPileVal, length: logPileLength } = getLaDownCardData(
+    const { value: logPileVal, length: logPileLength } = getLayDownCardData(
       get().pile
     );
 
@@ -298,26 +260,18 @@ export const playerLayDownCard = (
   const { cardStatus, latestAction } = humanStore;
   const {
     setLeader,
-    setPushPile,
     setTurn,
     setPlayerState,
-    setPlayerHand,
     setLatestPlayer,
+    setLayDownCard
   } = actions;
 
   const humanPlayer = players.find((player) => player.id === HUMAN_ID)!;
-  const { hand, className } = humanPlayer;
+  const { className } = humanPlayer;
 
   if (latestAction === "layDown") {
     if (!pile.length) {
-      const { toSendCards, copiedHand } = performLayDownCard(
-        hand,
-        cardStatus.cards,
-        cardStatus.selected
-      );
-
-      setPushPile(toSendCards);
-      setPlayerHand(HUMAN_ID, copiedHand);
+      setLayDownCard(HUMAN_ID, cardStatus.cards, cardStatus.selected);
       setLeader(HUMAN_ID, false);
     } else {
       const latestPileCards = pile[pile.length - 1];
@@ -327,15 +281,7 @@ export const playerLayDownCard = (
           cardStatus.selected === latestPileCards.length) ||
         cardStatus.cards.some((card) => card.value === 13)
       ) {
-        const { toSendCards, copiedHand } = performLayDownCard(
-          hand,
-          cardStatus.cards,
-          cardStatus.selected
-        );
-
-        setPushPile(toSendCards);
-        setPlayerHand(HUMAN_ID, copiedHand);
-
+        setLayDownCard(HUMAN_ID, cardStatus.cards, cardStatus.selected);
         setLeader(HUMAN_ID, true);
       }
     }
@@ -344,7 +290,7 @@ export const playerLayDownCard = (
   if (latestAction === "passed") {
     setLog(setLogData(`당신(${className})은 턴을 넘겼습니다.`));
   } else {
-    const { value: logPileVal, length: logPileLength } = getLaDownCardData(
+    const { value: logPileVal, length: logPileLength } = getLayDownCardData(
       get().pile
     );
 

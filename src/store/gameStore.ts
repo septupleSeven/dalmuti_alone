@@ -33,10 +33,10 @@ export const useGameStore = create<useGameStoreTypes>()(
     players: setPlayer(PLAYER_NUM),
     deck: createDeck(MAXIMUM_CARDRANK),
     pile: [],
-    settingStatus: {
-      settingStep: "booting",
-      settingStepCondition: "booting",
-    },
+    // settingStatus: {
+    //   settingStep: "booting",
+    //   settingStepCondition: "booting",
+    // },
     gameStatus: {
       gameStep: "collectingTax",
       currentTurn: 0,
@@ -45,12 +45,12 @@ export const useGameStore = create<useGameStoreTypes>()(
     },
     actions: {
       view: () => console.log(get()),
-      setSettingStep: (value, type = "step") =>
-        set((state) => {
-          const keyVal =
-            type === "step" ? "settingStep" : "settingStepCondition";
-          state.settingStatus[keyVal] = value;
-        }),
+      // setSettingStep: (value, type = "step") =>
+      //   set((state) => {
+      //     const keyVal =
+      //       type === "step" ? "settingStep" : "settingStepCondition";
+      //     state.settingStatus[keyVal] = value;
+      //   }),
       setGameStep: (value) =>
         set((state) => {
           state.gameStatus.gameStep = value;
@@ -138,7 +138,7 @@ export const useGameStore = create<useGameStoreTypes>()(
       runGame: async () => {
         const { players, actions } = get();
 
-        const { setGameStep } = actions;
+        const { setGameStep, setPile } = actions;
 
         const getLogStoreAction = useLogStore.getState().actions;
         const { setLog } = getLogStoreAction;
@@ -182,7 +182,7 @@ export const useGameStore = create<useGameStoreTypes>()(
           layDownCard(get(), get, setLog);
         }
 
-        await setDelay(1000);
+        await setDelay(500);
 
         const isGameContinue = await new Promise<void>((resolve, reject) =>
           setTimeout(() => {
@@ -203,7 +203,7 @@ export const useGameStore = create<useGameStoreTypes>()(
               // );
               setLog(
                 setLogData(`${currentLatestPlayer.className}(${currentLatestPlayer.name})은 더이상 수중에 패가 없습니다. 
-                  ${currentLatestPlayer.className}은 게임의 승리자 입니다! 이후 순번에서 제외됩니다.`)
+                  ${currentLatestPlayer.className}은 게임의 승리자 입니다! 이후 순번에서 제외됩니다. 진행을 위해 카드 더미가 초기화 됩니다.`)
               );
 
               setWinner(
@@ -212,6 +212,8 @@ export const useGameStore = create<useGameStoreTypes>()(
                 currentState.gameStatus,
                 currentState.actions
               );
+
+              setPile([]);
 
               alert("게임 종료");
               return reject();
@@ -225,7 +227,9 @@ export const useGameStore = create<useGameStoreTypes>()(
             return resolve();
           }, 1500)
         )
-          .then(() => true)
+          .then(() => {
+            return true;
+          })
           .catch(() => false);
 
         if (!isGameContinue) {
@@ -233,10 +237,17 @@ export const useGameStore = create<useGameStoreTypes>()(
 
           setWinner(
             updatedState.players,
-            updatedState.gameStatus.resultRank[0],
+            updatedState.players[0],
             updatedState.gameStatus,
             updatedState.actions
           );
+
+          // setWinner(
+          //   updatedState.players,
+          //   updatedState.gameStatus.resultRank[0],
+          //   updatedState.gameStatus,
+          //   updatedState.actions
+          // );
 
           setGameStep("GAMEOVER");
           return;
@@ -308,6 +319,22 @@ export const useGameStore = create<useGameStoreTypes>()(
           const currentPlayer = findPlayerWithId(state.players, playerId)!;
           currentPlayer.hand = hand;
         }),
+      setLayDownCard: (playerId, selectedCards, drawNum) => set((state) => {
+          const pile = state.pile;
+          const currentPlayer = findPlayerWithId(state.players, playerId)!;
+          const hand = currentPlayer.hand;
+          const toSendCards = [];
+
+          for (let i = 0; i < drawNum; i++) {
+            toSendCards.push({ ...selectedCards[i] });
+            const targetCardIdx = hand.findIndex(
+              (card) => card.id === selectedCards[i].id
+            );
+            hand.splice(targetCardIdx, 1);
+          }
+
+          pile.push(toSendCards);
+        })
     },
   }))
 );

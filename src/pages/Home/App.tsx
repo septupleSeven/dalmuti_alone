@@ -10,13 +10,21 @@ import { useGameStore, useGameStoreAction } from "../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
 import { HUMAN_ID } from "../../config/contants";
 import Ending from "./ui/Ending";
+import { useSettingStore, useSettingStoreAction } from "../../store/settingStore";
 
 function App() {
-  const { players, pile, settingStep, gameStep } = useGameStore(
+  // const { players, pile, settingStep, gameStep } = useGameStore(
+    // useShallow((state) => ({
+      // players: state.players,
+      // pile: state.pile,
+      // settingStep: state.settingStatus.settingStep,
+      // gameStep: state.gameStatus.gameStep,
+    // }))
+  // );
+  const { players, pile, gameStep } = useGameStore(
     useShallow((state) => ({
       players: state.players,
       pile: state.pile,
-      settingStep: state.settingStatus.settingStep,
       gameStep: state.gameStatus.gameStep,
     }))
   );
@@ -24,6 +32,11 @@ function App() {
     useGameStoreAction();
 
   // view();
+
+  const { settingStep } = useSettingStore(useShallow((state) => ({
+    settingStep: state.settingStatus.settingStep,
+    settingStepCondition: state.settingStatus.settingStepCondition
+  })));
 
   const isBootingToReadyToSetting = useMemo(
     () => isStepCondition(settingStep, "bootingToReadyToSetting"),

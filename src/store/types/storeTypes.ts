@@ -17,7 +17,7 @@ export type GameStepTypes =
   | "GAMEOVER"
 
 export type GameSettingTypes = "game" | "setting";
-export type GameActionTypes = "shuffle" | "deal";
+export type InitDeckTypes = "shuffle" | "deal";
 export type SortPlayersTypes = "game" | "setting" | "gRevolution";
 
 export type RoundStatusTypes = {
@@ -40,17 +40,17 @@ export type GameStatusTypes = {
 
 export type GameActionsTypes = {
   view: () => void;
-  setSettingStep: (
-    value: SettingStepTypes,
-    type?: "step" | "condition"
-  ) => void;
+  // setSettingStep: (
+  //   value: SettingStepTypes,
+  //   type?: "step" | "condition"
+  // ) => void;
   setGameStep: (value: GameStepTypes) => void;
   setShuffleDeck: () => void;
   setDealCard: (value: GameSettingTypes) => void;
-  setInitializeDeck: (action?: GameActionTypes) => void;
+  setInitializeDeck: (action?: InitDeckTypes) => void;
   setSortPlayer: (type: SortPlayersTypes) => void;
   setPile: (pile: Array<CardTypes>[]) => void;
-  setDeck: (deck: Array<CardTypes>) => void;
+  setDeck: (deck: Array<CardTypes>) => void; // 현재 안쓰임
   setTurn: (value: number) => void;
   setGameOrder: (type: GameSettingTypes) => void;
   setFirstInAction: () => void;
@@ -63,21 +63,21 @@ export type GameActionsTypes = {
   setLeader: (
     playerId: string,
     isNotFirstTurn: boolean,
-    // currentLeaderPlayer?: PlayerTypes | undefined
   ) => void;
   setPushPile: (card:CardTypes[]) => void
   setPlayerState: (playerId:string, gameState:PlayerGameStateTypes) => void
   setPlayerHand: (playerId:string, hand:CardTypes[]) => void
+  setLayDownCard: (playerId: string, selectedCards: CardTypes[], drawNum: number) => void
 };
 
 export type useGameStoreTypes = {
   players: Array<PlayerTypes>;
   deck: Array<CardTypes>;
   pile: Array<CardTypes>[];
-  settingStatus: {
-    settingStep: SettingStepTypes;
-    settingStepCondition: SettingStepTypes;
-  };
+  // settingStatus: {
+  //   settingStep: SettingStepTypes;
+  //   settingStepCondition: SettingStepTypes;
+  // };
   gameStatus: GameStatusTypes;
   actions: GameActionsTypes;
 };
@@ -134,3 +134,20 @@ export type useLogStoreTypes = {
   log: LogTypes[];
   actions: LogActionsTypes;
 };
+
+
+export type SettingActionTypes = {
+  view: () => void;
+  setSettingStep: (
+    value: SettingStepTypes,
+    type?: "step" | "condition"
+  ) => void;
+}
+
+export type useSettingStoreTypes = {
+  settingStatus: {
+    settingStep: SettingStepTypes;
+    settingStepCondition: SettingStepTypes;
+  };
+  actions: SettingActionTypes;
+}

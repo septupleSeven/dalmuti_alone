@@ -8,10 +8,11 @@ import {
 } from "../../../config/contants";
 import styles from "../styles/HomeStyles.module.scss";
 import { calcCoordinate } from "../../../features/utils";
-import { useGameStore, useGameStoreAction } from "../../../store/gameStore";
+import { useGameStoreAction } from "../../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
 import { setLogData } from "../../../features/setting";
 import { useLogStoreAction } from "../../../store/logStore";
+import { useSettingStore, useSettingStoreAction } from "../../../store/settingStore";
 
 const Player = ({
   playerInfo,
@@ -20,16 +21,25 @@ const Player = ({
   playerInfo: PlayerTypes;
   componentIdx: number;
 }) => {
-  const { settingStep, settingStepCondition } = useGameStore(
-    useShallow((state) => ({
-      settingStep: state.settingStatus.settingStep,
-      settingStepCondition: state.settingStatus.settingStepCondition,
-      players: state.players,
-    }))
-  );
-  const { setSettingStep, setDealCard } = useGameStoreAction();
+  // const { settingStep, settingStepCondition } = useGameStore(
+  //   useShallow((state) => ({
+  //     settingStep: state.settingStatus.settingStep,
+  //     settingStepCondition: state.settingStatus.settingStepCondition,
+  //     players: state.players,
+  //   }))
+  // );
+  // const { setSettingStep, setDealCard } = useGameStoreAction();
 
+  const { settingStep, settingStepCondition } = useSettingStore(useShallow((state) => ({
+    settingStep: state.settingStatus.settingStep,
+    settingStepCondition: state.settingStatus.settingStepCondition
+  })));
+  const { setSettingStep } = useSettingStoreAction();
+
+  const { setDealCard } = useGameStoreAction();
+  
   const { setLog } = useLogStoreAction();
+
 
   const { order, className, hand, id, status } = playerInfo;
   const [isOrderCard, setIsOrderCard] = useState(true);

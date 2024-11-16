@@ -107,6 +107,7 @@ const HandCardDispenser = ({
           <div className={styles.textWrap}>
             <input
               type="text"
+              placeholder="제출할 카드의 수량을 입력해주세요."
               value={
                 pile.length ? String(pile[pile.length - 1].length) : inputVal
               }
