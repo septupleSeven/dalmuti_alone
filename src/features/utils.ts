@@ -133,8 +133,8 @@ export const isHumanTurn = (players: PlayerTypes[]) => {
   return humanPlayer?.status.gameState === "inAction";
 };
 
-export const setDelay = async (ms:number) => {
-  return await new Promise((resolve) => setTimeout(resolve, ms));
+export const setDelay = (ms:number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export const hasJoker = (

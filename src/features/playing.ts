@@ -9,11 +9,11 @@ import {
 } from "../store/types/storeTypes";
 import { setLogData, setPlayerClass, sortHand, sortPlayer } from "./setting";
 import { CardTypes, PileTypes, PlayerTypes } from "./types/featuresTypes";
-import { copyPlayer, randomNumBetween } from "./utils";
+import { copyPlayer, randomNumBetween, setDelay } from "./utils";
 
-export const isRevolution = async (
+export const isRevolution = (
   players: PlayerTypes[]
-): Promise<"revolution" | "gRevolution" | "continue"> => {
+): "revolution" | "gRevolution" | "continue" => {
   const filteredPlayers = players.filter((player) => {
     const getJoker = player.hand.filter((card) => card.value === 13);
     if (getJoker.length >= 2) {
@@ -23,19 +23,17 @@ export const isRevolution = async (
     }
   });
 
-  return await new Promise((resolve) => {
-    let result: "revolution" | "gRevolution" | "continue" = "continue";
+  let result: "revolution" | "gRevolution" | "continue" = "continue";
 
-    if (filteredPlayers.length) {
-      result = "revolution";
+  if (filteredPlayers.length) {
+    result = "revolution";
 
-      if (filteredPlayers[0].order === players.length - 1) {
-        result = "gRevolution";
-      }
+    if (filteredPlayers[0].order === players.length - 1) {
+      result = "gRevolution";
     }
+  }
 
-    return resolve(result);
-  });
+  return result;
 };
 
 export const actionSwapCard = (
@@ -119,7 +117,7 @@ export const layDownCard = (
   const { hand, className, name, id } = currentPlayer;
 
   const passProb = hand.length < 8 ? 0 : 7;
-  let isPass = Math.floor(Math.random() * 10) > passProb ? true : false;
+  let isPass = Math.floor(Math.random() * 10) > passProb;
 
   if (!pile.length) {
     isPass = false;
@@ -136,10 +134,10 @@ export const layDownCard = (
     setLeader(id, false);
   } else if (pile.length && !isPass) {
     const currentLeaderPlayer = players.find(
-      (player) => player.status.isLeader === true
+      (player) => player.status.isLeader
     );
 
-    if (currentLeaderPlayer && currentLeaderPlayer.id === currentPlayer.id) {
+    if (currentLeaderPlayer && currentLeaderPlayer.id === id) {
       setLatestPlayer(id);
       return;
     }
@@ -151,7 +149,7 @@ export const layDownCard = (
 
     if (rankFulfilledCards.length) {
       const lengthFulfilledCards = rankFulfilledCards.reduce(
-        (acc: Record<string, typeof rankFulfilledCards>, cur) => {
+        (acc: Record<string, CardTypes[]>, cur) => {
           const keyString = String(cur.value);
 
           if (!acc[keyString]) acc[keyString] = [];
@@ -405,16 +403,10 @@ export const performTaxCollect = async (
   setGameStep("inPlaying");
   setFirstInAction();
 
-  const isComplete = await new Promise<string>((resolve) =>
-    setTimeout(() => {
-      setLog(setLogData("게임이 시작됩니다."));
-      return resolve("inPlaying");
-    }, 2000)
-  );
+  setLog(setLogData("게임이 시작됩니다."));
+  await setDelay(2000);
 
-  if (isComplete) {
-    await runGame();
-  }
+  await runGame();
 };
 
 export const runHumanActionTrigger = (

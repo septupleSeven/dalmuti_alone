@@ -122,7 +122,7 @@ export const useGameStore = create<useGameStoreTypes>()(
       runTaxCollect: async () => {
         const { deck, players, gameStatus, actions } = get();
         const getLogStore = useLogStore.getState();
-        const isRevolutionVal = await isRevolution(players);
+        const isRevolutionVal = isRevolution(players);
 
         await performTaxCollect(
           deck,
@@ -136,125 +136,111 @@ export const useGameStore = create<useGameStoreTypes>()(
       },
 
       runGame: async () => {
-        const { players, actions } = get();
+        const { setGameStep, setPile } = get().actions;
+        const { setLog } = useLogStore.getState().actions;
 
-        const { setGameStep, setPile } = actions;
+        while (true) {
+          const { players } = get();
 
-        const getLogStoreAction = useLogStore.getState().actions;
-        const { setLog } = getLogStoreAction;
+          const getCurrentPlayer = players.find(
+            (player) => player.status.gameState === "inAction"
+          );
 
-        const getCurrentPlayer = players.find(
-          (player) => player.status.gameState === "inAction"
-        );
-
-        // console.log(
-        //   "%cNow Turn is =>",
-        //   "background: #a7a8d9; color: #111",
-        //   getCurrentPlayer?.name
-        // );
-        setLog(
-          setLogData(
-            `${getCurrentPlayer?.className}(${getCurrentPlayer?.name})의 차례`
-          )
-        );
-
-        if (getCurrentPlayer!.status.isLeader) {
           // console.log(
-          //   "%cRound Ended Winner is => ",
-          //   "background: #bada55; color: #111",
-          //   getCurrentPlayer
+          //   "%cNow Turn is =>",
+          //   "background: #a7a8d9; color: #111",
+          //   getCurrentPlayer?.name
           // );
           setLog(
-            setLogData(`라운드 종료. 이번 라운드 승자는 ${getCurrentPlayer?.className}(${getCurrentPlayer?.name})입니다. 
-              다음 라운드는 이 플레이어 기준 시계방향으로 시작됩니다. 상단 '다음 라운드 시작' 버튼을 눌러서 계속 진행할 수 있습니다.`)
+            setLogData(
+              `${getCurrentPlayer?.className}(${getCurrentPlayer?.name})의 차례`
+            )
           );
-          setGameStep("roundEnd");
-          return;
-        }
 
-        if (getCurrentPlayer && getCurrentPlayer.id === HUMAN_ID) {
-          await new Promise<void>((resolve) => {
-            useHumanStore.getState().actions.setHumanActionTrigger(resolve);
-          });
-          const getHumanStore = useHumanStore.getState();
-          playerLayDownCard(get(), getHumanStore, get, setLog);
-        } else {
-          layDownCard(get(), get, setLog);
-        }
+          await setDelay(1000);
 
-        await setDelay(500);
+          if (getCurrentPlayer!.status.isLeader) {
+            // console.log(
+            //   "%cRound Ended Winner is => ",
+            //   "background: #bada55; color: #111",
+            //   getCurrentPlayer
+            // );
+            setLog(
+              setLogData(`라운드 종료. 이번 라운드 승자는 ${getCurrentPlayer?.className}(${getCurrentPlayer?.name})입니다. 
+                다음 라운드는 이 플레이어 기준 시계방향으로 시작됩니다. 상단 '다음 라운드 시작' 버튼을 눌러서 계속 진행할 수 있습니다.`)
+            );
+            setGameStep("roundEnd");
+            return;
+          }
 
-        const isGameContinue = await new Promise<void>((resolve, reject) =>
-          setTimeout(() => {
-            const currentState = get();
-            const currentLatestPlayer = currentState.players.find(
-              (player) => player.id === currentState.gameStatus.latestPlayer
+          if (getCurrentPlayer && getCurrentPlayer.id === HUMAN_ID) {
+            await new Promise<void>((resolve) => {
+              useHumanStore.getState().actions.setHumanActionTrigger(resolve);
+            });
+            const getHumanStore = useHumanStore.getState();
+            playerLayDownCard(get(), getHumanStore, get, setLog);
+          } else {
+            layDownCard(get(), get, setLog);
+          }
+
+          await setDelay(2200);
+
+          let isGameContinue:boolean = true;
+
+          const currentState = get();
+          const currentLatestPlayer = currentState.players.find(
+            (player) => player.id === currentState.gameStatus.latestPlayer
+          );
+
+          if (
+            // currentLatestPlayer &&
+            // !currentLatestPlayer.hand.length
+            currentLatestPlayer && currentLatestPlayer.hand.length < 6
+          ) {
+            // console.log(
+            //   "%cGame Set winner is=> ",
+            //   "background: #820e0e; color: #111",
+            //   playerChk.name
+            // );
+            setLog(
+              setLogData(`${currentLatestPlayer.className}(${currentLatestPlayer.name})은 더이상 수중에 패가 없습니다. 
+                ${currentLatestPlayer.className}은 게임의 승리자 입니다! 이후 순번에서 제외됩니다. 진행을 위해 카드 더미가 초기화 됩니다.`)
             );
 
-            if (
-              // currentLatestPlayer &&
-              // !currentLatestPlayer.hand.length
-              currentLatestPlayer && currentLatestPlayer.hand.length < 6
-            ) {
-              // console.log(
-              //   "%cGame Set winner is=> ",
-              //   "background: #820e0e; color: #111",
-              //   playerChk.name
-              // );
-              setLog(
-                setLogData(`${currentLatestPlayer.className}(${currentLatestPlayer.name})은 더이상 수중에 패가 없습니다. 
-                  ${currentLatestPlayer.className}은 게임의 승리자 입니다! 이후 순번에서 제외됩니다. 진행을 위해 카드 더미가 초기화 됩니다.`)
-              );
+            setWinner(
+              currentState.players,
+              currentLatestPlayer,
+              currentState.gameStatus,
+              currentState.actions
+            );
 
-              setWinner(
-                currentState.players,
-                currentLatestPlayer,
-                currentState.gameStatus,
-                currentState.actions
-              );
+            setPile([]);
 
-              setPile([]);
+            isGameContinue = false;
+          }
 
-              alert("게임 종료");
-              return reject();
+          if (!isGameContinue) {
+            alert("게임 종료");
+            const updatedState = get();
 
-              // if (get().players.length === 1) {
-              //   alert("게임 종료");
-              //   return reject();
-              // }
-            }
+            // setWinner(
+            //   updatedState.players,
+            //   updatedState.players[0],
+            //   updatedState.gameStatus,
+            //   updatedState.actions
+            // );
 
-            return resolve();
-          }, 1500)
-        )
-          .then(() => {
-            return true;
-          })
-          .catch(() => false);
+            setWinner(
+              updatedState.players,
+              updatedState.gameStatus.resultRank[0],
+              updatedState.gameStatus,
+              updatedState.actions
+            );
 
-        if (!isGameContinue) {
-          const updatedState = get();
+            setGameStep("GAMEOVER");
+            return;
+          }
 
-          setWinner(
-            updatedState.players,
-            updatedState.players[0],
-            updatedState.gameStatus,
-            updatedState.actions
-          );
-
-          // setWinner(
-          //   updatedState.players,
-          //   updatedState.gameStatus.resultRank[0],
-          //   updatedState.gameStatus,
-          //   updatedState.actions
-          // );
-
-          setGameStep("GAMEOVER");
-          return;
-        }
-
-        if (isGameContinue && get().gameStatus.gameStep === "inPlaying") {
-          await actions.runGame();
         }
       },
 
@@ -275,18 +261,13 @@ export const useGameStore = create<useGameStoreTypes>()(
           });
         }
 
-        const isComplete = await new Promise<string>((resolve) =>
-          setTimeout(() => {
-            setGameStep("inPlaying");
-            return resolve("inPlaying");
-          }, 2000)
-        );
+        setGameStep("inPlaying");
 
-        if (isComplete) {
-          // console.log("Round Restart");
-          setLog(setLogData(`다음 라운드가 시작됩니다.`));
-          runGame();
-        }
+        setLog(setLogData(`다음 라운드가 시작됩니다.`));
+
+        await setDelay(2000);
+
+        runGame();
       },
 
       setLeader: (playerId, isNotFirstTurn = false) =>
@@ -319,7 +300,8 @@ export const useGameStore = create<useGameStoreTypes>()(
           const currentPlayer = findPlayerWithId(state.players, playerId)!;
           currentPlayer.hand = hand;
         }),
-      setLayDownCard: (playerId, selectedCards, drawNum) => set((state) => {
+      setLayDownCard: (playerId, selectedCards, drawNum) =>
+        set((state) => {
           const pile = state.pile;
           const currentPlayer = findPlayerWithId(state.players, playerId)!;
           const hand = currentPlayer.hand;
@@ -334,7 +316,7 @@ export const useGameStore = create<useGameStoreTypes>()(
           }
 
           pile.push(toSendCards);
-        })
+        }),
     },
   }))
 );
