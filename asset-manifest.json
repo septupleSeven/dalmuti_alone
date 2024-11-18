@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/dalmuti_alone/static/css/main.c504e8f1.css",
-    "main.js": "/dalmuti_alone/static/js/main.b65f6c7e.js",
+    "main.js": "/dalmuti_alone/static/js/main.0fde62f9.js",
     "static/js/453.4af10311.chunk.js": "/dalmuti_alone/static/js/453.4af10311.chunk.js",
     "static/media/bg.jpg": "/dalmuti_alone/static/media/bg.39f54a27c2d3a090d0b4.jpg",
     "static/media/rank1.jpg": "/dalmuti_alone/static/media/rank1.7b296ac9bc4d71935943.jpg",
@@ -24,11 +24,11 @@
     "index.html": "/dalmuti_alone/index.html",
     "static/media/checkbox__check.svg": "/dalmuti_alone/static/media/checkbox__check.78cf34c5b157eb31966c.svg",
     "main.c504e8f1.css.map": "/dalmuti_alone/static/css/main.c504e8f1.css.map",
-    "main.b65f6c7e.js.map": "/dalmuti_alone/static/js/main.b65f6c7e.js.map",
+    "main.0fde62f9.js.map": "/dalmuti_alone/static/js/main.0fde62f9.js.map",
     "453.4af10311.chunk.js.map": "/dalmuti_alone/static/js/453.4af10311.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c504e8f1.css",
-    "static/js/main.b65f6c7e.js"
+    "static/js/main.0fde62f9.js"
   ]
 }
