@@ -120,7 +120,7 @@ export const sortPlayer = (
       break;
     }
     case "gRevolution": {
-      const copiedPlayers = [...players].reverse().map((player, idx) => {
+      const copiedPlayers = copyPlayer(players).reverse().map((player, idx) => {
         player.status.roundOrder = idx;
         player.order = idx;
         return player;
@@ -137,12 +137,6 @@ export const sortPlayer = (
 export const sortHand = (players: PlayerTypes[]): void => {
   players.forEach((player) => {
     player.hand.sort((a, b) => a.value - b.value);
-  });
-};
-
-export const setPlayerClass = (players: PlayerTypes[]): void => {
-  players.forEach((player) => {
-    player.className = `${PLAYER_NAME_TABLE[`ORDER${player.order}`].name}`;
   });
 };
 

@@ -7,7 +7,7 @@ import {
   useGameStoreTypes,
   useHumanStoreTypes,
 } from "../store/types/storeTypes";
-import { setLogData, setPlayerClass, sortHand, sortPlayer } from "./setting";
+import { setLogData, sortHand, sortPlayer } from "./setting";
 import { CardTypes, PileTypes, PlayerTypes } from "./types/featuresTypes";
 import { copyPlayer, randomNumBetween, setDelay } from "./utils";
 
@@ -397,7 +397,6 @@ export const performTaxCollect = async (
     actionSwapCard(players, setPlayers);
   } else if (isRevolution === "gRevolution") {
     sortPlayer(deck, players, "gRevolution", setPlayers);
-    setPlayerClass(get().players);
   }
 
   setGameStep("inPlaying");
