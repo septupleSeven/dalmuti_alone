@@ -120,10 +120,11 @@ export const sortPlayer = (
       break;
     }
     case "gRevolution": {
-      const copiedPlayers = copyPlayer(players).reverse().map((player, idx) => {
+      const copiedPlayers = copyPlayer(players).reverse()
+      
+      copiedPlayers.forEach((player, idx) => {
         player.status.roundOrder = idx;
         player.order = idx;
-        return player;
       });
 
       if (setPlayers) setPlayers(copiedPlayers);
