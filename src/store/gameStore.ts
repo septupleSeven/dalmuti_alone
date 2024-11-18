@@ -21,12 +21,14 @@ import {
   performTaxCollect,
   playerLayDownCard,
   setWinner,
+  setWinnerCondition,
 } from "../features/playing";
 import { useShallow } from "zustand/react/shallow";
 import { useHumanStore } from "./humanStore";
 import { useLogStore } from "./logStore";
 import { findPlayerWithId, setDelay } from "../features/utils";
 import { immer } from "zustand/middleware/immer";
+import { useSettingStore } from "./settingStore";
 
 export const useGameStore = create<useGameStoreTypes>()(
   immer((set, get) => ({
@@ -138,7 +140,8 @@ export const useGameStore = create<useGameStoreTypes>()(
       runGame: async () => {
         const { setGameStep, setPile } = get().actions;
         const { setLog } = useLogStore.getState().actions;
-
+        const { mode } = useSettingStore.getState().settingStatus;
+            
         while (true) {
           const { players } = get();
 
@@ -183,19 +186,17 @@ export const useGameStore = create<useGameStoreTypes>()(
             layDownCard(get(), get, setLog);
           }
 
-          await setDelay(2200);
+          await setDelay(1800);
 
           let isGameContinue:boolean = true;
 
           const currentState = get();
           const currentLatestPlayer = currentState.players.find(
             (player) => player.id === currentState.gameStatus.latestPlayer
-          );
+          )!;
 
           if (
-            // currentLatestPlayer &&
-            // !currentLatestPlayer.hand.length
-            currentLatestPlayer && currentLatestPlayer.hand.length < 6
+            setWinnerCondition(mode, currentLatestPlayer, "normal")
           ) {
             // console.log(
             //   "%cGame Set winner is=> ",
@@ -216,11 +217,13 @@ export const useGameStore = create<useGameStoreTypes>()(
 
             setPile([]);
 
-            isGameContinue = false;
+            if (setWinnerCondition(mode, currentLatestPlayer, "final", get)) {
+                alert("게임 종료");
+                isGameContinue = false;
+            }
           }
 
           if (!isGameContinue) {
-            alert("게임 종료");
             const updatedState = get();
 
             // setWinner(

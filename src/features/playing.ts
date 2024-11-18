@@ -4,12 +4,13 @@ import {
   GameStatusTypes,
   GameStepTypes,
   LogTypes,
+  ModeTypes,
   useGameStoreTypes,
   useHumanStoreTypes,
 } from "../store/types/storeTypes";
 import { setLogData, sortHand, sortPlayer } from "./setting";
 import { CardTypes, PileTypes, PlayerTypes } from "./types/featuresTypes";
-import { copyPlayer, randomNumBetween, setDelay } from "./utils";
+import { copyDeck, copyPlayer, randomNumBetween, setDelay } from "./utils";
 
 export const isRevolution = (
   players: PlayerTypes[]
@@ -121,12 +122,11 @@ export const layDownCard = (
 
   if (!pile.length) {
     isPass = false;
-    let randomVal = randomNumBetween(6, 11);
+    let randomVal = randomNumBetween(2, 11);
     let randomCards = hand.filter((card) => card.value === randomVal);
 
-    while (!randomCards.length) {
-      randomVal = randomNumBetween(2, 11);
-      randomCards = hand.filter((card) => card.value === randomVal);
+    if(!randomCards.length){
+      randomCards = hand.slice(-1);
     }
 
     const randomDraw = randomNumBetween(1, randomCards.length);
@@ -417,3 +417,26 @@ export const runHumanActionTrigger = (
     action(null);
   }
 };
+
+export const setWinnerCondition = <T extends ("normal" | "final")>(
+  mode: ModeTypes,
+  currentLatestPlayer: PlayerTypes,
+  type: T,
+  get?: T extends "final" ? (() => useGameStoreTypes) : undefined,
+):boolean => {
+
+  if(type === "normal"){
+    const conditionVal = mode === "short" ? 5 : 0
+    return currentLatestPlayer && currentLatestPlayer.hand.length <= conditionVal;
+  }
+
+  if(type === "final"){
+    if(get){
+      const conditionVal = mode !== "full" ? true : get().players.length === 1
+      return conditionVal;
+    }
+  }
+
+  return false
+
+}

@@ -230,6 +230,89 @@ body {
 
     }
 
+    &ModeContainer{
+        max-width: 640px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        align-items: center;
+        column-gap: 30px;
+
+        .listContainer{
+            display: flex;
+            flex-direction: column;
+            row-gap: 30px;
+
+            >p{
+                font-size: 1.125rem;
+                font-weight: 500;
+            }
+
+            >ul{
+                display: flex;
+                flex-direction: column;
+                row-gap: 20px;
+
+                li{
+                    button{
+                        opacity: 0.4;
+                        background-color: transparent;
+                        border: 0;
+                        position: relative;
+                        color: #fff;
+                        font-size: 1.125rem;
+                        font-weight: 500;
+                        padding: 0;
+                        padding-bottom: 10px;
+                        width: 100%;
+                        text-align: start;
+                        transition: 0.4s;
+
+                        &::after{
+                            content: "";
+                            position: absolute;
+                            bottom: 0;
+                            left: 0;
+                            width: 0;
+                            height: 2px;
+                            background-color: #fff;
+                            transition: 0.4s;
+                        }
+
+                        &:hover{
+                            opacity: 1;
+
+                            &::after{
+                                width: 100%;
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+        .contents{
+            background-color: rgba($color: #ffffff, $alpha: 0.1);
+            border: 1px solid #fff;
+            box-sizing: border-box;
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+
+            >p{
+                font-size: 1.0625rem;
+                line-height: 1.35;
+                word-break: keep-all;
+                
+            }
+
+        }
+
+    }
+
 }
 
 @keyframes glow {

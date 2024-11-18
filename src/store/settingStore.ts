@@ -8,6 +8,7 @@ export const useSettingStore = create<useSettingStoreTypes>()(
     settingStatus: {
       settingStep: "booting",
       settingStepCondition: "booting",
+      mode: "short",
     },
     actions: {
       view: () => console.log(get()),
@@ -17,8 +18,13 @@ export const useSettingStore = create<useSettingStoreTypes>()(
             type === "step" ? "settingStep" : "settingStepCondition";
           state.settingStatus[keyVal] = value;
         }),
+      setMode: (value) =>
+        set((state) => {
+          state.settingStatus.mode = value;
+        }),
     },
   }))
 );
 
-export const useSettingStoreAction = () => useSettingStore(useShallow((state) => state.actions));
+export const useSettingStoreAction = () =>
+  useSettingStore(useShallow((state) => state.actions));

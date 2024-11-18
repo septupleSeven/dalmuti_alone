@@ -3,12 +3,15 @@ import { HandGroupTypes } from "../../pages/Home/types/HomeTypes";
 
 export type SettingStepTypes =
   | "booting"
+  | "selectMode"
   | "readyToSetting"
   | "setting"
   | "dealForOrder"
   | "rearrange"
   | "readyToPlay"
   | "playing";
+
+export type ModeTypes = "short" | "long" | "full";
 
 export type GameStepTypes =
   | "collectingTax"
@@ -142,12 +145,14 @@ export type SettingActionTypes = {
     value: SettingStepTypes,
     type?: "step" | "condition"
   ) => void;
+  setMode: (value:ModeTypes) => void
 }
 
 export type useSettingStoreTypes = {
   settingStatus: {
     settingStep: SettingStepTypes;
     settingStepCondition: SettingStepTypes;
+    mode: ModeTypes;
   };
   actions: SettingActionTypes;
 }

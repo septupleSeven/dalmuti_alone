@@ -89,7 +89,7 @@ export const isStepCondition = (
 
   switch (type) {
     case "bootingToReadyToSetting": {
-      condition = settingStep !== "booting" && settingStep !== "readyToSetting";
+      condition = settingStep !== "booting" && settingStep !== "selectMode" && settingStep !== "readyToSetting";
       break;
     }
     case "readyToPlaying": {

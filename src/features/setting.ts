@@ -1,4 +1,4 @@
-import { HUMAN_ID, PLAYER_NAME_TABLE } from "../config/contants";
+import { HUMAN_ID } from "../config/contants";
 import { LogTypes } from "../store/types/storeTypes";
 import { CardTypes, PlayerTypes } from "./types/featuresTypes";
 import { copyPlayer } from "./utils";

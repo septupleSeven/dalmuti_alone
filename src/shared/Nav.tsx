@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./styles/GlobalStyles.module.scss";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { findPlayerWithId, isStepCondition } from "../features/utils";
@@ -6,8 +6,9 @@ import { useGameStore, useGameStoreAction } from "../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
 import { useLogStoreAction } from "../store/logStore";
 import { setLogData } from "../features/setting";
-import { HUMAN_ID } from "../config/contants";
+import { HUMAN_ID, MODE_TEXT } from "../config/contants";
 import { useSettingStore, useSettingStoreAction } from "../store/settingStore";
+import ModeSelector from "./ui/ModeSelector";
 
 const Nav = () => {
   // const { settingStep, gameStep, players } = useGameStore(
@@ -36,21 +37,20 @@ const Nav = () => {
       actions: state.actions,
     }))
   );
-  const {
-    setShuffleDeck,
-    setGameOrder,
-    settleRound,
-    runTaxCollect,
-  } = useGameStoreAction();
+  const { setShuffleDeck, setGameOrder, settleRound, runTaxCollect } =
+    useGameStoreAction();
 
-  const { settingStep } = useSettingStore(useShallow((state) => ({
-    settingStep: state.settingStatus.settingStep,
-    settingStepCondition: state.settingStatus.settingStepCondition
-  })));
+  const { settingStep } = useSettingStore(
+    useShallow((state) => ({
+      settingStep: state.settingStatus.settingStep,
+      settingStepCondition: state.settingStatus.settingStepCondition,
+    }))
+  );
   const { setSettingStep } = useSettingStoreAction();
 
   const { setLog } = useLogStoreAction();
 
+  const [startBtnCliked, setStartBtnCliked] = useState(true);
   const [firstInitGame, setFirstInitGame] = useState(false);
   const headerMotionControls = useAnimationControls();
 
@@ -58,6 +58,29 @@ const Nav = () => {
     () => isStepCondition(settingStep, "bootingToReadyToSetting"),
     [settingStep]
   );
+
+  const modeChk = useCallback(async () => {
+    if (!firstInitGame) {
+      headerMotionControls.start("headerAnimate");
+      setSettingStep("readyToSetting");
+
+      await new Promise((resolve) =>
+        setTimeout(() => {
+          setShuffleDeck();
+          setSettingStep("setting");
+          setLog(setLogData("플레이어와 덱을 구성합니다."));
+          return resolve;
+        }, 2000)
+      );
+    }
+    setFirstInitGame(true);
+  }, [
+    firstInitGame,
+    headerMotionControls,
+    setShuffleDeck,
+    setSettingStep,
+    setLog,
+  ]);
 
   const headerMotionVariants = {
     headerInit: {
@@ -133,7 +156,7 @@ const Nav = () => {
       className={styles.headerNode}
     >
       <AnimatePresence>
-        {settingStep === "booting" && (
+        {(settingStep === "booting" || settingStep === "selectMode") && (
           <>
             <div className={styles.headerTitleContainer}>
               <motion.h1
@@ -145,34 +168,25 @@ const Nav = () => {
               >
                 나홀로 달무티
               </motion.h1>
-              <ul className={styles.headerMenuContainer}>
-                <li>
-                  <motion.button
-                    variants={bootingScreenVariants}
-                    initial="menuInit"
-                    animate="menuAnimate"
-                    exit="menuExit"
-                    onClick={async () => {
-                      if (!firstInitGame) {
-                        headerMotionControls.start("headerAnimate");
-                        setSettingStep("readyToSetting");
-
-                        await new Promise((resolve) =>
-                          setTimeout(() => {
-                            setShuffleDeck();
-                            setSettingStep("setting");
-                            setLog(setLogData("플레이어와 덱을 구성합니다."));
-                            return resolve;
-                          }, 2000)
-                        );
-                      }
-                      setFirstInitGame(true);
-                    }}
-                  >
-                    시작하기
-                  </motion.button>
-                </li>
-              </ul>
+              {startBtnCliked && (
+                <ul className={styles.headerMenuContainer}>
+                  <li>
+                    <motion.button
+                      variants={bootingScreenVariants}
+                      initial="menuInit"
+                      animate="menuAnimate"
+                      exit="menuExit"
+                      onClick={() => {
+                        setSettingStep("selectMode");
+                        setStartBtnCliked(false);
+                      }}
+                    >
+                      시작하기
+                    </motion.button>
+                  </li>
+                </ul>
+              )}
+              {!startBtnCliked && <ModeSelector modeChk={modeChk} />}
             </div>
             <div className={styles.headerAnchorContainer}>
               <motion.a
@@ -188,14 +202,6 @@ const Nav = () => {
               >
                 게임 설명 보기
               </motion.a>
-              <motion.p
-                variants={bootingScreenVariants}
-                initial="menuInit"
-                animate="menuAnimate"
-                exit="menuExit"
-              >
-                ✨ 위 설명을 토대로 먼저 패에 5장 남은 플레이어가 승리합니다. ✨
-              </motion.p>
             </div>
           </>
         )}
