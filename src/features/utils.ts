@@ -20,11 +20,12 @@ export const randomNumBetween = (
 export const calcCoordinate = (
   value: number,
   length: number,
-  radius: number = 300
+  radius: number = 320
 ) => {
-  const getRadians = (value / length) * (Math.PI * 2) - Math.PI;
-  const x = -Math.sin(getRadians) * 320;
-  const y = Math.cos(getRadians) * 320;
+  const getRadians = (value / length) * (Math.PI * 2)  - Math.PI / 2;
+
+  const y = Math.sin(getRadians) * radius;
+  const x = Math.cos(getRadians) * radius;
 
   return { x, y };
 };
