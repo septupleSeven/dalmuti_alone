@@ -41,7 +41,7 @@ export const useGameStore = create<useGameStoreTypes>()(
       currentTurn: 0,
       latestPlayer: "",
       resultRank: [],
-      eventOccured: null
+      eventOccured: null,
     },
     actions: {
       view: () => console.log(get()),
@@ -134,9 +134,10 @@ export const useGameStore = create<useGameStoreTypes>()(
       runGame: async () => {
         const { setGameStep, setPile } = get().actions;
         const { setLog } = useLogStore.getState().actions;
-        const { setEventOccured, handleEventChk } = useModalStore.getState().actions;
+        const { setEventOccured, handleEventChk } =
+          useModalStore.getState().actions;
         const { mode } = useSettingStore.getState().settingStatus;
-            
+
         while (true) {
           const { players } = get();
 
@@ -167,7 +168,7 @@ export const useGameStore = create<useGameStoreTypes>()(
               setLogData(`라운드 종료. 이번 라운드 승자는 ${getCurrentPlayer?.className}(${getCurrentPlayer?.name})입니다. 
                 다음 라운드는 이 플레이어 기준 시계방향으로 시작됩니다. 상단 '다음 라운드 시작' 버튼을 눌러서 계속 진행할 수 있습니다.`)
             );
-            
+
             setEventOccured("roundEnd");
             await handleEventChk();
 
@@ -189,16 +190,14 @@ export const useGameStore = create<useGameStoreTypes>()(
 
           await setDelay(1800);
 
-          let isGameContinue:boolean = true;
+          let isGameContinue: boolean = true;
 
           const currentState = get();
           const currentLatestPlayer = currentState.players.find(
             (player) => player.id === currentState.gameStatus.latestPlayer
           )!;
 
-          if (
-            setWinnerCondition(mode, currentLatestPlayer, "normal")
-          ) {
+          if (setWinnerCondition(mode, currentLatestPlayer, "normal")) {
             // console.log(
             //   "%cGame Set winner is=> ",
             //   "background: #820e0e; color: #111",
@@ -221,7 +220,7 @@ export const useGameStore = create<useGameStoreTypes>()(
             if (setWinnerCondition(mode, currentLatestPlayer, "final", get)) {
               setEventOccured("gameEnd");
               await handleEventChk();
-                isGameContinue = false;
+              isGameContinue = false;
             }
           }
 
@@ -245,7 +244,6 @@ export const useGameStore = create<useGameStoreTypes>()(
             setGameStep("GAMEOVER");
             return;
           }
-
         }
       },
 
@@ -322,18 +320,6 @@ export const useGameStore = create<useGameStoreTypes>()(
 
           pile.push(toSendCards);
         }),
-      // setEventOccured: (currentEvent) => set(
-      //   state => {
-      //     state.gameStatus.eventOccured = currentEvent;
-      //   }
-      // ),
-      // handleEventChk: async () => {
-      //   await new Promise<void>((resolve) => {
-      //     useHumanStore.getState().actions.setHumanActionTrigger(resolve);
-      //   });
-      //   const { setEventOccured } = get().actions;
-      //   setEventOccured(null);
-      // }
     },
   }))
 );
