@@ -21,15 +21,6 @@ const Player = ({
   playerInfo: PlayerTypes;
   componentIdx: number;
 }) => {
-  // const { settingStep, settingStepCondition } = useGameStore(
-  //   useShallow((state) => ({
-  //     settingStep: state.settingStatus.settingStep,
-  //     settingStepCondition: state.settingStatus.settingStepCondition,
-  //     players: state.players,
-  //   }))
-  // );
-  // const { setSettingStep, setDealCard } = useGameStoreAction();
-
   const { settingStep, settingStepCondition } = useSettingStore(useShallow((state) => ({
     settingStep: state.settingStatus.settingStep,
     settingStepCondition: state.settingStatus.settingStepCondition

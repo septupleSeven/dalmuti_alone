@@ -9,26 +9,9 @@ import { setLogData } from "../features/setting";
 import { HUMAN_ID, MODE_TEXT } from "../config/contants";
 import { useSettingStore, useSettingStoreAction } from "../store/settingStore";
 import ModeSelector from "./ui/ModeSelector";
+import { useModalStoreAction } from "../store/modalStore";
 
 const Nav = () => {
-  // const { settingStep, gameStep, players } = useGameStore(
-  //   useShallow((state) => ({
-  //     players: state.players,
-  //     deck: state.deck,
-  //     settingStep: state.settingStatus.settingStep,
-  //     gameStep: state.gameStatus.gameStep,
-  //     actions: state.actions,
-  //   }))
-  // );
-
-  // const {
-  //   setShuffleDeck,
-  //   setSettingStep,
-  //   setGameOrder,
-  //   settleRound,
-  //   runTaxCollect,
-  // } = useGameStoreAction();
-
   const { gameStep, players } = useGameStore(
     useShallow((state) => ({
       players: state.players,
@@ -49,6 +32,8 @@ const Nav = () => {
   const { setSettingStep } = useSettingStoreAction();
 
   const { setLog } = useLogStoreAction();
+
+  const { setModalShow } = useModalStoreAction();
 
   const [startBtnCliked, setStartBtnCliked] = useState(true);
   const [firstInitGame, setFirstInitGame] = useState(false);
@@ -189,19 +174,16 @@ const Nav = () => {
               {!startBtnCliked && <ModeSelector modeChk={modeChk} />}
             </div>
             <div className={styles.headerAnchorContainer}>
-              <motion.a
+              <motion.p
                 variants={bootingScreenVariants}
                 initial="menuInit"
                 animate="menuAnimate"
                 exit="menuExit"
                 className={styles.guideAnchor}
-                href="https://youtu.be/sO-vxnoL31A?si=K1YYEMjvOBoduqmM"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="게임 설명 보기"
+                onClick={() => {setModalShow(true)}}
               >
                 게임 설명 보기
-              </motion.a>
+              </motion.p>
             </div>
           </>
         )}
@@ -247,6 +229,16 @@ const Nav = () => {
               }}
             >
               다음 라운드 시작
+            </motion.button>
+            <motion.button
+              className={styles.tipBtn}
+              variants={navBtnVariants}
+              initial="navBtnInit"
+              animate="navBtnAnimate"
+              exit="navBtnExit"
+              onClick={() => {setModalShow(true)}}
+            >
+              ?
             </motion.button>
           </div>
         )}

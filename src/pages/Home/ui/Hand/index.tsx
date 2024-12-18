@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import styles from "../styles/HomeStyles.module.scss";
+import styles from "../../styles/HomeStyles.module.scss";
 import { motion, useCycle } from "framer-motion";
-import { PlayerTypes } from "../../../features/types/featuresTypes";
+import { PlayerTypes } from "../../../../features/types/featuresTypes";
 import HandCardGroup from "./HandCardGroup";
 import HandCardDispenser from "./HandCardDispenser";
-import { getRankGroup, isHumanTurn } from "../../../features/utils";
+import { getRankGroup, isHumanTurn } from "../../../../features/utils";
 import { useShallow } from "zustand/react/shallow";
-import { useHandDispenserStore, useHandDispenserStoreAction } from "../../../store/handStore";
-import { useHumanStore, useHumanStoreAction } from "../../../store/humanStore";
-import { runHumanActionTrigger } from "../../../features/playing";
-import { useGameStore } from "../../../store/gameStore";
-import HandsIcon from "../../../assets/img/hands__icon.png"
-import FistsIcon from "../../../assets/img/fists__icon.png"
+import { useHandDispenserStore, useHandDispenserStoreAction } from "../../../../store/handStore";
+import { useHumanStore, useHumanStoreAction } from "../../../../store/humanStore";
+import { runHumanActionTrigger } from "../../../../features/playing";
+import { useGameStore } from "../../../../store/gameStore";
+import HandsIcon from "../../../../assets/img/hands__icon.png"
+import FistsIcon from "../../../../assets/img/fists__icon.png"
 
 const Hand = ({ human }: { human: PlayerTypes }) => {
   const [isOpen, toggleOpen] = useCycle(true, false);
@@ -77,7 +77,7 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
             }}
             disabled={isHumanTurn(players) && pile.length ? false : true}
           >
-            <img src={require("../../../assets/img/turn__up.png")} alt="패스하기" />
+            <img src={require("../../../../assets/img/turn__up.png")} alt="패스하기" />
             패스하기
           </button>
         </div>

@@ -29,30 +29,22 @@ import { useLogStore } from "./logStore";
 import { findPlayerWithId, setDelay } from "../features/utils";
 import { immer } from "zustand/middleware/immer";
 import { useSettingStore } from "./settingStore";
+import { useModalStore } from "./modalStore";
 
 export const useGameStore = create<useGameStoreTypes>()(
   immer((set, get) => ({
     players: setPlayer(PLAYER_NUM),
     deck: createDeck(MAXIMUM_CARDRANK),
     pile: [],
-    // settingStatus: {
-    //   settingStep: "booting",
-    //   settingStepCondition: "booting",
-    // },
     gameStatus: {
       gameStep: "collectingTax",
       currentTurn: 0,
       latestPlayer: "",
       resultRank: [],
+      eventOccured: null
     },
     actions: {
       view: () => console.log(get()),
-      // setSettingStep: (value, type = "step") =>
-      //   set((state) => {
-      //     const keyVal =
-      //       type === "step" ? "settingStep" : "settingStepCondition";
-      //     state.settingStatus[keyVal] = value;
-      //   }),
       setGameStep: (value) =>
         set((state) => {
           state.gameStatus.gameStep = value;
@@ -124,6 +116,7 @@ export const useGameStore = create<useGameStoreTypes>()(
       runTaxCollect: async () => {
         const { deck, players, gameStatus, actions } = get();
         const getLogStore = useLogStore.getState();
+        const getModalStore = useModalStore.getState();
         const isRevolutionVal = isRevolution(players);
 
         await performTaxCollect(
@@ -133,6 +126,7 @@ export const useGameStore = create<useGameStoreTypes>()(
           actions,
           get,
           getLogStore.actions.setLog,
+          getModalStore.actions,
           isRevolutionVal
         );
       },
@@ -140,6 +134,7 @@ export const useGameStore = create<useGameStoreTypes>()(
       runGame: async () => {
         const { setGameStep, setPile } = get().actions;
         const { setLog } = useLogStore.getState().actions;
+        const { setEventOccured, handleEventChk } = useModalStore.getState().actions;
         const { mode } = useSettingStore.getState().settingStatus;
             
         while (true) {
@@ -172,11 +167,17 @@ export const useGameStore = create<useGameStoreTypes>()(
               setLogData(`라운드 종료. 이번 라운드 승자는 ${getCurrentPlayer?.className}(${getCurrentPlayer?.name})입니다. 
                 다음 라운드는 이 플레이어 기준 시계방향으로 시작됩니다. 상단 '다음 라운드 시작' 버튼을 눌러서 계속 진행할 수 있습니다.`)
             );
+            
+            setEventOccured("roundEnd");
+            await handleEventChk();
+
             setGameStep("roundEnd");
             return;
           }
 
           if (getCurrentPlayer && getCurrentPlayer.id === HUMAN_ID) {
+            setEventOccured("humanTurn");
+            await handleEventChk();
             await new Promise<void>((resolve) => {
               useHumanStore.getState().actions.setHumanActionTrigger(resolve);
             });
@@ -218,7 +219,8 @@ export const useGameStore = create<useGameStoreTypes>()(
             setPile([]);
 
             if (setWinnerCondition(mode, currentLatestPlayer, "final", get)) {
-                alert("게임 종료");
+              setEventOccured("gameEnd");
+              await handleEventChk();
                 isGameContinue = false;
             }
           }
@@ -320,6 +322,18 @@ export const useGameStore = create<useGameStoreTypes>()(
 
           pile.push(toSendCards);
         }),
+      // setEventOccured: (currentEvent) => set(
+      //   state => {
+      //     state.gameStatus.eventOccured = currentEvent;
+      //   }
+      // ),
+      // handleEventChk: async () => {
+      //   await new Promise<void>((resolve) => {
+      //     useHumanStore.getState().actions.setHumanActionTrigger(resolve);
+      //   });
+      //   const { setEventOccured } = get().actions;
+      //   setEventOccured(null);
+      // }
     },
   }))
 );

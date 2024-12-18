@@ -43,7 +43,7 @@ body {
         top: 0;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 9997;
+        z-index: 9995;
         color: #fff;
         overflow: hidden;
     }
@@ -179,6 +179,18 @@ body {
                     animation: glow 2s infinite ease-in-out;
                 }
 
+                &.tipBtn{
+                    border-radius: 100%;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    box-sizing: border-box;
+                    font-size: 1.125rem;
+                    font-family: $font_point--B;
+                }
+
             }
 
         }
@@ -201,6 +213,7 @@ body {
             text-decoration: none;
             position: relative;
             transition: 0.4s;
+            cursor: pointer;
     
             &::after {
                 content: "";

@@ -111,6 +111,14 @@ export const findPlayerWithId = (players: PlayerTypes[], playerId: string) => {
   return searchedPlayer;
 };
 
+export const getCurrentLeader = (
+  players: PlayerTypes[]
+) => {
+  const currentLeader = players.find((player) => player.status.isLeader);
+
+  return currentLeader;
+};
+
 export const getCurrentLeaderOrder = (
   players: PlayerTypes[],
   latestPlayer: string

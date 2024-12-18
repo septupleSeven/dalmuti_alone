@@ -1,12 +1,12 @@
 import React, { FormEvent, useRef, useState } from "react";
-import styles from "../styles/HomeStyles.module.scss";
-import { hasJoker, isHumanTurn, jokerGroup } from "../../../features/utils";
-import { useGameStore } from "../../../store/gameStore";
-import { runHumanActionTrigger } from "../../../features/playing";
+import styles from "../../styles/HomeStyles.module.scss";
+import { hasJoker, isHumanTurn, jokerGroup } from "../../../../features/utils";
+import { useGameStore } from "../../../../store/gameStore";
+import { runHumanActionTrigger } from "../../../../features/playing";
 import { useShallow } from "zustand/react/shallow";
-import { useHandDispenserStoreAction } from "../../../store/handStore";
-import { useHumanStore, useHumanStoreAction } from "../../../store/humanStore";
-import { CARD_NAME_TABLE } from "../../../config/contants";
+import { useHandDispenserStoreAction } from "../../../../store/handStore";
+import { useHumanStore, useHumanStoreAction } from "../../../../store/humanStore";
+import { CARD_NAME_TABLE } from "../../../../config/contants";
 
 const HandCardDispenser = ({
   onSelect,

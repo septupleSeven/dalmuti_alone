@@ -4,6 +4,7 @@ import {
   GameStatusTypes,
   GameStepTypes,
   LogTypes,
+  ModalActionTypes,
   ModeTypes,
   useGameStoreTypes,
   useHumanStoreTypes,
@@ -385,9 +386,11 @@ export const performTaxCollect = async (
   actions: GameActionsTypes,
   get: () => useGameStoreTypes,
   setLog: (logData: LogTypes) => void,
+  modalStoreActions: ModalActionTypes,
   isRevolution: "revolution" | "gRevolution" | "continue"
 ): Promise<void> => {
   const { setGameStep, setFirstInAction, runGame, setPlayers } = actions;
+  const { setEventOccured, handleEventChk } = modalStoreActions;
 
   if (gameStep === "inPlaying") return;
 
@@ -395,7 +398,12 @@ export const performTaxCollect = async (
 
   if (isRevolution === "continue") {
     actionSwapCard(players, setPlayers);
+  }else if(isRevolution === "revolution") {
+    setEventOccured("revolution");
+    await handleEventChk();
   } else if (isRevolution === "gRevolution") {
+    setEventOccured("gRevolution");
+    await handleEventChk();
     sortPlayer(deck, players, "gRevolution", setPlayers);
   }
 

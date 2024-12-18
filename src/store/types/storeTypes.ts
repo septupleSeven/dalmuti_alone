@@ -39,6 +39,7 @@ export type GameStatusTypes = {
   currentTurn: number;
   latestPlayer: string;
   resultRank: Array<PlayerTypes>;
+  // eventOccured: null | EventOccuredTypes
 };
 
 export type GameActionsTypes = {
@@ -67,20 +68,18 @@ export type GameActionsTypes = {
     playerId: string,
     isNotFirstTurn: boolean,
   ) => void;
-  setPushPile: (card:CardTypes[]) => void
-  setPlayerState: (playerId:string, gameState:PlayerGameStateTypes) => void
-  setPlayerHand: (playerId:string, hand:CardTypes[]) => void
-  setLayDownCard: (playerId: string, selectedCards: CardTypes[], drawNum: number) => void
+  setPushPile: (card:CardTypes[]) => void;
+  setPlayerState: (playerId:string, gameState:PlayerGameStateTypes) => void;
+  setPlayerHand: (playerId:string, hand:CardTypes[]) => void;
+  setLayDownCard: (playerId: string, selectedCards: CardTypes[], drawNum: number) => void;
+  // setEventOccured: (currentEvent: null | EventOccuredTypes) => void;
+  // handleEventChk: () => Promise<void>;
 };
 
 export type useGameStoreTypes = {
   players: Array<PlayerTypes>;
   deck: Array<CardTypes>;
   pile: Array<CardTypes>[];
-  // settingStatus: {
-  //   settingStep: SettingStepTypes;
-  //   settingStepCondition: SettingStepTypes;
-  // };
   gameStatus: GameStatusTypes;
   actions: GameActionsTypes;
 };
@@ -155,4 +154,21 @@ export type useSettingStoreTypes = {
     mode: ModeTypes;
   };
   actions: SettingActionTypes;
+}
+
+export type EventModalTypes = "humanTurn" | "revolution" | "gRevolution" | "roundEnd" | "gameEnd";
+
+export type ModalActionTypes = {
+  setEventOccured: (currentEvent: null | EventModalTypes) => void;
+  setModalShow: (isModalShow: boolean) => void;
+  handleEventChk: () => Promise<void>;
+}
+
+export type useModalStoreTypes = {
+  eventModal: null | EventModalTypes,
+  tipModal: {
+    isActive: boolean,
+    page: number
+  },
+  actions: ModalActionTypes;
 }
