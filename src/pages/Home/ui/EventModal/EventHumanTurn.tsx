@@ -62,7 +62,7 @@ const EventHumanTurn = () => {
             <span>{currentLeader?.className}
             &#40;{currentLeader?.id}&#41;</span>이&#40;가&#41; 카드&nbsp;
             <span>{CARD_NAME_TABLE[pile[pile.length - 1][0].rank] ? CARD_NAME_TABLE[pile[pile.length - 1][0].rank].name : "광대"}
-            &#40;{pile[pile.length - 1][0].rank}&#41;</span>를&nbsp;
+            &#40;{pile[pile.length - 1][0].rank}&#41;</span>을&#40;를&#41;&nbsp;
             <span>{pile[pile.length - 1].length}</span>장 제출했습니다.
           </p>
         ) : (

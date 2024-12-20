@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../styles/HomeStyles.module.scss";
 import { PileTypes } from "../../../features/types/featuresTypes";
@@ -13,6 +13,8 @@ import { useGameStore } from "../../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
 
 const Pile = ({ pile }: { pile: PileTypes }) => {
+  const [radius, setRadius] = useState(320);
+
   const { players, latestPlayer } = useGameStore(
     useShallow((state) => ({
       players: state.players,
@@ -29,8 +31,8 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
         opacity: 0,
         rotate: 180,
         scale: 0.2,
-        x: calcCoordinate(xVal, PLAYER_NUM).x,
-        y: calcCoordinate(yVal, PLAYER_NUM).y,
+        x: calcCoordinate(xVal, PLAYER_NUM, radius).x,
+        y: calcCoordinate(yVal, PLAYER_NUM, radius).y,
       },
       getCenter: {
         opacity: 1,
@@ -41,10 +43,26 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
       },
       exit: {
         opacity: 0,
-        y: 30
-      }
+        y: 30,
+      },
     };
   }, [players, latestPlayer]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768 && window.innerWidth > 540) {
+        setRadius(window.innerWidth / 3);
+      } else if (window.innerWidth <= 540) {
+        setRadius(window.innerWidth / 2.5);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <motion.div
@@ -78,13 +96,17 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
                 }}
               >
                 <div>
-                  <Card cardVal={cards[0].value} size="pile"/>
+                  <Card cardVal={cards[0].value} size="pile" />
                 </div>
               </motion.div>
             );
           })}
       </AnimatePresence>
-      <p className={styles.pileAmount}>제출한 카드 수 : <span>{calcPileCount(pile)}</span></p>
+      <p className={styles.pileAmount}>
+        제출한
+        <br className={styles.resBr} /> 카드 수 :{" "}
+        <span>{calcPileCount(pile)}</span>
+      </p>
     </motion.div>
   );
 };

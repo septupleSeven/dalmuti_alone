@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { useGameStoreTypes } from "./types/storeTypes";
+import { GameStoreKeyTypes, useGameStoreTypes } from "./types/storeTypes";
 import {
   createDeck,
   dealDeck,
@@ -41,7 +41,6 @@ export const useGameStore = create<useGameStoreTypes>()(
       currentTurn: 0,
       latestPlayer: "",
       resultRank: [],
-      eventOccured: null,
     },
     actions: {
       view: () => console.log(get()),
@@ -130,7 +129,6 @@ export const useGameStore = create<useGameStoreTypes>()(
           isRevolutionVal
         );
       },
-
       runGame: async () => {
         const { setGameStep, setPile } = get().actions;
         const { setLog } = useLogStore.getState().actions;
@@ -222,6 +220,7 @@ export const useGameStore = create<useGameStoreTypes>()(
               await handleEventChk();
               isGameContinue = false;
             }
+
           }
 
           if (!isGameContinue) {
@@ -319,6 +318,41 @@ export const useGameStore = create<useGameStoreTypes>()(
           }
 
           pile.push(toSendCards);
+        }),
+      resetGameStore: (execpt) =>
+        set((state) => {
+          const allKeys:GameStoreKeyTypes[] = [
+            "players",
+            "deck",
+            "pile",
+            "gameStatus"
+          ];
+
+          const filteredKeys = execpt 
+          ? allKeys.filter(key => !execpt.includes(key))
+          : allKeys;
+
+          if(filteredKeys.includes("players")){
+            state.players = setPlayer(PLAYER_NUM);
+          }
+
+          if(filteredKeys.includes("deck")){
+            state.deck = createDeck(MAXIMUM_CARDRANK);
+          }
+
+          if(filteredKeys.includes("pile")){
+            state.pile = [];
+          }
+
+          if(filteredKeys.includes("gameStatus")){
+            state.gameStatus = {
+              gameStep: "collectingTax",
+              currentTurn: 0,
+              latestPlayer: "",
+              resultRank: [],
+            };
+          }
+          
         }),
     },
   }))

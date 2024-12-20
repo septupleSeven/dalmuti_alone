@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../styles/GlobalStyles.module.scss";
 import { ModeTypes } from "../../store/types/storeTypes";
 import { motion } from "framer-motion";
 import { useSettingStoreAction } from "../../store/settingStore";
 import { MODE_TEXT } from "../../config/contants";
 
-const ModeSelector = ({
-    modeChk
-}:{
-    modeChk: () => Promise<void>
-}) => {
+const ModeSelector = ({ modeChk }: { modeChk: () => Promise<void> }) => {
   const { setMode } = useSettingStoreAction();
   const [modeHover, setModeHover] = useState<ModeTypes | "">("");
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [canClick, setCanClick] = useState({
+    short: false,
+    long: false,
+    full: false,
+  });
 
   const modeSelectorVariants = {
     modeInit: {
@@ -29,6 +31,49 @@ const ModeSelector = ({
     },
   };
 
+  const handleClick = async (mode: ModeTypes) => {
+    const initCanClick = {
+      short: false,
+      long: false,
+      full: false,
+    };
+
+    if (isTouchDevice) {
+      if (canClick[mode]) {
+        if (mode === modeHover) {
+          setMode(mode);
+          await modeChk();
+        }
+
+        setCanClick({ ...initCanClick });
+      } else {
+        setModeHover(mode);
+
+        setCanClick({
+          ...initCanClick,
+          [mode]: true,
+        });
+      }
+    } else {
+      setMode(mode);
+      await modeChk();
+    }
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 1024) {
+        setIsTouchDevice(true);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <motion.div
       variants={modeSelectorVariants}
@@ -41,10 +86,11 @@ const ModeSelector = ({
           <li>
             <button
               onClick={async () => {
-                setMode("short");
-                await modeChk();
+                handleClick("short");
               }}
-              onMouseEnter={() => setModeHover("short")}
+              onMouseEnter={() => {
+                if (!isTouchDevice) setModeHover("short");
+              }}
             >
               짧은 게임
             </button>
@@ -52,10 +98,11 @@ const ModeSelector = ({
           <li>
             <button
               onClick={async () => {
-                setMode("long");
-                await modeChk();
+                handleClick("long");
               }}
-              onMouseEnter={() => setModeHover("long")}
+              onMouseEnter={() => {
+                if (!isTouchDevice) setModeHover("long");
+              }}
             >
               일반 게임
             </button>
@@ -63,10 +110,11 @@ const ModeSelector = ({
           <li>
             <button
               onClick={async () => {
-                setMode("full");
-                await modeChk();
+                handleClick("full");
               }}
-              onMouseEnter={() => setModeHover("full")}
+              onMouseEnter={() => {
+                if (!isTouchDevice) setModeHover("full");
+              }}
             >
               풀 게임
             </button>

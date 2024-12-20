@@ -1,0 +1,544 @@
+@media screen and (max-width: 768px) {
+
+    .player {
+    
+        &Node {
+            width: 80px;
+            height: 100px;
+        }
+    
+        &ClassName {
+            top: calc(-1rem - 10px);
+            font-size: 1rem;
+        }
+    
+        &OrderCard {
+            bottom: calc(-1rem - 10px);
+        }
+    
+        &GameInfo {
+            transform: translateY(calc(100% + 10px));
+    
+            p {
+                font-size: .875rem;
+                white-space: nowrap;
+            }
+    
+        }
+    
+    }
+
+    .pile {
+
+        &Node {
+            max-width: 120px;
+        }
+    
+        &Count {
+            width: 60px;
+            height: 60px;
+            right: -30px;
+            top: -30px;
+            font-size: 1.25rem;
+    
+            span {
+                font-size: .875rem;
+            }
+    
+        }
+
+        &Amount {
+            font-size: 1rem;
+        }
+    
+    }
+    
+    .hand {
+
+        &Btn {
+            padding: 20px;
+    
+            img {
+                width: 40px;
+                height: 40px;
+            }
+    
+        }
+    
+        &Container {
+            width: 350px;
+            background-color: rgba($color: #111, $alpha: 0.8);
+            padding: 40px 20px;
+            row-gap: 30px;
+        }
+    
+        &TitleWrap {
+    
+            h1 {
+                font-size: 1.375rem;
+            }
+    
+            button {
+                font-size: 1.0625rem;
+    
+                img {
+                    width: 18px;
+                    height: 18px;
+                }
+    
+            }
+    
+        }
+
+        &ContentsContainer {
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+    
+        &ContentsWrapper {
+            grid-template-columns: repeat(3, 1fr);
+            row-gap: 30px;
+            column-gap: 15px;
+        }
+    
+        &Dispenser {
+    
+            &Contents {
+                padding: 40px 20px;
+                row-gap: 20px;
+            }
+    
+            &TitleWrap {
+                display: flex;
+                flex-direction: column;
+                row-gap: 10px;
+    
+                >.title {
+                    font-size: 1.125rem;
+                }
+    
+                >.amount {
+                    font-size: 1rem;
+                }
+    
+            }
+    
+            &SubmitContainer {
+                row-gap: 8px;
+    
+                .textWrap {
+    
+                    >input[type="text"] {
+                        height: 40px;
+                        padding: 0 30px 0 10px;
+                        font-size: 1rem;
+                    }
+    
+                    >span {
+                        right: 10px;
+                    }
+    
+                }
+    
+            }
+    
+            &BtnContainer {
+                row-gap: 8px;
+    
+                button {
+                    font-size: .9375rem;
+                    padding: 8px 15px;
+                }
+    
+            }
+    
+            &BtnWrap {
+                column-gap: 8px;
+            }
+    
+            &JokerWrap {
+                column-gap: 10px;
+    
+                .inputContainer {
+    
+                    input {
+    
+                        &[type="checkbox"],
+                        &[type="radio"] {
+
+                            &+label {
+
+                                &::before {
+                                    width: 17px;
+                                    height: 17px;
+                                }
+    
+                            }
+    
+                        }
+    
+    
+                    }
+    
+                }
+
+            }
+    
+        }
+    
+    }
+
+    .ending {
+
+        &Container {
+            row-gap: 50px;
+        }
+    
+        &TitleWrap {
+            row-gap: 20px;
+    
+            >h1 {
+                font-size: 2.8125rem;
+            }
+    
+            >p {
+                font-size: 1.125rem;
+            }
+    
+        }
+    
+        &Contents {
+            row-gap: 40px;
+    
+            ul {
+                row-gap: 30px;
+    
+                li {
+                    grid-template-columns: 70px 1fr;
+                    column-gap: 20px;
+    
+                    .nameWrap {
+                        row-gap: 15px;
+    
+                        .order {
+                            font-size: 1.125rem;
+                        }
+    
+                    }
+    
+                }
+    
+            }
+    
+            >button {
+                column-gap: 15px;
+                font-size: 1.375rem;
+    
+                img {
+                    width: 22px;
+                }
+    
+            }
+    
+        }
+    
+    }
+
+}
+
+@media screen and (max-width: 540px) {
+
+    .player {
+    
+        &Node {
+            width: 45px;
+            height: 65px;
+
+            figure {
+                width: 100%;
+                height: 100%;
+            }
+
+        }
+    
+        &ClassName {
+            top: calc(-0.9375rem - 10px);
+            font-size: .9375rem;
+        }
+    
+        &OrderCard {
+            bottom: calc(-1rem - 10px);
+        }
+    
+        &GameInfo {
+            transform: translateY(calc(100% + 10px));
+    
+            p {
+                font-size: .8125rem;
+                white-space: nowrap;
+            }
+    
+        }
+    
+    }
+
+    .pile {
+
+        &Node {
+            max-width: 75px;
+        }
+    
+        &Count {
+            width: 40px;
+            height: 40px;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.125rem;
+            border-radius: 5px;
+            border-width: 1px;
+    
+            span {
+                font-size: .75rem;
+            }
+    
+        }
+
+        &Amount {
+            font-size: .9375rem;
+            bottom: -10px;
+            line-height: 1.15;
+            
+            .resBr{
+                display: block;
+            }
+
+        }
+    
+    }
+    
+    .hand {
+
+        &Btn {
+            padding: 15px;
+            top: 25%;
+    
+            img {
+                width: 20px;
+                height: 20px;
+            }
+    
+        }
+    
+        &Container {
+            width: 280px;
+            padding: 40px 20px;
+            row-gap: 30px;
+        }
+    
+        &TitleWrap {
+    
+            h1 {
+                font-size: 1.25rem;
+            }
+    
+            button {
+                font-size: 1rem;
+    
+                img {
+                    width: 15px;
+                    height: 15px;
+                }
+    
+            }
+    
+        }
+    
+        &ContentsWrapper {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    
+        &Dispenser {
+    
+            &Contents {
+                padding: 30px 20px;
+                row-gap: 15px;
+            }
+    
+            &TitleWrap {
+                row-gap: 10px;
+    
+                >.title {
+                    font-size: 1.125rem;
+                    line-height: 1.35;
+                }
+    
+            }
+    
+            &SubmitContainer {
+                row-gap: 5px;
+    
+                .textWrap {
+    
+                    >input[type="text"] {
+                        height: 35px;
+                        font-size: .9375rem;
+                    }
+    
+                    >span {
+                        right: 10px;
+                    }
+    
+                }
+    
+            }
+    
+            &BtnContainer {
+                row-gap: 5px;
+    
+                button {
+                    font-size: .9375rem;
+                    padding: 8px 15px;
+                }
+    
+            }
+    
+            &BtnWrap {
+                column-gap: 5px;
+            }
+    
+        }
+    
+    }
+
+    .card {
+
+        &Container {
+            row-gap: 8px;
+        }
+    
+        &Size {
+    
+            &--pile {
+                border-radius: 3px;
+            }
+    
+        }
+    
+        &Rank {
+            font-size: 1.0625rem;
+    
+            span {
+                font-size: .875rem;
+            }
+    
+        }
+    
+        &Amount {
+            font-size: 1.0625rem;
+    
+            span {
+                font-size: .875rem;
+            }
+    
+        }
+    
+    }
+
+    .log {
+    
+        &Container {
+            width: 280px;
+            max-height: 80vh;
+            background-color: rgba($color: #000000, $alpha: 0.8);
+    
+            ul {
+                row-gap: 20px;
+            }
+    
+        }
+    
+        &Chat {
+
+            .time {
+                font-size: .875rem;
+                opacity: 0.6;
+            }
+
+        }
+    
+        &Toggle {
+            right: -40px;
+            width: 40px;
+            height: 40px;
+            padding: 10px;
+        }
+    
+    }
+
+    .ending {
+
+        &Container {
+            row-gap: 30px;
+            padding: 0 20px;
+        }
+    
+        &TitleWrap {
+            row-gap: 20px;
+    
+            >h1 {
+                font-size: 2.5rem;
+            }
+    
+            >p {
+                font-size: 1.125rem;
+            }
+    
+        }
+    
+        &Contents {
+            row-gap: 40px;
+    
+            ul {
+                row-gap: 30px;
+    
+                li {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    row-gap: 20px;
+
+                    figure {
+                        max-width: 100px;
+                    }
+    
+                    .nameWrap {
+                        align-items: center;
+                        row-gap: 10px;
+    
+                        .order {
+                            font-size: 1.125rem;
+                        }
+    
+                    }
+    
+                }
+    
+            }
+    
+            >button {
+                column-gap: 15px;
+                font-size: 1.25rem;
+    
+                img {
+                    width: 22px;
+                }
+    
+            }
+    
+        }
+    
+    }
+
+}

@@ -18,6 +18,7 @@ export type GameStepTypes =
   | "inPlaying"
   | "roundEnd"
   | "GAMEOVER"
+  | "resetGame"
 
 export type GameSettingTypes = "game" | "setting";
 export type InitDeckTypes = "shuffle" | "deal";
@@ -39,15 +40,12 @@ export type GameStatusTypes = {
   currentTurn: number;
   latestPlayer: string;
   resultRank: Array<PlayerTypes>;
-  // eventOccured: null | EventOccuredTypes
 };
+
+export type GameStoreKeyTypes = "players" | "deck" | "pile" | "gameStatus";
 
 export type GameActionsTypes = {
   view: () => void;
-  // setSettingStep: (
-  //   value: SettingStepTypes,
-  //   type?: "step" | "condition"
-  // ) => void;
   setGameStep: (value: GameStepTypes) => void;
   setShuffleDeck: () => void;
   setDealCard: (value: GameSettingTypes) => void;
@@ -72,8 +70,7 @@ export type GameActionsTypes = {
   setPlayerState: (playerId:string, gameState:PlayerGameStateTypes) => void;
   setPlayerHand: (playerId:string, hand:CardTypes[]) => void;
   setLayDownCard: (playerId: string, selectedCards: CardTypes[], drawNum: number) => void;
-  // setEventOccured: (currentEvent: null | EventOccuredTypes) => void;
-  // handleEventChk: () => Promise<void>;
+  resetGameStore: (execpt?: GameStoreKeyTypes[]) => void;
 };
 
 export type useGameStoreTypes = {
@@ -113,6 +110,7 @@ export type HumanActionsTypes = {
   setCardStatusJokerCombine: (value: number) => void;
   setLatestAction: (value: HumanLatestActionTypes) => void;
   setHumanActionTrigger: (value: (() => void) | null) => void;
+  resetHumanStore: () => void;
 };
 
 export type useHumanStoreTypes = {
@@ -130,6 +128,7 @@ export type LogTypes = {
 export type LogActionsTypes = {
   view: () => void;
   setLog: (logData:LogTypes) => void;
+  resetLogStore: () => void
 };
 
 export type useLogStoreTypes = {
@@ -144,7 +143,8 @@ export type SettingActionTypes = {
     value: SettingStepTypes,
     type?: "step" | "condition"
   ) => void;
-  setMode: (value:ModeTypes) => void
+  setMode: (value:ModeTypes) => void;
+  resetSettingStore: () => void;
 }
 
 export type useSettingStoreTypes = {

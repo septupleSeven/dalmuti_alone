@@ -18,6 +18,7 @@ import Hand from "./ui/Hand";
 import { AnimatePresence } from "framer-motion";
 import { useModalStore } from "../../store/modalStore";
 import TipModal from "./ui/tipModal";
+import Loading from "../../shared/ui/Loading";
 
 function App() {
   const { players, pile, gameStep } = useGameStore(
@@ -92,7 +93,7 @@ function App() {
       </div>
       {isReadyToPlaying && <Hand human={humanPlayer} />}
       {isBootingToReadyToSetting && <Log />}
-      {gameStep === "GAMEOVER" && <Ending />}
+      {(gameStep === "GAMEOVER" || gameStep === "resetGame") && <Ending />}
       <AnimatePresence>
         {isReadyToPlaying && eventModal ? (
           <EventModal key={"EVENTMODAL"} currentEvent={eventModal} />
@@ -100,6 +101,9 @@ function App() {
       </AnimatePresence>
       <AnimatePresence>
         {tipModalActive && <TipModal />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {gameStep === "resetGame" && <Loading key={"testttt"} />}
       </AnimatePresence>
     </Container>
   );

@@ -1,9 +1,14 @@
 import React from "react";
 import styles from "../styles/HomeStyles.module.scss";
-import { useGameStore } from "../../../store/gameStore";
+import { useGameStore, useGameStoreAction } from "../../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
 import { ENDING_TEXT } from "../../../config/contants";
 import { motion } from "framer-motion";
+import { useHumanStoreAction } from "../../../store/humanStore";
+import { useSettingStoreAction } from "../../../store/settingStore";
+import { useLogStoreAction } from "../../../store/logStore";
+import { setDelay } from "../../../features/utils";
+import Reset from "../../../assets/img/reset.svg";
 
 const Ending = () => {
   const { resultRank } = useGameStore(
@@ -11,6 +16,11 @@ const Ending = () => {
       resultRank: state.gameStatus.resultRank,
     }))
   );
+
+  const { resetGameStore, setGameStep } = useGameStoreAction();
+  const { resetHumanStore } = useHumanStoreAction();
+  const { resetLogStore } = useLogStoreAction();
+  const { resetSettingStore } = useSettingStoreAction();
   
   return (
     <motion.div 
@@ -49,6 +59,18 @@ const Ending = () => {
               </li>
           ))}
         </ul>
+        <button onClick={async () => {
+          resetGameStore(["gameStatus"]);
+          setGameStep("resetGame");
+          resetHumanStore();
+          resetLogStore();
+          resetSettingStore();
+          await setDelay(3000);
+          resetGameStore(["players", "deck", "pile"]);
+        }}>
+          <img src={Reset} alt="reset" />
+          다시하기
+        </button>
       </div>
     </motion.div>
   );

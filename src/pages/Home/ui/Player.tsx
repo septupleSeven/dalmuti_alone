@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { PlayerTypes } from "../../../features/types/featuresTypes";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -21,6 +21,8 @@ const Player = ({
   playerInfo: PlayerTypes;
   componentIdx: number;
 }) => {
+  const [radius, setRadius] = useState(320);
+
   const { settingStep, settingStepCondition } = useSettingStore(useShallow((state) => ({
     settingStep: state.settingStatus.settingStep,
     settingStepCondition: state.settingStatus.settingStepCondition
@@ -45,15 +47,32 @@ const Player = ({
       },
       getPosition: {
         opacity: 1,
-        x: calcCoordinate(order, PLAYER_NUM).x,
-        y: calcCoordinate(order, PLAYER_NUM).y,
+        x: calcCoordinate(order, PLAYER_NUM, radius).x,
+        y: calcCoordinate(order, PLAYER_NUM, radius).y,
       },
       exit: {
         opacity: 0,
       },
     }),
-    [order]
+    [order, radius]
   );
+
+  useEffect(() => {
+    const handleResize = () => {
+      if(window.innerWidth <= 768 && window.innerWidth > 540){
+        setRadius(window.innerWidth / 3);
+      }else if(window.innerWidth <= 540){
+        setRadius(window.innerWidth / 2.5);
+      }
+      
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    handleResize();
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <motion.div

@@ -1,0 +1,277 @@
+@media screen and (max-width: 768px) {
+
+    .eventModal {
+
+        &Container {
+            row-gap: 30px;
+            padding: 40px 20px;
+
+            .titleWrap {
+                row-gap: 30px;
+
+                .title {
+                    font-size: 2.5rem;
+                }
+
+                >p {
+                    font-size: 1.0625rem;
+                    line-height: 1.4;
+                }
+
+            }
+
+            .info {
+
+                button {
+                    font-size: 1.0625rem;
+                    padding: 8px 15px;
+                }
+
+            }
+
+        }
+
+    }
+
+    .tipModal {
+        background-color: rgba($color: #111, $alpha: 0.9);
+
+        &Container {
+            max-height: 70vh;
+            height: 100%;
+            flex-direction: column;
+            row-gap: 20px;
+
+            .slideContainer {
+                display: flex;
+                flex-direction: column-reverse;
+                row-gap: 40px;
+                height: 100%;
+                padding: 30px 20px;
+
+                .tipSlide{
+                    width: 100%;
+                }
+
+                .linkContainer {
+                    width: 100%;
+                    display: flex;
+                    justify-content: flex-end;
+                    padding: 0;
+                    box-sizing: border-box;
+
+                    a {
+                        font-size: 1.0625rem;
+                    }
+
+                }
+
+                .slideContents {
+                    display: flex;
+                    flex-direction: column-reverse;
+                    row-gap: 30px;
+                    height: 100%;
+
+                    .imgContainer {
+                        max-height: none;
+                        height: 60%;
+                        padding: 0;
+                        padding-right: 15px;
+
+                        figure {
+                            display: flex;
+                            flex-direction: column;
+                            row-gap: 10px;
+                            width: 100%;
+                        }
+
+                    }
+
+
+                    .desc {
+                        max-height: none;
+                        height: 40%;
+                        padding: 0;
+                        padding-top: 30px;
+                        padding-right: 15px;
+                        border-top: 1px solid rgba($color: #ffffff, $alpha: 0.4);
+                        row-gap: 20px;
+
+                        .title {
+                            font-size: 1.125rem;
+                        }
+
+                        .text {
+                            font-size: .9375rem;
+                            line-height: 1.4;
+                        }
+
+                    }
+
+                }
+
+            }
+
+            .utilContainer {
+                column-gap: 30px;
+
+                .navContainer {
+                    column-gap: 25px;
+
+                    .navBtn {
+                        padding: 0;
+
+                        img {
+                            width: 15px;
+                        }
+
+                    }
+
+                }
+
+                .pagingContainer {
+                    column-gap: 12px;
+
+                    span {
+                        width: 12px;
+                        height: 12px;
+                    }
+
+                }
+            }
+
+        }
+
+        .closeBtn {
+            top: 30px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+        }
+
+    }
+
+}
+
+@media screen and (max-width: 540px) {
+
+    .eventModal {
+
+        &Container {
+            row-gap: 20px;
+            padding: 40px 20px;
+
+            .titleWrap {
+                row-gap: 20px;
+
+                .title {
+                    font-size: 2rem;
+                }
+
+                >p {
+                    font-size: 1rem;
+                    line-height: 1.4;
+                }
+
+            }
+
+            .info {
+
+                button {
+                    font-size: 1.0625rem;
+                    padding: 8px 10px;
+                }
+
+            }
+
+        }
+
+    }
+
+    .tipModal {
+
+        &Container {
+            row-gap: 15px;
+
+            .slideContainer {
+
+                .linkContainer {
+
+                    a {
+                        font-size: 1.0625rem;
+                    }
+
+                }
+
+                .slideContents {
+                    row-gap: 30px;
+
+                    .imgContainer {
+                        padding-right: 10px;
+
+                        figure {
+                            row-gap: 5px;
+                        }
+
+                    }
+
+
+                    .desc {
+                        padding-top: 30px;
+                        padding-right: 10px;
+
+                        .title {
+                            font-size: 1.125rem;
+                        }
+
+                        .text {
+                            font-size: .9375rem;
+                            line-height: 1.4;
+                        }
+
+                    }
+
+                }
+
+            }
+
+            .utilContainer {
+                column-gap: 30px;
+
+                .navContainer {
+                    column-gap: 25px;
+
+                    .navBtn {
+                        padding: 0;
+
+                        img {
+                            width: 12px;
+                        }
+
+                    }
+
+                }
+
+                .pagingContainer {
+                    column-gap: 12px;
+
+                    span {
+                        width: 12px;
+                        height: 12px;
+                    }
+
+                }
+            }
+
+        }
+
+        .closeBtn {
+            top: 30px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+        }
+
+    }
+
+}

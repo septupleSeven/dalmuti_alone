@@ -22,6 +22,13 @@ export const useSettingStore = create<useSettingStoreTypes>()(
         set((state) => {
           state.settingStatus.mode = value;
         }),
+      resetSettingStore: () => set((state) => {
+        state.settingStatus = {
+          settingStep: "booting",
+          settingStepCondition: "booting",
+          mode: "short",
+        }
+      })
     },
   }))
 );

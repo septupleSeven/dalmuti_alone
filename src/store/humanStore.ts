@@ -47,6 +47,18 @@ export const useHumanStore = create<useHumanStoreTypes>()(
         set((state) => {
           state.actionTrigger = value;
         }),
+      resetHumanStore: () =>
+        set((state) => {
+          state.cardStatus = {
+            rank: "",
+            value: 0,
+            cards: [],
+            selected: 0,
+            jokerPicked: [],
+          };
+          state.actionTrigger = null;
+          state.latestAction = "waiting";
+        }),
     },
   }))
 );

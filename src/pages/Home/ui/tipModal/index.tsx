@@ -80,6 +80,7 @@ const TipModal = () => {
             onSwiper={(swiper: SwiperClass) => {
               swiperRef.current = swiper;
             }}
+            className={styles.tipSlide}
           >
             {TIP_MODAL_CONTENTS.map((contents, idx) => (
               <SwiperSlide key={`TIPSLIDE-${contents.id}`}>

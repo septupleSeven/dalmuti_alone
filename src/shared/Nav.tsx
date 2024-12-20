@@ -6,7 +6,7 @@ import { useGameStore, useGameStoreAction } from "../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
 import { useLogStoreAction } from "../store/logStore";
 import { setLogData } from "../features/setting";
-import { HUMAN_ID, MODE_TEXT } from "../config/contants";
+import { HUMAN_ID } from "../config/contants";
 import { useSettingStore, useSettingStoreAction } from "../store/settingStore";
 import ModeSelector from "./ui/ModeSelector";
 import { useModalStoreAction } from "../store/modalStore";
@@ -38,6 +38,7 @@ const Nav = () => {
   const [startBtnCliked, setStartBtnCliked] = useState(true);
   const [firstInitGame, setFirstInitGame] = useState(false);
   const headerMotionControls = useAnimationControls();
+  const [headerHeight, setHeaderHeight] = useState(80);
 
   const isBootingToReadyToSetting = useMemo(
     () => isStepCondition(settingStep, "bootingToReadyToSetting"),
@@ -73,7 +74,7 @@ const Nav = () => {
       backgroundColor: "rgba(0, 0, 0, 0.8)",
     },
     headerAnimate: {
-      height: 80,
+      height: headerHeight,
       backgroundColor: "rgba(0, 0, 0, 0.4)",
       transition: {
         delay: isBootingToReadyToSetting ? 0 : 0.4,
@@ -128,10 +129,29 @@ const Nav = () => {
   };
 
   useEffect(() => {
-    if (settingStep === "playing") {
+    if (settingStep === "playing" && (gameStep !== "GAMEOVER" && gameStep !== "resetGame")) {
       runTaxCollect();
     }
-  }, [settingStep, runTaxCollect]);
+
+    if(gameStep === "resetGame") {
+      headerMotionControls.start("headerInit");
+    }
+
+    const handleResize = () => {
+      if (window.innerWidth <= 540) {
+        setHeaderHeight(65);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    handleResize();
+    
+    return () => window.removeEventListener("resize", handleResize);
+  }, [settingStep, 
+    gameStep, 
+    headerMotionControls, 
+    runTaxCollect]);
 
   return (
     <motion.header
@@ -224,6 +244,7 @@ const Nav = () => {
               onClick={() => {
                 if (gameStep === "roundEnd") {
                   setGameOrder("setting");
+                  console.log("애미")
                   settleRound();
                 }
               }}
