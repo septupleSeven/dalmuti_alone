@@ -1,4 +1,4 @@
-![dala_git001](https://github.com/user-attachments/assets/be2fb67e-23aa-4de5-bb0e-6cd56a40d0cf)# 나홀로 달무티
+# 나홀로 달무티
 <p align="center">
     <img src=".readme/preview.jpg" />
 </p>
@@ -55,4 +55,29 @@ npm start
 - 일반 게임 : 기존 룰 그대로 진행합니다. 승리한 플레이어가 나올 시 게임은 종료됩니다.
 - 풀 게임 : 기존 룰 그대로 진행합니다. 마지막 한 명의 플레이어가 남을 때까지 진행합니다. 게임이 상당히 길게 진행됩니다.
 <br/>
+
 ### 플레이 방법
+![dala_git002](https://github.com/user-attachments/assets/476c142c-dd4f-447b-acee-98aaceb3e4e3)
+<br/>
+내부의 플레이 방법 모달을 활성화하여 플레이 가이드를 볼 수 있습니다. 모달 내부의 영상 자료 링크도 포함되어 있습니다.
+<br/>
+
+### 플레이
+![dala_git003](https://github.com/user-attachments/assets/9a830305-93fa-455b-93fd-f1bc77f1a03c)
+<br/>
+달무티의 기본 룰, 조커 등을 혼자서 즐길 수 있습니다.
+
+### 반응형
+![dala_mo001](https://github.com/user-attachments/assets/db616812-c7d9-45be-82fb-87c08fd5d0ac)
+<br/>
+반응형 레이아웃이 적용되어 있습니다. 원활한 진핸은 데스크탑 환경에서 진행하는 것을 권장드립니다.
+<br/>
+<br/>
+
+## 자료 참조
+- 영상 자료 참조
+  - [코리아보드게임즈](https://www.youtube.com/watch?v=sO-vxnoL31A)
+- 이미지 생성
+  - [Canva](https://www.canva.com/ko_kr/)
+<br />
+본 사이트는 상업적 목적으로 제작된 사이트가 아닙니다.
