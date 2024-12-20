@@ -129,7 +129,7 @@ const Nav = () => {
   };
 
   useEffect(() => {
-    if (settingStep === "playing" && (gameStep !== "GAMEOVER" && gameStep !== "roundEnd" && gameStep !== "resetGame")) {
+    if (settingStep === "playing" && (gameStep !== "collectingTax" && gameStep !== "GAMEOVER" && gameStep !== "roundEnd" && gameStep !== "resetGame")) {
       runTaxCollect();
     }
 
