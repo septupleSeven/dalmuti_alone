@@ -11,7 +11,6 @@ import { HUMAN_ID } from "../../config/contants";
 import Ending from "./ui/Ending";
 import {
   useSettingStore,
-  useSettingStoreAction,
 } from "../../store/settingStore";
 import EventModal from "./ui/EventModal";
 import Hand from "./ui/Hand";
@@ -31,7 +30,7 @@ function App() {
   const { view, setDealCard, setSortPlayer, setInitializeDeck } =
     useGameStoreAction();
 
-  view();
+  // view();
 
   const { settingStep } = useSettingStore(
     useShallow((state) => ({
@@ -41,7 +40,7 @@ function App() {
   );
 
   const { eventModal, tipModalActive } = useModalStore(
-    useShallow(state => ({
+    useShallow((state) => ({
       eventModal: state.eventModal,
       tipModalActive: state.tipModal.isActive,
     }))
@@ -99,9 +98,7 @@ function App() {
           <EventModal key={"EVENTMODAL"} currentEvent={eventModal} />
         ) : null}
       </AnimatePresence>
-      <AnimatePresence>
-        {tipModalActive && <TipModal />}
-      </AnimatePresence>
+      <AnimatePresence>{tipModalActive && <TipModal />}</AnimatePresence>
       <AnimatePresence>
         {gameStep === "resetGame" && <Loading key={"testttt"} />}
       </AnimatePresence>
