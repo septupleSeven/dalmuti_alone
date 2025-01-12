@@ -9,9 +9,7 @@ import { useGameStore, useGameStoreAction } from "../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
 import { HUMAN_ID } from "../../config/contants";
 import Ending from "./ui/Ending";
-import {
-  useSettingStore,
-} from "../../store/settingStore";
+import { useSettingStore } from "../../store/settingStore";
 import EventModal from "./ui/EventModal";
 import Hand from "./ui/Hand";
 import { AnimatePresence } from "framer-motion";
@@ -100,7 +98,7 @@ function App() {
       </AnimatePresence>
       <AnimatePresence>{tipModalActive && <TipModal />}</AnimatePresence>
       <AnimatePresence>
-        {gameStep === "resetGame" && <Loading key={"testttt"} />}
+        {gameStep === "resetGame" && <Loading key={"loadingComp"} />}
       </AnimatePresence>
     </Container>
   );

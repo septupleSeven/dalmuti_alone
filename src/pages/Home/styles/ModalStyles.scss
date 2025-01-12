@@ -150,15 +150,21 @@
                     padding: 40px 0;
                     padding-right: 15px;
 
-                    figure {
+                    .imgContents{
                         display: flex;
                         flex-direction: column;
                         row-gap: 10px;
                         width: 100%;
 
-                        img {
-                            width: 100%;
+                        figure {
                             height: auto;
+
+                            img {
+                                width: 100%;
+                                height: auto;
+                                object-fit: contain;
+                            }
+    
                         }
 
                     }

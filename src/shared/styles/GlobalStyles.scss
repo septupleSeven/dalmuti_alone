@@ -15,16 +15,21 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background-image: url(../../assets/img/bg.jpg);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+    // background-image: url(../../assets/img/bg.jpg);
+    // background-size: cover;
+    // background-repeat: no-repeat;
+    // background-position: center;
     font-family: $font;
     font-size: 16px;
     color: #111;
 
     button {
         cursor: pointer;
+
+        &:focus {
+            outline-color: #4caf50;
+        }
+
     }
 
 }
@@ -415,4 +420,28 @@ body {
     100% {
         transform: rotate(360deg)
     }
+}
+
+.lazyImg {
+
+    &Container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    &Placeholder {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &Contents{
+        width: 100%;
+        height: 100%;
+        object-fit: cover; 
+    }
+
 }

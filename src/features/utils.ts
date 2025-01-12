@@ -172,3 +172,12 @@ export const jokerGroup = (players: PlayerTypes[]) => {
   );
   return joker ? joker : null;
 };
+
+export const loadImage = async (src: string) => {
+  return new Promise<void>((resolve, reject) => {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error(`Image load Fail : ${src}`));
+  });
+};

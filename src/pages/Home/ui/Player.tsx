@@ -16,6 +16,8 @@ import {
   useSettingStore,
   useSettingStoreAction,
 } from "../../../store/settingStore";
+import LazyImage from "../../../shared/ui/LazyImage";
+import playerPlaceholder from "../../../assets/img/players/player_placeholder.jpg";
 
 const Player = ({
   playerInfo,
@@ -88,10 +90,11 @@ const Player = ({
       }
 
       if (window.innerHeight <= 768 && window.innerHeight > 540) {
-        setRadius(window.innerWidth / 4);
+        setRadius(window.innerWidth / 3);
         setIsRes(false);
       } else if (window.innerHeight <= 540) {
-        setRadius(window.innerHeight / 3.5);
+        const calcedHei = window.innerHeight <= 310 ? 310 : window.innerHeight;
+        setRadius(calcedHei / 3.5);
         setIsRes(true);
 
         if (!order) {
@@ -179,7 +182,7 @@ const Player = ({
       >
         <AnimatePresence>
           {settingStep === "playing" && (
-            <motion.figure
+            <motion.div
               initial={{
                 clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)",
               }}
@@ -191,11 +194,16 @@ const Player = ({
                 },
               }}
             >
-              <img
+              {/* <img
                 src={require(`../../../assets/img/players/order${playerInfo.order}.jpg`)}
                 alt="Player"
+              /> */}
+              <LazyImage
+                src={require(`../../../assets/img/players/order${playerInfo.order}.jpg`)}
+                placeholder={playerPlaceholder}
+                alt="Player"
               />
-            </motion.figure>
+            </motion.div>
           )}
         </AnimatePresence>
       </motion.div>

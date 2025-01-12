@@ -33,16 +33,20 @@ const Log = () => {
     }
 
     const handleResize = () => {
-      if(window.innerWidth <= 768 && isOpen){
+      if (window.innerWidth <= 768 && isOpen) {
+        toggleOpen();
+      }
+
+      if (window.innerHeight <= 540 && isOpen) {
         toggleOpen();
       }
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     handleResize();
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [log, toggleOpen]);
 
   return (

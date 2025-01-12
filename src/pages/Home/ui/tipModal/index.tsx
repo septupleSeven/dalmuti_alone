@@ -8,6 +8,8 @@ import ChevronLeft from "../../../../assets/img/slide__prev.svg";
 import BtnClose from "../../../../assets/img/btn__close.svg";
 import { motion } from "framer-motion";
 import { useModalStoreAction } from "../../../../store/modalStore";
+import LazyImage from "../../../../shared/ui/LazyImage";
+import TipsPlaceholder from "../../../../assets/img/tips/tips_placeholder.jpg";
 
 const TipModal = () => {
   const navPrevRef = useRef(null);
@@ -96,15 +98,16 @@ const TipModal = () => {
                     </div>
                   </div>
                   <div className={styles.imgContainer}>
-                    <figure>
+                    <div className={styles.imgContents}>
                       {contents.src.map((img, imgIdx) => (
-                        <img
+                        <LazyImage
                           key={`${contents.id}IMG-${imgIdx}`}
                           src={require(`../../../../assets/img/tips/${img}`)}
+                          placeholder={TipsPlaceholder}
                           alt="tip"
                         />
                       ))}
-                    </figure>
+                    </div>
                   </div>
                 </div>
               </SwiperSlide>

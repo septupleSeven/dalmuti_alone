@@ -46,6 +46,10 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
       if (window.innerWidth <= 768 && isOpen) {
         toggleOpen();
       }
+
+      if (window.innerHeight <= 540 && isOpen) {
+        toggleOpen();
+      }
     };
 
     window.addEventListener("resize", handleResize);
@@ -116,6 +120,7 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
                   group={el}
                   selected={isSelected === el.cards[0].value ? true : false}
                   onSelect={(val: number) => setIsSelected(val)}
+                  activeFocus={isOpen ? 0 : -1}
                 />
               ))}
           </div>

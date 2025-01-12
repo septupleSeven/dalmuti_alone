@@ -5,7 +5,10 @@ import { useGameStore } from "../../../../store/gameStore";
 import { runHumanActionTrigger } from "../../../../features/playing";
 import { useShallow } from "zustand/react/shallow";
 import { useHandDispenserStoreAction } from "../../../../store/handStore";
-import { useHumanStore, useHumanStoreAction } from "../../../../store/humanStore";
+import {
+  useHumanStore,
+  useHumanStoreAction,
+} from "../../../../store/humanStore";
 import { CARD_NAME_TABLE } from "../../../../config/contants";
 
 const HandCardDispenser = ({
@@ -162,7 +165,7 @@ const HandCardDispenser = ({
                       return false;
                     }
                   }
-                  
+
                   if (gameStep === "inPlaying") {
                     chkBtn();
                     setLatestAction("layDown");

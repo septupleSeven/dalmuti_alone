@@ -12,10 +12,12 @@ const HandCardGroup = ({
   group,
   selected,
   onSelect,
+  activeFocus = 0,
 }: {
   group: HandGroupTypes;
   selected: boolean;
   onSelect: (val: number) => void;
+  activeFocus: number;
 }) => {
   const { setDispenserOpen } = useHandDispenserStoreAction();
 
@@ -45,7 +47,12 @@ const HandCardGroup = ({
       <p className={styles.cardRank}>
         <span>등급 :</span> &nbsp; {cards[0].value}
       </p>
-      <Card cardVal={cards[0].value} size={"hand"} button={true} />
+      <Card
+        cardVal={cards[0].value}
+        size={"hand"}
+        button={true}
+        activeFocus={activeFocus}
+      />
       <p className={styles.cardAmount}>
         <span>보유 :</span> &nbsp; {cards.length}
       </p>
