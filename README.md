@@ -69,8 +69,10 @@ npm start
 
 ### 반응형
 ![dala_mo001](https://github.com/user-attachments/assets/db616812-c7d9-45be-82fb-87c08fd5d0ac)
+![dala_mo002](https://github.com/user-attachments/assets/c952526b-9fe6-4fe5-a619-eafcfb45edc5)
+
 <br/>
-반응형 레이아웃이 적용되어 있습니다. 원활한 진핸은 데스크탑 환경에서 진행하는 것을 권장드립니다.
+반응형 레이아웃이 적용되어 있습니다. 원활한 진행은 데스크탑 환경에서 진행하는 것을 권장드립니다.
 <br/>
 <br/>
 
