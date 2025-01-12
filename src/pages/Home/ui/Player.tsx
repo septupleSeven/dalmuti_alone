@@ -12,7 +12,10 @@ import { useGameStoreAction } from "../../../store/gameStore";
 import { useShallow } from "zustand/react/shallow";
 import { setLogData } from "../../../features/setting";
 import { useLogStoreAction } from "../../../store/logStore";
-import { useSettingStore, useSettingStoreAction } from "../../../store/settingStore";
+import {
+  useSettingStore,
+  useSettingStoreAction,
+} from "../../../store/settingStore";
 
 const Player = ({
   playerInfo,
@@ -22,17 +25,24 @@ const Player = ({
   componentIdx: number;
 }) => {
   const [radius, setRadius] = useState(320);
+  const [isRes, setIsRes] = useState<boolean>(false);
+  const [resVals, setResVals] = useState<{
+    x?: number;
+    y?: number;
+  } | null>(null);
+  const [resClassName, setResClassName] = useState("");
 
-  const { settingStep, settingStepCondition } = useSettingStore(useShallow((state) => ({
-    settingStep: state.settingStatus.settingStep,
-    settingStepCondition: state.settingStatus.settingStepCondition
-  })));
+  const { settingStep, settingStepCondition } = useSettingStore(
+    useShallow((state) => ({
+      settingStep: state.settingStatus.settingStep,
+      settingStepCondition: state.settingStatus.settingStepCondition,
+    }))
+  );
   const { setSettingStep } = useSettingStoreAction();
 
   const { setDealCard } = useGameStoreAction();
-  
-  const { setLog } = useLogStoreAction();
 
+  const { setLog } = useLogStoreAction();
 
   const { order, className, hand, id, status } = playerInfo;
   const [isOrderCard, setIsOrderCard] = useState(true);
@@ -47,32 +57,72 @@ const Player = ({
       },
       getPosition: {
         opacity: 1,
-        x: calcCoordinate(order, PLAYER_NUM, radius).x,
-        y: calcCoordinate(order, PLAYER_NUM, radius).y,
+        x: calcCoordinate(
+          order,
+          PLAYER_NUM,
+          radius,
+          isRes,
+          isRes ? resVals : null
+        ).x,
+        y: calcCoordinate(
+          order,
+          PLAYER_NUM,
+          radius,
+          isRes,
+          isRes ? resVals : null
+        ).y,
       },
       exit: {
         opacity: 0,
       },
     }),
-    [order, radius]
+    [order, radius, isRes, resVals]
   );
 
   useEffect(() => {
     const handleResize = () => {
-      if(window.innerWidth <= 768 && window.innerWidth > 540){
+      if (window.innerWidth <= 768 && window.innerWidth > 540) {
         setRadius(window.innerWidth / 3);
-      }else if(window.innerWidth <= 540){
+      } else if (window.innerWidth <= 540) {
         setRadius(window.innerWidth / 2.5);
       }
-      
+
+      if (window.innerHeight <= 768 && window.innerHeight > 540) {
+        setRadius(window.innerWidth / 4);
+        setIsRes(false);
+      } else if (window.innerHeight <= 540) {
+        setRadius(window.innerHeight / 3.5);
+        setIsRes(true);
+
+        if (!order) {
+          setResVals({
+            x: 0,
+            y: 0,
+          });
+          setResClassName("right");
+        } else if (order && (order === 1 || order === 2)) {
+          setResVals({
+            x: 80,
+            y: 0,
+          });
+          setResClassName("right");
+        } else if (order && (order === 3 || order === 4)) {
+          setResVals({
+            x: -80,
+            y: 0,
+          });
+          setResClassName("resHeiLeft");
+          setResClassName("left");
+        }
+      }
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     handleResize();
 
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [order]);
 
   return (
     <motion.div
@@ -80,7 +130,11 @@ const Player = ({
       initial="init"
       animate="getPosition"
       exit="exit"
-      className={styles.playerContainer}
+      className={`${styles.playerContainer} ${
+        resClassName && resClassName === "right"
+          ? styles.resHeiRight
+          : styles.resHeiLeft
+      }`}
       transition={{
         duration: 1.2,
         delay: order / 20,

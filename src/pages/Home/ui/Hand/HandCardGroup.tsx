@@ -45,7 +45,7 @@ const HandCardGroup = ({
       <p className={styles.cardRank}>
         <span>등급 :</span> &nbsp; {cards[0].value}
       </p>
-      <Card cardVal={cards[0].value} size={"hand"} />
+      <Card cardVal={cards[0].value} size={"hand"} button={true} />
       <p className={styles.cardAmount}>
         <span>보유 :</span> &nbsp; {cards.length}
       </p>

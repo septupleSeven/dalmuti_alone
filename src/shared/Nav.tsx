@@ -39,6 +39,7 @@ const Nav = () => {
   const [firstInitGame, setFirstInitGame] = useState(false);
   const headerMotionControls = useAnimationControls();
   const [headerHeight, setHeaderHeight] = useState(80);
+  const [isHeiRes, setIsHeiRes] = useState(false);
 
   const isBootingToReadyToSetting = useMemo(
     () => isStepCondition(settingStep, "bootingToReadyToSetting"),
@@ -68,21 +69,24 @@ const Nav = () => {
     setLog,
   ]);
 
-  const headerMotionVariants = {
-    headerInit: {
-      height: "100%",
-      backgroundColor: "rgba(0, 0, 0, 0.8)",
-    },
-    headerAnimate: {
-      height: headerHeight,
-      backgroundColor: "rgba(0, 0, 0, 0.4)",
-      transition: {
-        delay: isBootingToReadyToSetting ? 0 : 0.4,
-        duration: isBootingToReadyToSetting ? 0.4 : 1.6,
-        ease: "circOut",
+  const headerMotionVariants = useMemo(
+    () => ({
+      headerInit: {
+        height: "100%",
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
       },
-    },
-  };
+      headerAnimate: {
+        height: headerHeight,
+        backgroundColor: isHeiRes ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.4)",
+        transition: {
+          delay: isBootingToReadyToSetting ? 0 : 0.4,
+          duration: isBootingToReadyToSetting ? 0.4 : 1.6,
+          ease: "circOut",
+        },
+      },
+    }),
+    [headerHeight, isBootingToReadyToSetting, isHeiRes]
+  );
 
   const bootingScreenVariants = {
     titleInit: {
@@ -129,11 +133,16 @@ const Nav = () => {
   };
 
   useEffect(() => {
-    if (settingStep === "playing" && (gameStep !== "GAMEOVER" && gameStep !== "roundEnd" && gameStep !== "resetGame")) {
+    if (
+      settingStep === "playing" &&
+      gameStep !== "GAMEOVER" &&
+      gameStep !== "roundEnd" &&
+      gameStep !== "resetGame"
+    ) {
       runTaxCollect();
     }
 
-    if(gameStep === "resetGame") {
+    if (gameStep === "resetGame") {
       headerMotionControls.start("headerInit");
     }
 
@@ -141,17 +150,21 @@ const Nav = () => {
       if (window.innerWidth <= 540) {
         setHeaderHeight(65);
       }
+
+      if (window.innerHeight <= 540) {
+        setHeaderHeight(65);
+        setIsHeiRes(true);
+      } else {
+        setIsHeiRes(false);
+      }
     };
 
     window.addEventListener("resize", handleResize);
 
     handleResize();
-    
+
     return () => window.removeEventListener("resize", handleResize);
-  }, [settingStep, 
-    gameStep, 
-    headerMotionControls, 
-    runTaxCollect]);
+  }, [settingStep, gameStep, headerMotionControls, runTaxCollect]);
 
   return (
     <motion.header
@@ -185,6 +198,7 @@ const Nav = () => {
                         setSettingStep("selectMode");
                         setStartBtnCliked(false);
                       }}
+                      tabIndex={1}
                     >
                       시작하기
                     </motion.button>
@@ -194,16 +208,19 @@ const Nav = () => {
               {!startBtnCliked && <ModeSelector modeChk={modeChk} />}
             </div>
             <div className={styles.headerAnchorContainer}>
-              <motion.p
+              <motion.button
                 variants={bootingScreenVariants}
                 initial="menuInit"
                 animate="menuAnimate"
                 exit="menuExit"
                 className={styles.guideAnchor}
-                onClick={() => {setModalShow(true)}}
+                onClick={() => {
+                  setModalShow(true);
+                }}
+                tabIndex={0}
               >
                 게임 설명 보기
-              </motion.p>
+              </motion.button>
             </div>
           </>
         )}
@@ -244,7 +261,6 @@ const Nav = () => {
               onClick={() => {
                 if (gameStep === "roundEnd") {
                   setGameOrder("setting");
-                  console.log("애미")
                   settleRound();
                 }
               }}
@@ -257,7 +273,9 @@ const Nav = () => {
               initial="navBtnInit"
               animate="navBtnAnimate"
               exit="navBtnExit"
-              onClick={() => {setModalShow(true)}}
+              onClick={() => {
+                setModalShow(true);
+              }}
             >
               ?
             </motion.button>

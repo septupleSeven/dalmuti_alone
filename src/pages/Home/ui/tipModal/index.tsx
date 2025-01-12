@@ -7,9 +7,7 @@ import { TIP_MODAL_CONTENTS } from "../../../../config/contants";
 import ChevronLeft from "../../../../assets/img/slide__prev.svg";
 import BtnClose from "../../../../assets/img/btn__close.svg";
 import { motion } from "framer-motion";
-import {
-  useModalStoreAction,
-} from "../../../../store/modalStore";
+import { useModalStoreAction } from "../../../../store/modalStore";
 
 const TipModal = () => {
   const navPrevRef = useRef(null);
@@ -75,7 +73,7 @@ const TipModal = () => {
           </div>
           <Swiper
             modules={[Navigation, Pagination]}
-            spaceBetween={0}
+            spaceBetween={20}
             slidesPerView={1}
             onSwiper={(swiper: SwiperClass) => {
               swiperRef.current = swiper;

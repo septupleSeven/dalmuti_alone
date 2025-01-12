@@ -275,3 +275,123 @@
     }
 
 }
+
+@media screen and (max-height: 540px) {
+
+    .tipModal {
+
+        &Container {
+            max-height: 70vh;
+            height: 100%;
+            flex-direction: column;
+            row-gap: 20px;
+
+            .slideContainer {
+                display: flex;
+                flex-direction: column-reverse;
+                row-gap: 30px;
+                height: 100%;
+                padding: 30px 20px;
+
+                .tipSlide{
+                    width: 100%;
+                }
+
+                .linkContainer {
+                    width: 100%;
+                    display: flex;
+                    justify-content: flex-end;
+                    padding: 0;
+                    box-sizing: border-box;
+
+                    a {
+                        font-size: 1.0625rem;
+                    }
+
+                }
+
+                .slideContents {
+                    display: grid;
+                    row-gap: 30px;
+                    height: 100%;
+
+                    .imgContainer {
+                        max-height: none;
+                        height: 100%;
+                        padding: 0;
+                        padding-right: 15px;
+
+                        figure {
+                            display: flex;
+                            flex-direction: column;
+                            row-gap: 10px;
+                            width: 100%;
+                        }
+
+                    }
+
+
+                    .desc {
+                        max-height: none;
+                        height: 100%;
+                        padding: 0;
+                        padding-top: 0;
+                        padding-right: 15px;
+                        border-top: none;
+                        row-gap: 20px;
+
+                        .title {
+                            font-size: 1.125rem;
+                        }
+
+                        .text {
+                            font-size: .9375rem;
+                            line-height: 1.4;
+                        }
+
+                    }
+
+                }
+
+            }
+
+            .utilContainer {
+                column-gap: 30px;
+
+                .navContainer {
+                    column-gap: 25px;
+
+                    .navBtn {
+                        padding: 0;
+
+                        img {
+                            width: 10px;
+                        }
+
+                    }
+
+                }
+
+                .pagingContainer {
+                    column-gap: 12px;
+
+                    span {
+                        width: 10px;
+                        height: 10px;
+                    }
+
+                }
+            }
+
+        }
+
+        .closeBtn {
+            top: 10px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+        }
+
+    }
+
+}

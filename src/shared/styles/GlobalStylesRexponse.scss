@@ -50,7 +50,7 @@
         }
 
         &AnchorContainer {
-            bottom: 80px;
+            // bottom: 80px;
             row-gap: 25px;
 
             >.guideAnchor {
@@ -63,7 +63,7 @@
 
             }
 
-            >p {
+            >button {
                 font-size: .875rem;
             }
 
@@ -105,11 +105,14 @@
             }
 
             .contents {
-                padding: 20px;
 
-                >p {
-                    font-size: 1rem;
-                    line-height: 1.35;
+                .desc{
+                    padding: 20px;
+
+                    >p {
+                        font-size: 1rem;
+                        line-height: 1.35;
+                    }
                 }
 
             }
@@ -213,7 +216,7 @@
 
             }
 
-            >p {
+            >button {
                 font-size: .875rem;
             }
 
@@ -255,11 +258,147 @@
             }
 
             .contents {
-                padding: 20px;
+                align-items: center;
+
+                .desc{
+                    padding: 20px;
+
+                    >p {
+                        font-size: 1rem;
+                        line-height: 1.35;
+                    }
+                }
+
+            }
+
+        }
+
+    }
+
+}
+
+@media screen and (max-height: 540px) {
+
+    html,
+    body {
+        font-size: 14px;
+    }
+
+    .header {
+
+        &Node {
+            row-gap: 50px;
+        }
+
+        &TitleContainer {
+            width: 100%;
+            padding: 0 20px;
+            row-gap: 30px;
+
+            .title {
+                font-size: 3.125rem;
+                letter-spacing: 5px;
+            }
+
+        }
+
+        &MenuContainer {
+            max-width: 300px;
+            row-gap: 30px;
+
+            button {
+                padding: 10px 0;
+                max-width: 200px;
+                font-size: 1.125rem;
+            }
+
+        }
+
+        &NavBtn {
+
+            &Wrap {
+                column-gap: 10px;
+
+                button {
+                    font-size: .9375rem;
+                    padding: 5px 10px;
+
+                    &.tipBtn {
+                        width: 25px;
+                        height: 25px;
+                        font-size: 1.0625rem;
+                    }
+
+                }
+
+            }
+
+        }
+
+        &AnchorContainer {
+            bottom: 5vh;
+            left: 20px;
+            transform: translateX(0);
+            row-gap: 25px;
+
+            >.guideAnchor {
+                font-size: 1.125rem;
+
+                &::after {
+                    bottom: -10px;
+                    height: 2px;
+                }
+
+            }
+
+            >button {
+                font-size: .875rem;
+            }
+
+        }
+
+        &ModeContainer {
+            align-items: center;
+            row-gap: 30px;
+
+            .listContainer {
+                padding: 0;
+                row-gap: 15px;
 
                 >p {
-                    font-size: 1rem;
-                    line-height: 1.35;
+                    font-size: 1.125rem;
+                    opacity: 0.4;
+                    text-align: center;
+                }
+
+                >ul {
+                    align-items: center;
+                    row-gap: 10px;
+
+                    li {
+                        button {
+                            opacity: 1;
+                            font-size: 1.125rem;
+                            padding-bottom: 0;
+                        }
+
+                        &::after{
+                            display: none;
+                        }
+                    }
+                }
+
+            }
+
+            .contents {
+
+                .desc{
+                    padding: 20px;
+
+                    >p {
+                        font-size: 1rem;
+                        line-height: 1.35;
+                    }
                 }
 
             }

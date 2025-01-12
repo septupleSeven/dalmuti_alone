@@ -11,7 +11,7 @@ import {
 } from "../store/types/storeTypes";
 import { setLogData, sortHand, sortPlayer } from "./setting";
 import { CardTypes, PileTypes, PlayerTypes } from "./types/featuresTypes";
-import { copyDeck, copyPlayer, randomNumBetween, setDelay } from "./utils";
+import { copyPlayer, randomNumBetween, setDelay } from "./utils";
 
 export const isRevolution = (
   players: PlayerTypes[]
@@ -126,7 +126,7 @@ export const layDownCard = (
     let randomVal = randomNumBetween(2, 11);
     let randomCards = hand.filter((card) => card.value === randomVal);
 
-    if(!randomCards.length){
+    if (!randomCards.length) {
       randomCards = hand.slice(-1);
     }
 
@@ -262,7 +262,7 @@ export const playerLayDownCard = (
     setTurn,
     setPlayerState,
     setLatestPlayer,
-    setLayDownCard
+    setLayDownCard,
   } = actions;
 
   const humanPlayer = players.find((player) => player.id === HUMAN_ID)!;
@@ -398,7 +398,7 @@ export const performTaxCollect = async (
 
   if (isRevolution === "continue") {
     actionSwapCard(players, setPlayers);
-  }else if(isRevolution === "revolution") {
+  } else if (isRevolution === "revolution") {
     setEventOccured("revolution");
     await handleEventChk();
   } else if (isRevolution === "gRevolution") {
@@ -426,25 +426,25 @@ export const runHumanActionTrigger = (
   }
 };
 
-export const setWinnerCondition = <T extends ("normal" | "final")>(
+export const setWinnerCondition = <T extends "normal" | "final">(
   mode: ModeTypes,
   currentLatestPlayer: PlayerTypes,
   type: T,
-  get?: T extends "final" ? (() => useGameStoreTypes) : undefined,
-):boolean => {
-
-  if(type === "normal"){
-    const conditionVal = mode === "short" ? 5 : 0
-    return currentLatestPlayer && currentLatestPlayer.hand.length <= conditionVal;
+  get?: T extends "final" ? () => useGameStoreTypes : undefined
+): boolean => {
+  if (type === "normal") {
+    const conditionVal = mode === "short" ? 5 : 0;
+    return (
+      currentLatestPlayer && currentLatestPlayer.hand.length <= conditionVal
+    );
   }
 
-  if(type === "final"){
-    if(get){
-      const conditionVal = mode !== "full" ? true : get().players.length === 1
+  if (type === "final") {
+    if (get) {
+      const conditionVal = mode !== "full" ? true : get().players.length === 1;
       return conditionVal;
     }
   }
 
-  return false
-
-}
+  return false;
+};

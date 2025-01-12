@@ -14,6 +14,11 @@ import { useShallow } from "zustand/react/shallow";
 
 const Pile = ({ pile }: { pile: PileTypes }) => {
   const [radius, setRadius] = useState(320);
+  const [isRes, setIsRes] = useState<boolean>(false);
+  const [resVals, setResVals] = useState<{
+    x?: number;
+    y?: number;
+  } | null>(null);
 
   const { players, latestPlayer } = useGameStore(
     useShallow((state) => ({
@@ -31,8 +36,20 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
         opacity: 0,
         rotate: 180,
         scale: 0.2,
-        x: calcCoordinate(xVal, PLAYER_NUM, radius).x,
-        y: calcCoordinate(yVal, PLAYER_NUM, radius).y,
+        x: calcCoordinate(
+          xVal,
+          PLAYER_NUM,
+          radius,
+          isRes,
+          isRes ? resVals : null
+        ).x,
+        y: calcCoordinate(
+          yVal,
+          PLAYER_NUM,
+          radius,
+          isRes,
+          isRes ? resVals : null
+        ).y,
       },
       getCenter: {
         opacity: 1,
@@ -46,7 +63,7 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
         y: 30,
       },
     };
-  }, [players, latestPlayer]);
+  }, [players, latestPlayer, radius, isRes, resVals]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -55,6 +72,32 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
       } else if (window.innerWidth <= 540) {
         setRadius(window.innerWidth / 2.5);
       }
+
+      if (window.innerHeight <= 768 && window.innerHeight > 540) {
+        setRadius(window.innerWidth / 4);
+        setIsRes(false);
+      } else if (window.innerHeight <= 540) {
+        setRadius(window.innerHeight / 3.5);
+        const order = getCurrentLeaderOrder(players, latestPlayer);
+        setIsRes(true);
+
+        if (!order) {
+          setResVals({
+            x: 0,
+            y: 0,
+          });
+        } else if (order && (order === 1 || order === 2)) {
+          setResVals({
+            x: 80,
+            y: 0,
+          });
+        } else if (order && (order === 3 || order === 4)) {
+          setResVals({
+            x: -80,
+            y: 0,
+          });
+        }
+      }
     };
 
     window.addEventListener("resize", handleResize);
@@ -62,7 +105,7 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
     handleResize();
 
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [players, latestPlayer]);
 
   return (
     <motion.div

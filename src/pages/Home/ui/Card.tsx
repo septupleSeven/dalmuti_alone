@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo } from "react";
 import styles from "../styles/HomeStyles.module.scss";
 
 const Card = memo(
@@ -13,7 +13,20 @@ const Card = memo(
   }) => {
     const isBtnClass = button ? `${styles[`cardNode--btn`]}` : ``;
 
-    return (
+    return button ? (
+      <button
+        className={`${styles.cardNode} ${isBtnClass} ${
+          styles[`cardSize--${size}`]
+        }`}
+      >
+        <figure>
+          <img
+            src={require(`../../../assets/img/cards/rank${cardVal}.jpg`)}
+            alt="Card"
+          />
+        </figure>
+      </button>
+    ) : (
       <div
         className={`${styles.cardNode} ${isBtnClass} ${
           styles[`cardSize--${size}`]
@@ -30,4 +43,4 @@ const Card = memo(
   }
 );
 
-export default Card
+export default Card;

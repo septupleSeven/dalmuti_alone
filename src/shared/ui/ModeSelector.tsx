@@ -122,7 +122,14 @@ const ModeSelector = ({ modeChk }: { modeChk: () => Promise<void> }) => {
         </ul>
       </div>
       <div className={styles.contents}>
-        <p>{modeHover === "" ? "" : MODE_TEXT[modeHover]}</p>
+        <div className={styles.desc}>
+          <p>{modeHover === "" ? "" : MODE_TEXT[modeHover]}</p>
+        </div>
+        {isTouchDevice && (canClick.full || canClick.long || canClick.short) ? (
+          <p className={styles.tooltip}>
+            선택한 모드를 한번 더 선택 시 모드가 선택됩니다.
+          </p>
+        ) : null}
       </div>
     </motion.div>
   );

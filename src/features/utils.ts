@@ -17,15 +17,28 @@ export const randomNumBetween = (
   return 1;
 };
 
-export const calcCoordinate = (
+export const calcCoordinate = <T extends boolean>(
   value: number,
   length: number,
-  radius: number = 320
+  radius: number = 320,
+  isRes?: T,
+  resCalc?: T extends true
+    ? {
+        x?: number;
+        y?: number;
+      }
+    : null
 ) => {
-  const getRadians = (value / length) * (Math.PI * 2)  - Math.PI / 2;
+  const getRadians = (value / length) * (Math.PI * 2) - Math.PI / 2;
 
-  const y = Math.sin(getRadians) * radius;
-  const x = Math.cos(getRadians) * radius;
+  let resConfig = {} as Record<string, number>;
+
+  if (isRes && resCalc) {
+    resConfig = { ...resCalc };
+  }
+
+  const y = Math.sin(getRadians) * radius + (resConfig.y ? resConfig.y : 0);
+  const x = Math.cos(getRadians) * radius + (resConfig.x ? resConfig.x : 0);
 
   return { x, y };
 };
@@ -90,7 +103,10 @@ export const isStepCondition = (
 
   switch (type) {
     case "bootingToReadyToSetting": {
-      condition = settingStep !== "booting" && settingStep !== "selectMode" && settingStep !== "readyToSetting";
+      condition =
+        settingStep !== "booting" &&
+        settingStep !== "selectMode" &&
+        settingStep !== "readyToSetting";
       break;
     }
     case "readyToPlaying": {
@@ -111,9 +127,7 @@ export const findPlayerWithId = (players: PlayerTypes[], playerId: string) => {
   return searchedPlayer;
 };
 
-export const getCurrentLeader = (
-  players: PlayerTypes[]
-) => {
+export const getCurrentLeader = (players: PlayerTypes[]) => {
   const currentLeader = players.find((player) => player.status.isLeader);
 
   return currentLeader;
@@ -142,20 +156,16 @@ export const isHumanTurn = (players: PlayerTypes[]) => {
   return humanPlayer?.status.gameState === "inAction";
 };
 
-export const setDelay = (ms:number) => {
+export const setDelay = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
+};
 
-export const hasJoker = (
-  players:PlayerTypes[]
-) => {
+export const hasJoker = (players: PlayerTypes[]) => {
   const humanPlayer = players.find((player) => player.id === HUMAN_ID);
   return humanPlayer?.hand.some((card) => card.value === 13);
 };
 
-export const jokerGroup = (
-  players:PlayerTypes[]
-) => {
+export const jokerGroup = (players: PlayerTypes[]) => {
   const humanPlayer = findPlayerWithId(players, HUMAN_ID)!;
   const joker = getRankGroup(humanPlayer.hand).find(
     (group) => group.rank === "JOKER"

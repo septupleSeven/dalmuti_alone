@@ -1,4 +1,4 @@
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 768px), screen and (max-height: 768px) {
 
     .player {
     
@@ -247,7 +247,114 @@
 
 }
 
-@media screen and (max-width: 540px) {
+@media screen and (max-height: 768px) {
+
+    .hand {
+    
+        &Container {
+            padding: 30px 20px;
+            row-gap: 30px;
+        }
+    
+        &TitleWrap {
+    
+            h1 {
+                font-size: 1.25rem;
+            }
+    
+            button {
+                font-size: 1rem;
+            }
+    
+        }
+    
+        &Dispenser {
+    
+            &Contents {
+                padding: 30px 20px;
+                row-gap: 15px;
+            }
+    
+            &TitleWrap {
+    
+                >.title {
+                    font-size: 1.0625rem;
+                }
+    
+                >.amount {
+                    font-size: .9375rem;
+                }
+    
+            }
+    
+            &SubmitContainer {
+    
+                .textWrap {
+    
+                    >input[type="text"] {
+                        height: 35px;
+                        padding: 0 30px 0 10px;
+                        font-size: 1rem;
+                    }
+    
+                    >span {
+                        right: 10px;
+                    }
+    
+                }
+    
+            }
+    
+            &BtnContainer {
+                row-gap: 8px;
+    
+                button {
+                    font-size: .9375rem;
+                    padding: 5px 15px;
+                }
+    
+            }
+    
+            &BtnWrap {
+                column-gap: 8px;
+            }
+    
+            &JokerWrap {
+                column-gap: 10px;
+    
+                .inputContainer {
+    
+                    input {
+    
+                        &[type="checkbox"],
+                        &[type="radio"] {
+
+                            &+label {
+                                font-size: .9375rem;
+
+                                &::before {
+                                    width: 15px;
+                                    height: 15px;
+                                }
+    
+                            }
+    
+                        }
+    
+    
+                    }
+    
+                }
+
+            }
+    
+        }
+    
+    }
+
+}
+
+@media screen and (max-width: 540px), screen and (max-height: 540px)  {
 
     .player {
     
@@ -533,6 +640,226 @@
     
                 img {
                     width: 22px;
+                }
+    
+            }
+    
+        }
+    
+    }
+
+}
+
+@media screen and (max-height: 540px) {
+
+    .gameTable {
+
+        &Container {
+            max-height: none;
+            transform: translateY(0);
+        }
+
+    }
+
+    .player {
+
+        &Container {
+            
+            &.resHeiRight{
+
+                .playerGameInfo {
+                    transform: translateX(calc(100% + 10px)) translateY(50%);
+                    right: 0;
+                    bottom: auto;
+                    align-items: flex-start;
+            
+                    p {
+                        font-size: .8125rem;
+                        white-space: nowrap;
+                    }
+            
+                }
+
+                .playerClassName {
+                    top: auto;
+                    right: 0;
+                    transform: translateX(calc(100% + 10px)) translateY(calc(-50% - 10px)) !important;
+                    text-align: start;
+                }
+
+            }
+
+            &.resHeiLeft{
+
+                .playerGameInfo {
+                    transform: translateX(calc(-100% - 10px)) translateY(50%);
+                    left: 0;
+                    bottom: auto;
+                    align-items: flex-end;
+            
+                    p {
+                        font-size: .8125rem;
+                        white-space: nowrap;
+                    }
+            
+                }
+
+                .playerClassName {
+                    top: auto;
+                    left: 0;
+                    transform: translateX(calc(-100% - 10px)) translateY(calc(-50% - 10px)) !important;
+                    text-align: end;
+                }
+
+            }
+
+        }
+    
+        &ClassName {
+            font-size: .9375rem;
+        }
+    
+    }
+
+    .pile {
+
+        &Node {
+            margin-top: 25vh;
+        }
+    
+    }
+
+    .hand {
+    
+        &Container {
+            width: 280px;
+            padding: 20px;
+            row-gap: 30px;
+        }
+    
+        &TitleWrap {
+    
+            h1 {
+                font-size: 1.25rem;
+            }
+    
+            button {
+                font-size: 1rem;
+            }
+    
+        }
+    
+        &Dispenser {
+    
+            &Contents {
+                padding: 20px;
+                row-gap: 15px;
+            }
+    
+            &TitleWrap {
+    
+                >.title {
+                    font-size: 1.0625rem;
+                }
+    
+                >.amount {
+                    font-size: .9375rem;
+                }
+    
+            }
+    
+            &SubmitContainer {
+    
+                .textWrap {
+    
+                    >input[type="text"] {
+                        height: 30px;
+                    }
+    
+                }
+    
+            }
+    
+            &BtnContainer {
+    
+                button {
+                    padding: 5px 15px;
+                }
+    
+            }
+    
+            &BtnWrap {
+                column-gap: 5px;
+            }
+    
+            &JokerWrap {
+                column-gap: 10px;
+    
+                .inputContainer {
+    
+                    input {
+    
+                        &[type="checkbox"],
+                        &[type="radio"] {
+
+                            &+label {
+                                font-size: .9375rem;
+
+                                &::before {
+                                    width: 15px;
+                                    height: 15px;
+                                }
+    
+                            }
+    
+                        }
+    
+    
+                    }
+    
+                }
+
+            }
+    
+        }
+    
+    }
+
+    .ending {
+
+        &Container {
+            row-gap: 25px;
+        }
+    
+        &TitleWrap {
+    
+            >h1 {
+                font-size: 2.25rem;
+            }
+    
+            >p {
+                font-size: 1.0625rem;
+            }
+    
+        }
+    
+        &Contents {
+            row-gap: 30px;
+    
+            ul {
+    
+                li {
+                    flex-direction: row;
+                    align-items: center;
+
+                    figure {
+                        max-width: 80px;
+                    }
+    
+                    .nameWrap {
+                        align-items: flex-start;
+                    }
+    
                 }
     
             }
