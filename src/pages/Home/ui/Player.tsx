@@ -83,39 +83,46 @@ const Player = ({
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth <= 768 && window.innerWidth > 540) {
-        setRadius(window.innerWidth / 3);
-      } else if (window.innerWidth <= 540) {
-        setRadius(window.innerWidth / 2.5);
-      }
+      if (window.innerWidth > window.innerHeight) {
+        if (window.innerHeight <= 768 && window.innerHeight > 540) {
+          setRadius(window.innerHeight / 3);
+          setIsRes(false);
+        } else if (window.innerHeight <= 540) {
+          const calcedHei =
+            window.innerHeight <= 310 ? 310 : window.innerHeight;
+          setRadius(calcedHei / 3.5);
+          setIsRes(true);
 
-      if (window.innerHeight <= 768 && window.innerHeight > 540) {
-        setRadius(window.innerHeight / 3);
-        setIsRes(false);
-      } else if (window.innerHeight <= 540) {
-        const calcedHei = window.innerHeight <= 310 ? 310 : window.innerHeight;
-        setRadius(calcedHei / 3.5);
-        setIsRes(true);
-
-        if (!order) {
-          setResVals({
-            x: 0,
-            y: 0,
-          });
-          setResClassName("right");
-        } else if (order && (order === 1 || order === 2)) {
-          setResVals({
-            x: 80,
-            y: 0,
-          });
-          setResClassName("right");
-        } else if (order && (order === 3 || order === 4)) {
-          setResVals({
-            x: -80,
-            y: 0,
-          });
-          setResClassName("resHeiLeft");
-          setResClassName("left");
+          if (!order) {
+            setResVals({
+              x: 0,
+              y: 0,
+            });
+            setResClassName("right");
+          } else if (order && (order === 1 || order === 2)) {
+            setResVals({
+              x: 80,
+              y: 0,
+            });
+            setResClassName("right");
+          } else if (order && (order === 3 || order === 4)) {
+            setResVals({
+              x: -80,
+              y: 0,
+            });
+            setResClassName("resHeiLeft");
+            setResClassName("left");
+          }
+        } else {
+          setRadius(320);
+        }
+      } else {
+        if (window.innerWidth <= 768 && window.innerWidth > 540) {
+          setRadius(window.innerWidth / 3);
+        } else if (window.innerWidth <= 540) {
+          setRadius(window.innerWidth / 2.5);
+        } else {
+          setRadius(320);
         }
       }
     };
