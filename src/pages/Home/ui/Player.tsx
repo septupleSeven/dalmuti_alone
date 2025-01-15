@@ -90,7 +90,7 @@ const Player = ({
       }
 
       if (window.innerHeight <= 768 && window.innerHeight > 540) {
-        setRadius(window.innerWidth / 3);
+        setRadius(window.innerHeight / 3);
         setIsRes(false);
       } else if (window.innerHeight <= 540) {
         const calcedHei = window.innerHeight <= 310 ? 310 : window.innerHeight;

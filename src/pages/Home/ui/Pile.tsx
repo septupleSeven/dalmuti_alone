@@ -74,7 +74,7 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
       }
 
       if (window.innerHeight <= 768 && window.innerHeight > 540) {
-        setRadius(window.innerWidth / 4);
+        setRadius(window.innerHeight / 3);
         setIsRes(false);
       } else if (window.innerHeight <= 540) {
         setRadius(window.innerHeight / 3.5);
