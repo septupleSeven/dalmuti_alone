@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/dalmuti_alone/static/css/main.88c026ad.css",
-    "main.js": "/dalmuti_alone/static/js/main.6decf5af.js",
+    "main.js": "/dalmuti_alone/static/js/main.d246f599.js",
     "static/js/453.4af10311.chunk.js": "/dalmuti_alone/static/js/453.4af10311.chunk.js",
     "static/media/bg.jpg": "/dalmuti_alone/static/media/bg.39f54a27c2d3a090d0b4.jpg",
     "static/media/rank1.jpg": "/dalmuti_alone/static/media/rank1.7b296ac9bc4d71935943.jpg",
@@ -43,11 +43,11 @@
     "static/media/slide__prev.svg": "/dalmuti_alone/static/media/slide__prev.6aa1987c07afe05346572744fcc19b8c.svg",
     "static/media/btn__close.svg": "/dalmuti_alone/static/media/btn__close.c0df078d2c41aa672ab76717cb22c320.svg",
     "main.88c026ad.css.map": "/dalmuti_alone/static/css/main.88c026ad.css.map",
-    "main.6decf5af.js.map": "/dalmuti_alone/static/js/main.6decf5af.js.map",
+    "main.d246f599.js.map": "/dalmuti_alone/static/js/main.d246f599.js.map",
     "453.4af10311.chunk.js.map": "/dalmuti_alone/static/js/453.4af10311.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.88c026ad.css",
-    "static/js/main.6decf5af.js"
+    "static/js/main.d246f599.js"
   ]
 }
