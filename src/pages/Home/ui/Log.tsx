@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/HomeStyles.module.scss";
 import {
   AnimatePresence,
@@ -14,6 +14,7 @@ import LogClose from "../../../assets/img/logClose.svg";
 
 const Log = () => {
   const [isOpen, toggleOpen] = useCycle(true, false);
+  const [isInit, setIsInit] = useState(true);
 
   const { log } = useLogStore(
     useShallow((state) => ({
@@ -44,10 +45,13 @@ const Log = () => {
 
     window.addEventListener("resize", handleResize);
 
-    handleResize();
+    if (isInit) {
+      handleResize();
+      setIsInit(false);
+    }
 
     return () => window.removeEventListener("resize", handleResize);
-  }, [log, toggleOpen]);
+  }, [log, toggleOpen, isInit]);
 
   return (
     <motion.div

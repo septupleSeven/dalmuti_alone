@@ -21,6 +21,7 @@ import FistsIcon from "../../../../assets/img/fists__icon.png";
 
 const Hand = ({ human }: { human: PlayerTypes }) => {
   const [isOpen, toggleOpen] = useCycle(true, false);
+  const [isInit, setIsInit] = useState(true);
 
   const { isDispenserOpen } = useHandDispenserStore(
     useShallow((state) => ({
@@ -54,10 +55,13 @@ const Hand = ({ human }: { human: PlayerTypes }) => {
 
     window.addEventListener("resize", handleResize);
 
-    handleResize();
+    if (isInit) {
+      handleResize();
+      setIsInit(false);
+    }
 
     return () => window.removeEventListener("resize", handleResize);
-  }, [toggleOpen]);
+  }, [toggleOpen, isInit]);
 
   return (
     <motion.div
