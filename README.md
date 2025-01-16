@@ -19,7 +19,7 @@
 [https://septupleseven.github.io/dalmuti_alone/]: https://septupleseven.github.io/dalmuti_alone/
 <br/>
 
-### 관련 노션
+### 관련 상세 노션
 - [https://www.notion.so/13e675d69a9480af8388c895afa3019b?pvs=4][]
 
 [https://www.notion.so/13e675d69a9480af8388c895afa3019b?pvs=4]: https://www.notion.so/13e675d69a9480af8388c895afa3019b?pvs=4
