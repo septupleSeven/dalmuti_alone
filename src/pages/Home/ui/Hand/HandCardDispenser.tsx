@@ -117,6 +117,7 @@ const HandCardDispenser = ({
               onInput={(e) => onlyNumber(e)}
               disabled={isHumanTurn(players) && pile.length ? true : false}
               ref={inputRef}
+              inputMode="numeric"
             />
             <span>장</span>
           </div>
