@@ -124,6 +124,10 @@ const Player = ({
         } else {
           setRadius(320);
         }
+        setResVals({
+          x: 0,
+          y: 0,
+        });
       }
     };
 

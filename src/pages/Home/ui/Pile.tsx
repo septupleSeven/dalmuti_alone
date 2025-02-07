@@ -103,6 +103,10 @@ const Pile = ({ pile }: { pile: PileTypes }) => {
         } else {
           setRadius(320);
         }
+        setResVals({
+          x: 0,
+          y: 0,
+        });
       }
     };
 
